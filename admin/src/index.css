@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+* {
+  font-family: outfit;
+}
+
+@theme {
+  --color-primary: #5F6FFF;
+  --color-secondary: #FF5F5F;
+  --font-display: "Poppins", sans-serif;
+  --spacing-card: 2rem;
+}
+
+::-webkit-scrollbar{
+  @apply hidden
+}
+
