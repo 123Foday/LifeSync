@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { v2 as cloudinary } from 'cloudinary'
 import userModel from '../models/userModel.js'
 import doctorModel from '../models/doctorModel.js'
+import hospitalModel from '../models/hospitalModel.js'
 import appointmentModel from '../models/appointmentModel.js'
 
 // API to register user
@@ -130,11 +131,16 @@ const updateProfile = async (req, res) => {
 const bookAppointment = async (req, res) => {
   
   try {
-    
-    const { docId, slotDate, slotTime } = req.body
+
+    const { docId, hospitalId, sDate, slotDate, sTime, slotTime } = req.body
     const userId = req.userId
 
     const docData = await doctorModel.findById(docId).select('-password')
+    // doctor may not be associated with a hospital; guard against missing hospitalId
+    let hospitalData = {}
+    if (docData && docData.hospitalId) {
+      hospitalData = await hospitalModel.findById(docData.hospitalId).select('-password')
+    }
 
     if (!docData.available) {
       return res.json({success: false, message: "Doctor not available"})
@@ -143,7 +149,7 @@ const bookAppointment = async (req, res) => {
     let slots_booked = docData.slots_booked
 
     // Settings for slot availability
-    if (slots_booked[slotDate]) {
+    if (slots_booked[slotDate] ) {
       if (slots_booked[slotDate].includes(slotTime)) {
         return res.json({success: false, message: "Slot not available"})
       } else {
@@ -160,11 +166,15 @@ const bookAppointment = async (req, res) => {
     const appointmentData = {
       userId,
       docId,
+      hospitalId,
       userData,
       docData,
+      hospitalData,
       amount:docData.fees,
       slotTime,
+      sTime,
       slotDate,
+      sDate,
       date: Date.now()
     }
 

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
 import { AdminContext } from '../context/AdminContext'
 import { DoctorContext } from '../context/DoctorContext'
+import { HospitalContext } from '../context/HospitalContext'
 
 const Login = () => {
 
@@ -13,6 +14,7 @@ const Login = () => {
 
   const {setAToken, backendUrl} = useContext(AdminContext)
   const {setDToken} = useContext(DoctorContext)
+  const {setHToken} = useContext(HospitalContext)
   
   const onSubmitHandler = async (event) => {
     event.preventDefault()
@@ -29,6 +31,14 @@ const Login = () => {
           toast.error(data.message)
         }
         
+      } else if (state === 'Hospital') {
+        const {data} = await axios.post(backendUrl + '/api/hospital/login', {email, password})
+        if (data.success) {
+          localStorage.setItem('hToken', data.token)
+          setHToken(data.token);
+        } else {
+          toast.error(data.message)
+        }
       } else {
         const {data} = await axios.post(backendUrl + '/api/doctor/login', {email, password})
         if (data.success) {
@@ -41,7 +51,7 @@ const Login = () => {
       }
 
     } catch (error) {
-      
+      toast.error(error.message)
     }
   }
 
@@ -59,9 +69,22 @@ const Login = () => {
         </div>
         <button className='bg-primary text-white w-full py-2 rounded-md text-base cursor-pointer'>Login</button>
         {
-          state === 'Admin'
-          ? <p>Doctor Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Doctor')}>Click here</span></p>
-          : <p>Admin Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Admin')}>Click here</span></p>
+          state === 'Admin' ? (
+            <>
+              <p>Doctor Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Doctor')}>Click here</span></p>
+              <p>Hospital Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Hospital')}>Click here</span></p>
+            </>
+          ) : state === 'Doctor' ? (
+            <>
+              <p>Admin Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Admin')}>Click here</span></p>
+              <p>Hospital Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Hospital')}>Click here</span></p>
+            </>
+          ) : (
+            <>
+              <p>Admin Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Admin')}>Click here</span></p>
+              <p>Doctor Login? <span className='text-primary underline cursor-pointer' onClick={()=>setState('Doctor')}>Click here</span></p>
+            </>
+          )
         }
       </div>
     </form>

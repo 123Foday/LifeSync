@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { assets } from '../../assets/assets';
@@ -17,8 +17,15 @@ const AddDoctor = () => {
   const [degree, setDegree] = useState('')
   const [address1, setAddress1] = useState('')
   const [address2, setAddress2] = useState('')
+  const [hospitalId, setHospitalId] = useState('')
 
-  const { backendUrl, aToken } = useContext(AdminContext)
+  const { backendUrl, aToken, hospitals, getAllHospitals } = useContext(AdminContext)
+
+  useEffect(() => {
+    if (aToken) {
+      getAllHospitals()
+    }
+  }, [aToken, getAllHospitals])
 
   const onSubmitHandler = async (event) => {
     event.preventDefault()
@@ -40,6 +47,7 @@ const AddDoctor = () => {
       formData.append('speciality', speciality)
       formData.append('degree', degree)
       formData.append('address', JSON.stringify({line1:address1, line2:address2}))
+      formData.append('hospitalId', hospitalId)
 
       // console.log formData
       formData.forEach((value, key)=>{
@@ -146,13 +154,30 @@ const AddDoctor = () => {
               <input onChange={(e)=>setAddress1(e.target.value)} value={address1} className='border rounded px-3 py-2' type="text" placeholder='address 1' />
               <input onChange={(e)=>setAddress2(e.target.value)} value={address2} className='border rounded px-3 py-2' type="text" placeholder='address 2' />
             </div>
+
+            <div className='flex-1 flex flex-col gap-1'>
+              <p>Hospital</p>
+              <select
+                onChange={(e) => setHospitalId(e.target.value)}
+                value={hospitalId}
+                className='border rounded px-3 py-2'
+                required
+              >
+                <option value="">Select Hospital</option>
+                {hospitals.map((hospital) => (
+                  <option key={hospital._id} value={hospital._id}>
+                    {hospital.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             
           </div>
         </div>
 
         <div>
               <p className='mt-4 mb-2'>About Doctor</p>
-              <textarea onChange={(e)=>setAbout(e.target.value)} value={about} className='w-full px-4 pt-2 border rounded' placeholder='write about doctor' row={5} required />
+              <textarea onChange={(e)=>setAbout(e.target.value)} value={about} className='w-full px-4 pt-2 border rounded' placeholder='write about doctor' rows={5} required />
             </div>
             <button type='submit' className='bg-primary px-10 py-3 mt-4 text-white rounded-full'>Add doctor</button>
 

@@ -6,7 +6,7 @@ import User from "./models/userModel.js"; // adjust path if needed
 dotenv.config(); // loads .env file (make sure MONGO_URI is there)
 
 const addUser = async () => {
-  try {
+  /*try {
     // 1️⃣ Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
     console.log("✅ MongoDB Connected");
@@ -23,6 +23,45 @@ const addUser = async () => {
         line2: "Bombali District, Sierra Leone",
       },
       phone: "+23270000000",
+      image: "",
+    };
+
+    // 3️⃣ Hash password
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+    // 4️⃣ Create user
+    const newUser = new User({
+      ...userData,
+      password: hashedPassword,
+    });
+
+    // 5️⃣ Save user
+    await newUser.save();
+    console.log("🎉 User added successfully:", newUser);
+
+    process.exit();
+  } catch (error) {
+    console.error("❌ Error adding user:", error.message);
+    process.exit(1);
+  }*/
+
+  try {
+    // 1️⃣ Connect to MongoDB
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("✅ MongoDB Connected");
+
+    // 2️⃣ Define user details
+    const userData = {
+      name: "CTSO ADBangs",
+      email: "ctso.cbc.sl@gmail.com",
+      password: "ADBangs@cbc.Sl", // plain password (will be hashed below)
+      gender: "Male",
+      dob: "2002-10-20",
+      address: {
+        line1: "Makeni City",
+        line2: "Bombali District, Sierra Leone",
+      },
+      phone: "+23274841741",
       image: "",
     };
 
