@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Routes, Route } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import Login from './pages/Login.jsx';
 import { AdminContext } from './context/AdminContext.jsx';
 import Navbar from './components/Navbar.jsx';
@@ -21,40 +21,44 @@ import DoctorAppointments from './pages/Doctor/DoctorAppointments.jsx';
 import DoctorProfile from './pages/Doctor/DoctorProfile.jsx';
 
 const App = () => {
-
   const { aToken } = useContext(AdminContext)
   const { dToken } = useContext(DoctorContext)
   const { hToken } = useContext(HospitalContext)
 
   return aToken || dToken || hToken ? (
-    <div className='bg-[#F8F9FD]'>
+    <div className='flex flex-col h-screen bg-[#F8F9FD]'>
       <ToastContainer />
-      <Navbar />
-      <div className='flex items-start'>
-        <Sidebar />
-        <Routes>
-          {/* Admin Routes */}
-          <Route path='/' element={<></>} />
-          <Route path='/admin-dashboard' element={<Dashboard />} />
-          <Route path='/all-appointments' element={<AllAppointments />} />
-          <Route path='/add-doctor' element={<AddDoctor />} />
-          <Route path='/add-hospital' element={<AddHospital />} />
-          <Route path='/doctor-list' element={<DoctorList />} />
-          <Route path='/hospital-list' element={<HospitalList />} />
+      <div className='fixed top-0 left-0 right-0 z-50'>
+        <Navbar />
+      </div>
+      <div className='flex flex-1 pt-[61px]'>
+        <div className='fixed left-0 top-[61px] bottom-0 z-40'>
+          <Sidebar />
+        </div>
+        <main className='flex-1 ml-[72px] md:ml-[288px] overflow-y-auto'>
+          <Routes>
+            {/* Admin Routes */}
+            <Route path='/' element={<></>} />
+            <Route path='/admin-dashboard' element={<Dashboard />} />
+            <Route path='/all-appointments' element={<AllAppointments />} />
+            <Route path='/add-doctor' element={<AddDoctor />} />
+            <Route path='/add-hospital' element={<AddHospital />} />
+            <Route path='/doctor-list' element={<DoctorList />} />
+            <Route path='/hospital-list' element={<HospitalList />} />
 
-          {/* Doctor Routes */}
-          <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
-          <Route path='/doctor-appointments' element={<DoctorAppointments />} />
-          <Route path='/doctor-profile' element={<DoctorProfile />} />
+            {/* Doctor Routes */}
+            <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
+            <Route path='/doctor-appointments' element={<DoctorAppointments />} />
+            <Route path='/doctor-profile' element={<DoctorProfile />} />
 
-          {/* Hospital Routes */}
-          <Route path='/hospital-dashboard' element={<HospitalDashboard />} />
-          <Route path='/hospital-appointments' element={<HospitalAppointments />} />
-          <Route path='/hospital-profile' element={<HospitalProfile />} />
-        </Routes>
+            {/* Hospital Routes */}
+            <Route path='/hospital-dashboard' element={<HospitalDashboard />} />
+            <Route path='/hospital-appointments' element={<HospitalAppointments />} />
+            <Route path='/hospital-profile' element={<HospitalProfile />} />
+          </Routes>
+        </main>
       </div>
     </div>
-
   ) : (
     <>
       <Login />

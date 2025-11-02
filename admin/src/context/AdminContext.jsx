@@ -18,7 +18,7 @@ const AdminContextProvider = ({ children }) => {
 
   const getAllDoctors = useCallback(async () => {
     try {
-      const { data } = await axios.post(backendUrl + '/api/admin/all-doctors', {}, { headers: { aToken } })
+  const { data } = await axios.post(backendUrl + '/api/admin/all-doctors', {}, { headers: { atoken: aToken } })
       if (data.success) {
         setDoctors(data.doctors)
         console.log(data.doctors)
@@ -34,7 +34,7 @@ const AdminContextProvider = ({ children }) => {
 
     try {
 
-      const { data } = await axios.post(backendUrl + '/api/admin/change-availability', {docId}, {headers:{aToken}})
+  const { data } = await axios.post(backendUrl + '/api/admin/change-availability', {docId}, {headers:{atoken: aToken}})
       if (data.success) {
         toast.success(data.message)
         getAllDoctors()
@@ -49,7 +49,8 @@ const AdminContextProvider = ({ children }) => {
 
   const getAllHospitals = useCallback(async () => {
     try {
-      const { data } = await axios.post(backendUrl + '/api/admin/all-hospitals', {}, { headers: { aToken } })
+      // use POST to match backend route definition
+  const { data } = await axios.post(backendUrl + '/api/admin/all-hospitals', {}, { headers: { atoken: aToken } })
       if (data.success) {
         setHospitals(data.hospitals)
         console.log(data.hospitals)
@@ -66,7 +67,7 @@ const AdminContextProvider = ({ children }) => {
       const { data } = await axios.post(
         backendUrl + "/api/admin/change-hospital-availability",
         { hospitalId },
-        { headers: { aToken } }
+        { headers: { atoken: aToken } }
       );
       if (data.success) {
         toast.success(data.message);
@@ -81,7 +82,7 @@ const AdminContextProvider = ({ children }) => {
 
   const getAllAppointments = useCallback(async () => {
     try {
-      const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { aToken } })
+  const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { atoken: aToken } })
       if (data.success) {
         setAppointments(data.appointments)
         console.log(data.appointments)
@@ -97,7 +98,7 @@ const AdminContextProvider = ({ children }) => {
     
     try {
 
-      const {data} = await axios.post(backendUrl + '/api/admin/cancel-appointment', {appointmentId}, {headers:{aToken}})
+  const {data} = await axios.post(backendUrl + '/api/admin/cancel-appointment', {appointmentId}, {headers:{atoken: aToken}})
       if (data.success) {
         toast.success(data.message)
         getAllAppointments()
@@ -112,7 +113,7 @@ const AdminContextProvider = ({ children }) => {
 
   const getDashData = useCallback(async () => {
     try {
-      const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
+  const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { atoken: aToken } })
       if (data.success) {
         setDashData(data.dashData)
       } else {

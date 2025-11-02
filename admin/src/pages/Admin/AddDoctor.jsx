@@ -54,7 +54,7 @@ const AddDoctor = () => {
         console.log(`${key} : ${value}`);
       })
 
-      const {data} = await axios.post(backendUrl + '/api/admin/add-doctor', formData, {headers:{ aToken } })
+  const {data} = await axios.post(backendUrl + '/api/admin/add-doctor', formData, {headers:{ atoken: aToken } })
 
       if (data.success) {
         toast.success(data.message)

@@ -1,12 +1,11 @@
-import React from 'react'
-import { useState, useEffect } from 'react'
-import axios from 'axios'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
 import { toast } from 'react-toastify'
-import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
+import AppointmentTypeSelector from '../components/AppointmentTypeSelector'
 
 const Appointments = () => {
 
@@ -102,14 +101,29 @@ const Appointments = () => {
       let year = date.getFullYear()
 
       const slotDate = day + "_" + month + "_" + year
+      
+      const appointmentData = {
+        docId: docInfo._id,
+        hospitalId: docInfo.hospitalId,
+        slotDate,
+        sDate: date.toLocaleDateString(),
+        slotTime,
+        sTime: slotTime,
+        amount: docInfo.fees // Ensure fees are included
+      };
 
-      const { data } = await axios.post(backendUrl + '/api/user/book-appointment', { docId, slotDate, slotTime }, { headers: { token } })
+      const { data } = await axios.post(
+        `${backendUrl}/api/user/book-appointment`, 
+        appointmentData, 
+        { headers: { token } }
+      );
+
       if (data.success) {
-        toast.success(data.message)
-        getDoctorsData()
-        navigate('/my-appointments')
+        toast.success(data.message);
+        getDoctorsData();
+        navigate('/my-appointments');
       } else {
-        toast.error(data.message)
+        toast.error(data.message);
       }
 
     } catch (error) {

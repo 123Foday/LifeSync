@@ -9,13 +9,43 @@ const AddHospital = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [experience, setExperience] = useState("1 Year");
+  const [experience, setExperience] = useState("1-5 Years");
   const [fees, setFees] = useState("");
   const [about, setAbout] = useState("");
-  const [speciality, setSpeciality] = useState("Government");
-  const [degree, setDegree] = useState("College of Medicine and Allied Health Sciences (COMAHS)");
+  const [speciality, setSpeciality] = useState("General Hospital");
+  const [degree, setDegree] = useState("Joint Commission International (JCI)");
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
+
+  const hospitalTypes = [
+    "General Hospital",
+    "Specialist Hospital",
+    "Teaching Hospital",
+    "Private Hospital",
+    "Government Hospital",
+    "Community Health Center",
+    "Children's Hospital",
+    "Maternity Hospital",
+    "Mental Health Facility",
+    "Rehabilitation Center"
+  ];
+
+  const certifications = [
+    "Joint Commission International (JCI)",
+    "National Healthcare Safety Network (NHSN)",
+    "International Organization for Standardization (ISO)",
+    "College of Medicine and Allied Health Sciences (COMAHS)",
+    "West African College of Physicians (WACP)",
+    "Sierra Leone Medical and Dental Council (SLMDC)"
+  ];
+
+  const experienceRanges = [
+    "1-5 Years",
+    "5-10 Years",
+    "10-15 Years",
+    "15-20 Years",
+    "20+ Years"
+  ];
 
   const { backendUrl, aToken } = useContext(AdminContext);
 
@@ -51,7 +81,7 @@ const AddHospital = () => {
       const { data } = await axios.post(
         backendUrl + "/api/admin/add-hospital",
         formData,
-        { headers: { aToken } }
+        { headers: { atoken: aToken } }
       );
 
       if (data.success) {
@@ -74,28 +104,34 @@ const AddHospital = () => {
   };
 
   return (
-    <form onSubmit={onSubmitHandler} className="m-5 w-full">
-      <p className="mb-3 text-lg font-medium">Add Hospital</p>
-
-      <div className="bg-white px-8 py-8 border rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll">
-        <div className=" flex items-center gap-4 mb-8 text-gray-500">
-          <label htmlFor="doc-img">
-            <img
-              className="w-16 bg-gray-100 rounded-full cursor-pointer"
-              src={docImg ? URL.createObjectURL(docImg) : assets.upload_area}
-              alt=""
-            />
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Add New Hospital</h1>
+      
+      <form onSubmit={onSubmitHandler} className="bg-white rounded-xl shadow-sm p-6 max-w-4xl">
+        <div className="flex items-center gap-4 mb-8">
+          <label htmlFor="doc-img" className="relative group cursor-pointer">
+            <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden border-2 border-blue-100 group-hover:border-blue-300 transition-all">
+              <img
+                className="w-full h-full object-cover"
+                src={docImg ? URL.createObjectURL(docImg) : assets.upload_area}
+                alt=""
+              />
+            </div>
+            <div className="absolute inset-0 bg-black bg-opacity-40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-white text-sm">Change</span>
+            </div>
           </label>
           <input
             onChange={(e) => setDocImg(e.target.files[0])}
             type="file"
             id="doc-img"
-            hidden
+            className="hidden"
+            accept="image/*"
           />
-          <p>
-            Upload hospital <br />
-            picture
-          </p>
+          <div>
+            <h2 className="text-lg font-medium text-gray-800">Hospital Image</h2>
+            <p className="text-sm text-gray-500">Upload hospital logo or building image</p>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row items-start gap-10 text-gray-600">
@@ -270,10 +306,10 @@ const AddHospital = () => {
           type="submit"
           className="bg-primary px-10 py-3 mt-4 text-white rounded-full"
         >
-          Add hospital
+          Add Hospital
         </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

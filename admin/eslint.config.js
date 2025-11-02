@@ -28,6 +28,10 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      // allow new JSX transform (no need to have React in scope) and
+      // avoid prop-types errors for this codebase
+      'no-unused-vars': ['error', { 'varsIgnorePattern': '^React$' }],
+      'react/prop-types': 'off',
       'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': [
         'warn',

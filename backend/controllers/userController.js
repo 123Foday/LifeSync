@@ -111,12 +111,82 @@ const updateProfile = async (req, res) => {
     await userModel.findByIdAndUpdate(userId, {name, phone, address: JSON.parse(address), dob, gender })
 
     if (imageFile) {
-      
-      // upload image to cloudinary
-      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {resource_type: 'image'})
-      const imageURL = imageUpload.secure_url
+      try {
+        // Import image compression utilities
+        const { compressImage, shouldCompress, getImageMetadata } = await import('../utils/imageCompression.js');
+        
+        let uploadPath = imageFile.path;
+        const needsCompression = await shouldCompress(uploadPath);
+        
+        if (needsCompression) {
+          // Get original image metadata
+          const originalMeta = await getImageMetadata(uploadPath);
+          console.log('Original image:', originalMeta);
+          
+          // Compress the image
+          uploadPath = await compressImage(uploadPath);
+          
+          // Get compressed image metadata
+          const compressedMeta = await getImageMetadata(uploadPath);
+          console.log('Compressed image:', compressedMeta);
+        }
 
-      await userModel.findByIdAndUpdate(userId, {image: imageURL})
+        // Set a timeout for the Cloudinary upload
+        const uploadPromise = cloudinary.uploader.upload(uploadPath, {
+          resource_type: 'image',
+          timeout: 60000, // 60 seconds timeout
+          chunked: true, // Enable chunked uploads
+          chunk_size: 6000000, // 6MB chunks
+          transformation: [
+            { quality: "auto:good" }, // Let Cloudinary optimize quality
+            { fetch_format: "auto" }  // Auto-select best format
+          ]
+        });
+
+        // Add timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('Upload timeout'));
+          }, 60000);
+        });
+
+        // Race between upload and timeout
+        const imageUpload = await Promise.race([uploadPromise, timeoutPromise]);
+        
+        if (imageUpload && imageUpload.secure_url) {
+          await userModel.findByIdAndUpdate(userId, { image: imageUpload.secure_url });
+        } else {
+          console.error('No secure_url in Cloudinary response');
+          return res.json({
+            success: false,
+            message: "Image upload failed. Please try again."
+          });
+        }
+      } catch (uploadError) {
+        console.error('Cloudinary upload error:', uploadError);
+        
+        // If it's a network error
+        if (uploadError.code === 'ENOTFOUND') {
+          return res.json({
+            success: false,
+            message: "Unable to connect to image server. Please check your internet connection and try again."
+          });
+        }
+        
+        // If it's a timeout
+        if (uploadError.message === 'Upload timeout' || uploadError.http_code === 499) {
+          return res.json({
+            success: false,
+            message: "Image upload timed out. Please try again with a smaller image or better connection."
+          });
+        }
+
+        // For other errors
+        return res.json({
+          success: false,
+          message: "Failed to upload image. Please try again later."
+        });
+      }
     }
 
     res.json({success: true, message: "Profile Updated"})
@@ -132,50 +202,125 @@ const bookAppointment = async (req, res) => {
   
   try {
 
-    const { docId, hospitalId, sDate, slotDate, sTime, slotTime } = req.body
-    const userId = req.userId
+    const { 
+      docId, 
+      hospitalId, 
+      sDate, 
+      slotDate, 
+      sTime, 
+      slotTime,
+      amount 
+    } = req.body;
+    
+    const userId = req.userId;
 
-    const docData = await doctorModel.findById(docId).select('-password')
-    // doctor may not be associated with a hospital; guard against missing hospitalId
-    let hospitalData = {}
-    if (docData && docData.hospitalId) {
-      hospitalData = await hospitalModel.findById(docData.hospitalId).select('-password')
+    // Validate required fields
+    if (!userId || !hospitalId || !slotDate || !slotTime || !amount) {
+      return res.json({
+        success: false, 
+        message: "Missing required fields"
+      });
     }
 
-    if (!docData.available) {
-      return res.json({success: false, message: "Doctor not available"})
+    // Get user data first
+    const userData = await userModel.findById(userId).select('-password');
+    if (!userData) {
+      return res.json({
+        success: false,
+        message: "User profile not found"
+      });
     }
 
-    let slots_booked = docData.slots_booked
+    // Get doctor data if provided
+    let docData = null;
+    if (docId) {
+      docData = await doctorModel.findById(docId).select('-password');
+      if (!docData) {
+        return res.json({
+          success: false,
+          message: "Doctor not found"
+        });
+      }
+      if (!docData.available) {
+        return res.json({
+          success: false,
+          message: "Doctor not available"
+        });
+      }
+    }
 
-    // Settings for slot availability
-    if (slots_booked[slotDate] ) {
-      if (slots_booked[slotDate].includes(slotTime)) {
-        return res.json({success: false, message: "Slot not available"})
-      } else {
-        slots_booked[slotDate].push(slotTime)
+    // Get hospital data
+    const hospitalData = await hospitalModel.findById(hospitalId).select('-password');
+    if (!hospitalData) {
+      return res.json({
+        success: false,
+        message: "Hospital not found"
+      });
+    }
+
+    // Check hospital slot availability first
+    let hospitalSlots = hospitalData.slots_booked || {};
+    if (hospitalSlots[slotDate]?.includes(slotTime)) {
+      return res.json({
+        success: false,
+        message: "This time slot is not available at the hospital"
+      });
+    }
+
+    // If it's a doctor appointment, check doctor's availability
+    if (docData) {
+      let doctorSlots = docData.slots_booked || {};
+      if (doctorSlots[slotDate]?.includes(slotTime)) {
+        return res.json({
+          success: false,
+          message: "Doctor is not available at this time"
+        });
       }
 
-    } else {
-      slots_booked[slotDate] = []
-      slots_booked[slotDate].push(slotTime)
+      // Update doctor's slots
+      if (!doctorSlots[slotDate]) {
+        doctorSlots[slotDate] = [];
+      }
+      doctorSlots[slotDate].push(slotTime);
+      docData.slots_booked = doctorSlots;
+      await docData.save();
     }
 
-    const userData = await userModel.findById(userId).select('-password')
+    // Update hospital's slots
+    if (!hospitalSlots[slotDate]) {
+      hospitalSlots[slotDate] = [];
+    }
+    hospitalSlots[slotDate].push(slotTime);
+    hospitalData.slots_booked = hospitalSlots;
+    await hospitalData.save();
 
     const appointmentData = {
       userId,
-      docId,
       hospitalId,
       userData,
-      docData,
-      hospitalData,
-      amount:docData.fees,
+      hospitalData: {
+        name: hospitalData.name,
+        address: hospitalData.address,
+        image: hospitalData.image
+      },
+      amount,
       slotTime,
       sTime,
       slotDate,
       sDate,
-      date: Date.now()
+      date: Date.now(),
+      appointmentType: docId ? 'doctor' : 'hospital'
+    };
+
+    // Add doctor data if it's a doctor appointment
+    if (docData) {
+      appointmentData.docId = docId;
+      appointmentData.docData = {
+        name: docData.name,
+        speciality: docData.speciality,
+        image: docData.image,
+        fees: docData.fees
+      };
     }
 
     const newAppointment = new appointmentModel(appointmentData)
