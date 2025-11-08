@@ -30,6 +30,12 @@ import doc12 from './doc12.png'
 import doc13 from './doc13.png'
 import doc14 from './doc14.png'
 import doc15 from './doc15.png'
+import Government from './Government.svg'
+import Private from './private.svg'
+import NGO_Community from './ngo-community.svg'
+import Military_Police from './Military-Police.svg'
+import Specialised_teaching from './Specialised-teaching.svg'
+import Mission_FaithBased from './faith-mission.svg'
 import Dermatologist from './Dermatologist.svg'
 import Gastroenterologist from './Gastroenterologist.svg'
 import General_physician from './General_physician.svg'
@@ -84,6 +90,33 @@ export const specialityData = [
         image: Gastroenterologist
     },
 ]
+
+export const categoryData = [
+    {
+        speciality: "Government",
+        image: Government,
+    },
+    {
+        speciality: "Private",
+        image: Private,
+    },
+    {
+        speciality: "Mission/Faith-Based",
+        image: Mission_FaithBased,
+    },
+    {
+        speciality: "NGO/Community",
+        image: NGO_Community,
+    },
+    {
+        speciality: "Military/Police",
+        image: Military_Police,
+    },
+    {
+        speciality: "Specialised/Teaching",
+        image: Specialised_teaching,
+    },
+];
 
 export const doctors = [
     {

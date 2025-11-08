@@ -1,19 +1,23 @@
 import React from 'react'
 import Header from '../components/Header'
 import SpecialityMenu from '../components/SpecialityMenu'
-import TodDoctors from '../components/TopDoctors'
+import TopDoctors from '../components/TopDoctors'
+import TopHospitals from '../components/TopHospitals'
 import Banner from '../components/Banner'
+import CategoryMenu from '../components/CategoryMenu'
 
 
 const Home = () => {
   return (
     <div>
-        <Header />
-        <SpecialityMenu />
-        <TodDoctors />
-        <Banner />
+      <Header />
+      <CategoryMenu />
+      <TopHospitals />
+      <SpecialityMenu />
+      <TopDoctors />
+      <Banner />
     </div>
-  )
+  );
 }
 
 export default Home

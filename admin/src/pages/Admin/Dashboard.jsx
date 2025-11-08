@@ -71,51 +71,92 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className='bg-white rounded-xl shadow-sm mt-6'>
-        <div className='flex items-center gap-3 p-6 border-b'>
-          <img src={assets.list_icon} alt="" className='w-5 h-5' />
-          <h2 className='text-lg font-semibold text-gray-800'>Latest Bookings</h2>
+      {/* Latest Bookings Section */}
+      <div className='bg-white'>
+        <div className='flex items-center gap-2.5 px-4 py-4 mt-10 rounded-t border'>
+          <img src={assets.list_icon} alt="" />
+          <p className='font-semibold'>Latest Bookings</p>
         </div>
 
-        <div className='p-4'>
-          {
-            dashData.latestAppointments.map((item, index) => (
-              <div 
-                className='flex items-center px-6 py-4 gap-4 hover:bg-gray-50 rounded-lg transition-colors duration-200 group' 
-                key={index}
-              >
-                <img 
-                  className='w-12 h-12 rounded-full object-cover border-2 border-gray-100' 
-                  src={item.docData.image} 
-                  alt={item.docData.name} 
-                />
-                <div className='flex-1'>
-                  <p className='text-gray-800 font-medium mb-1'>{item.docData.name}</p>
-                  <p className='text-gray-500 text-sm'>{slotDateFormat(item.slotDate)}</p>
-                </div>
-                {item.cancelled ? (
-                  <span className='px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600'>
-                    Cancelled
-                  </span>
-                ) : item.isComplete ? (
-                  <span className='px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600'>
-                    Completed
-                  </span>
-                ) : (
-                  <button 
-                    onClick={() => cancelAppointment(item._id)}
-                    className='p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50'
+        <div className='pt-4 border border-t-0'>
+          {dashData.latestAppointments && dashData.latestAppointments.length > 0 ? (
+            dashData.latestAppointments.map((item, index) => {
+              // Safely get provider data based on appointment type
+              const providerData = item.providerType === 'hospital' 
+                ? item.hospitalData 
+                : item.docData;
+              
+              // Fallback if provider data is missing
+              if (!providerData) {
+                return (
+                  <div 
+                    className='flex items-center px-6 py-3 gap-3 hover:bg-gray-100' 
+                    key={index}
                   >
-                    <img className='w-5 h-5' src={assets.cancel_icon} alt="Cancel appointment" />
-                  </button>
-                )}
-              </div>
-            ))
-          }
+                    <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center'>
+                      <span className='text-gray-500 text-xs'>N/A</span>
+                    </div>
+                    <div className='flex-1 text-sm'>
+                      <p className='text-gray-800 font-medium'>Provider data unavailable</p>
+                      <p className='text-gray-600'>
+                        {item.slotDate} | {item.slotTime}
+                      </p>
+                    </div>
+                    <span className='text-xs text-gray-400'>
+                      {item.providerType || 'doctor'}
+                    </span>
+                  </div>
+                );
+              }
+
+              return (
+                <div 
+                  className='flex items-center px-6 py-3 gap-3 hover:bg-gray-100' 
+                  key={index}
+                >
+                  <img 
+                    className='rounded-full w-10' 
+                    src={providerData.image} 
+                    alt={providerData.name || "Provider"} 
+                    onError={(e) => {
+                      e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="%23ddd"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-size="14">?</text></svg>';
+                    }}
+                  />
+                  <div className='flex-1 text-sm'>
+                    <p className='text-gray-800 font-medium flex items-center gap-2'>
+                      {providerData.name}
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        item.providerType === 'hospital'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-blue-100 text-blue-700'
+                      }`}>
+                        {item.providerType === 'hospital' ? '🏥' : '👨‍⚕️'}
+                      </span>
+                    </p>
+                    <p className='text-gray-600'>
+                      {item.slotDate} | {item.slotTime}
+                    </p>
+                  </div>
+                  {item.cancelled ? (
+                    <p className='text-red-400 text-xs font-medium'>Cancelled</p>
+                  ) : item.isCompleted ? (
+                    <p className='text-green-500 text-xs font-medium'>Completed</p>
+                  ) : (
+                    <p className='text-blue-500 text-xs font-medium'>Scheduled</p>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className='px-6 py-8 text-center text-gray-400'>
+              No recent bookings
+            </div>
+          )}
         </div>
       </div>
     </div>
-  )
-}
+    )
+  }
+
 
 export default Dashboard

@@ -102,7 +102,7 @@ const addHospital = async (req, res) => {
       });
     }
 
-    // hashing hospitaal password
+    // hashing hospital password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -226,13 +226,13 @@ const appointmentCancel = async (req, res) => {
 
     // releasing hospital slot if present
     try {
-      const { Id, sDate, sTime } = appointmentData
+      const { hospitalId, slotDate, slotTime } = appointmentData
       if (Id) {
-        const hospitalData = await hospitalModel.findById(Id)
-        if (hospitalData && hospitalData.slot_booked && hospitalData.slot_booked[sDate]) {
-          let slot_booked = hospitalData.slot_booked
-          slot_booked[sDate] = slot_booked[sDate].filter(e => e !== sTime)
-          await hospitalModel.findByIdAndUpdate(Id, { slot_booked })
+        const hospitalData = await hospitalModel.findById(hospitalId)
+        if (hospitalData && hospitalData.slots_booked && hospitalData.slots_booked[slotDate]) {
+          let slots_booked = hospitalData.slots_booked
+          slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
+          await hospitalModel.findByIdAndUpdate(Id, { slots_booked })
         }
       }
     } catch (e) {

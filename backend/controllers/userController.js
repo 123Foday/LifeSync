@@ -197,146 +197,140 @@ const updateProfile = async (req, res) => {
   }
 }
 
-// API to book an appointment
-const bookAppointment = async (req, res) => {
-  
-  try {
+// Fixed bookAppointment function for userController.js
+// Make sure to import both models at the top of your file:
+// import doctorModel from '../models/doctorModel.js';
+// import hospitalModel from '../models/hospitalModel.js';
+// import userModel from '../models/userModel.js';
+// import appointmentModel from '../models/appointmentModel.js';
 
-    const { 
-      docId, 
-      hospitalId, 
-      sDate, 
-      slotDate, 
-      sTime, 
-      slotTime,
-      amount 
-    } = req.body;
-    
-    const userId = req.userId;
+const bookAppointment = async (req, res) => {
+  try {
+    // userId comes from authUser middleware
+    const { userId, providerId, providerType, slotDate, slotTime } = req.body;
+
+    console.log('Booking request:', { userId, providerId, providerType, slotDate, slotTime });
 
     // Validate required fields
-    if (!userId || !hospitalId || !slotDate || !slotTime || !amount) {
-      return res.json({
-        success: false, 
-        message: "Missing required fields"
-      });
+    if (!userId) {
+      return res.json({ success: false, message: 'User ID is required' });
     }
 
-    // Get user data first
-    const userData = await userModel.findById(userId).select('-password');
+    if (!providerId) {
+      return res.json({ success: false, message: 'Provider ID is required' });
+    }
+
+    if (!providerType) {
+      return res.json({ success: false, message: 'Provider type is required' });
+    }
+
+    if (!slotDate || !slotTime) {
+      return res.json({ success: false, message: 'Please select date and time' });
+    }
+
+    // Validate provider type
+    if (!['doctor', 'hospital'].includes(providerType)) {
+      return res.json({ success: false, message: 'Invalid provider type' });
+    }
+
+    // Select the correct model based on provider type
+    const ProviderModel = providerType === 'hospital' ? hospitalModel : doctorModel;
+    
+    // Fetch provider data
+    const providerData = await ProviderModel.findById(providerId).select('-password');
+
+    if (!providerData) {
+      return res.json({ success: false, message: `${providerType === 'doctor' ? 'Doctor' : 'Hospital'} not found` });
+    }
+
+    if (!providerData.available) {
+      return res.json({ success: false, message: `${providerType === 'doctor' ? 'Doctor' : 'Hospital'} not available` });
+    }
+
+    // Get provider's booked slots
+    let slots_booked = providerData.slots_booked || {};
+
+    // Check for slot availability
+    if (slots_booked[slotDate]) {
+      if (slots_booked[slotDate].includes(slotTime)) {
+        return res.json({ success: false, message: 'Slot not available' });
+      } else {
+        slots_booked[slotDate].push(slotTime);
+      }
+    } else {
+      slots_booked[slotDate] = [slotTime];
+    }
+
+    // Fetch user data
+    const userData = await userModel.findById(userId).select("-password");
+
     if (!userData) {
-      return res.json({
-        success: false,
-        message: "User profile not found"
-      });
+      return res.json({ success: false, message: 'User not found' });
     }
 
-    // Get doctor data if provided
-    let docData = null;
-    if (docId) {
-      docData = await doctorModel.findById(docId).select('-password');
-      if (!docData) {
-        return res.json({
-          success: false,
-          message: "Doctor not found"
-        });
-      }
-      if (!docData.available) {
-        return res.json({
-          success: false,
-          message: "Doctor not available"
-        });
-      }
-    }
-
-    // Get hospital data
-    const hospitalData = await hospitalModel.findById(hospitalId).select('-password');
-    if (!hospitalData) {
-      return res.json({
-        success: false,
-        message: "Hospital not found"
-      });
-    }
-
-    // Check hospital slot availability first
-    let hospitalSlots = hospitalData.slots_booked || {};
-    if (hospitalSlots[slotDate]?.includes(slotTime)) {
-      return res.json({
-        success: false,
-        message: "This time slot is not available at the hospital"
-      });
-    }
-
-    // If it's a doctor appointment, check doctor's availability
-    if (docData) {
-      let doctorSlots = docData.slots_booked || {};
-      if (doctorSlots[slotDate]?.includes(slotTime)) {
-        return res.json({
-          success: false,
-          message: "Doctor is not available at this time"
-        });
-      }
-
-      // Update doctor's slots
-      if (!doctorSlots[slotDate]) {
-        doctorSlots[slotDate] = [];
-      }
-      doctorSlots[slotDate].push(slotTime);
-      docData.slots_booked = doctorSlots;
-      await docData.save();
-    }
-
-    // Update hospital's slots
-    if (!hospitalSlots[slotDate]) {
-      hospitalSlots[slotDate] = [];
-    }
-    hospitalSlots[slotDate].push(slotTime);
-    hospitalData.slots_booked = hospitalSlots;
-    await hospitalData.save();
-
+    // Prepare appointment data based on provider type
     const appointmentData = {
       userId,
-      hospitalId,
       userData,
-      hospitalData: {
-        name: hospitalData.name,
-        address: hospitalData.address,
-        image: hospitalData.image
-      },
-      amount,
+      amount: providerData.fees,
       slotTime,
-      sTime,
       slotDate,
-      sDate,
       date: Date.now(),
-      appointmentType: docId ? 'doctor' : 'hospital'
+      providerType,
+      cancelled: false,
+      payment: false,
+      isCompleted: false
     };
 
-    // Add doctor data if it's a doctor appointment
-    if (docData) {
-      appointmentData.docId = docId;
+    // Add provider-specific fields
+    if (providerType === 'doctor') {
+      appointmentData.docId = providerId;
       appointmentData.docData = {
-        name: docData.name,
-        speciality: docData.speciality,
-        image: docData.image,
-        fees: docData.fees
+        name: providerData.name,
+        email: providerData.email,
+        image: providerData.image,
+        speciality: providerData.speciality,
+        degree: providerData.degree,
+        experience: providerData.experience,
+        about: providerData.about,
+        fees: providerData.fees,
+        address: providerData.address
+      };
+    } else {
+      appointmentData.hospitalId = providerId;
+      appointmentData.hospitalData = {
+        name: providerData.name,
+        email: providerData.email,
+        image: providerData.image,
+        speciality: providerData.speciality,
+        degree: providerData.degree,
+        experience: providerData.experience,
+        about: providerData.about,
+        fees: providerData.fees,
+        address: providerData.address
       };
     }
 
-    const newAppointment = new appointmentModel(appointmentData)
-    await newAppointment.save()
+    // Create new appointment
+    const newAppointment = new appointmentModel(appointmentData);
+    await newAppointment.save();
 
-    // save new slots data in docData
-    await doctorModel.findByIdAndUpdate(docId, {slots_booked})
+    // Update provider's slots_booked
+    await ProviderModel.findByIdAndUpdate(providerId, { slots_booked });
 
-    res.json({success: true, message: "Appointment booked"})
+    console.log('Appointment booked successfully:', newAppointment._id);
+
+    res.json({ 
+      success: true, 
+      message: 'Appointment Booked Successfully',
+      appointmentId: newAppointment._id
+    });
 
   } catch (error) {
-    console.log(error)
-    res.json({success: false, message: error.message})
+    console.log('Book appointment error:', error);
+    res.json({ success: false, message: error.message });
   }
-}
-
+};
 // API to get user appointments for frontend my-appointments page
 const listAppointment = async (req, res) => {
   

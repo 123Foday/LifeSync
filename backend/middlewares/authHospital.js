@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 // Hospital authentication middleware
 const authHospital = async (req, res, next) => {
@@ -15,7 +15,7 @@ const authHospital = async (req, res, next) => {
 
     const token_decode = jwt.verify(hToken, process.env.JWT_SECRET)
 
-    // Do not mutate req.body (may be undefined). Attach id to req.hospitalId instead.
+    // Do not mutate req.body (may be undefined). Attach id to req.userId instead.
     req.hospitalId = token_decode.id || token_decode._id || token_decode.hospitalId
     next()
     
@@ -25,4 +25,4 @@ const authHospital = async (req, res, next) => {
   }
 }
 
-export default authHospital
+export default authHospital;
