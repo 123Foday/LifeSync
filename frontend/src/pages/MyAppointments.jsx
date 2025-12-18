@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -37,7 +37,7 @@ const MyAppointments = () => {
   const getUserAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
-        headers: { token },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (data.success) {
@@ -55,7 +55,7 @@ const MyAppointments = () => {
       const { data } = await axios.post(
         backendUrl + "/api/user/cancel-appointment",
         { appointmentId },
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success) {
         toast.success(data.message);

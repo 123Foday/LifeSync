@@ -11,7 +11,7 @@ export const bookAppointment = async (req, res) => {
       slotTime,
       sTime,
       hospitalId,
-      docId // Optional for hospital appointments
+      // docId // Optional for hospital appointments
     } = req.body;
 
     const userId = req.userId;

@@ -6,6 +6,8 @@ import userModel from '../models/userModel.js'
 import doctorModel from '../models/doctorModel.js'
 import hospitalModel from '../models/hospitalModel.js'
 import appointmentModel from '../models/appointmentModel.js'
+import { OAuth2Client } from "google-auth-library";// your User schema
+
 
 // API to register user
 const registerUser = async (req, res) => {
@@ -50,107 +52,268 @@ const registerUser = async (req, res) => {
   }
 }
 
+// Google SSO login controller
+
+// Initialize Google OAuth Client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+/**
+ * Google SSO Login/Register Controller
+ * Verifies Google token, creates user if needed, returns JWT
+ */
+// Google SSO login/register controller
+const googleLoginController = async (req, res) => {
+  try {
+    const { credential } = req.body
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google credential is required',
+      })
+    }
+
+    // Verify the Google token
+    let ticket
+    try {
+      ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      })
+    } catch (verifyError) {
+      console.error('Google token verification failed:', verifyError)
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Google token',
+      })
+    }
+
+    // Extract user info from verified token
+    const payload = ticket.getPayload()
+    const { sub: googleId, email, name, picture } = payload
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email not provided by Google',
+      })
+    }
+
+    // Check if user exists with this Google ID
+    let user = await userModel.findOne({ googleId })
+
+    if (user) {
+      // Existing Google user - just login
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
+      })
+
+      return res.json({
+        success: true,
+        token,
+        message: 'Login successful',
+      })
+    }
+
+    // Check if user exists with this email (from local registration)
+    const existingUser = await userModel.findOne({ email })
+
+    if (existingUser) {
+      // User registered with email/password, now linking Google account
+      if (existingUser.authProvider === 'local' && !existingUser.googleId) {
+        // Link Google account to existing local account
+        existingUser.googleId = googleId
+        existingUser.image = picture || existingUser.image
+        existingUser.isEmailVerified = true
+        await existingUser.save()
+
+        const token = jwt.sign(
+          { id: existingUser._id },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: '7d',
+          }
+        )
+
+        return res.json({
+          success: true,
+          token,
+          message: 'Google account linked successfully',
+        })
+      } else if (existingUser.googleId && existingUser.googleId !== googleId) {
+        // Email exists with different Google account
+        return res.status(409).json({
+          success: false,
+          message: 'Email already registered with different Google account',
+        })
+      }
+    }
+
+    // New user - create account with Google
+    const newUser = new userModel({
+      name: name || email.split('@')[0],
+      email,
+      googleId,
+      image: picture || undefined, // Use default if no picture
+      authProvider: 'google',
+      isEmailVerified: true,
+    })
+
+    await newUser.save()
+
+    // Generate JWT token
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    })
+
+    return res.json({
+      success: true,
+      token,
+      message: 'Account created successfully',
+    })
+  } catch (error) {
+    console.error('Google login error:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during Google login',
+    })
+  }
+}
+
 // API for user login
 const loginUser = async (req, res) => {
-  
   try {
-    
     const { email, password } = req.body
-    const user = await userModel.findOne({email})
+    const user = await userModel.findOne({ email })
 
     if (!user) {
-      return res.json({success: false, message: 'User does not exist' })
+      return res.json({ success: false, message: 'User does not exist' })
+    }
+
+    // Check if user registered with SSO
+    if (user.authProvider !== 'local' && !user.password) {
+      return res.json({
+        success: false,
+        message: `Please login with ${user.authProvider.charAt(0).toUpperCase() + user.authProvider.slice(1)}`,
+      })
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
 
     if (isMatch) {
-      const token = jwt.sign({id: user._id}, process.env.JWT_SECRET)
-      res.json({success: true, token})
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+      res.json({ success: true, token })
     } else {
-      res.json({success: false, message: 'Invalid credentials'})
+      res.json({ success: false, message: 'Invalid credentials' })
     }
-
   } catch (error) {
     console.log(error)
-    res.json({success: false, message: error.message})
+    res.json({ success: false, message: error.message })
   }
 }
 
 // API to get user profile data
 const getProfile = async (req, res) => {
-  
   try {
+    // Get userId from middleware (authUser sets req.body.userId)
+    const userId = req.body.userId;
     
-    // prefer userId set by auth middleware, fall back to req.body for compatibility
-    const userId = req.userId || (req.body && req.body.userId)
-    const userData = await userModel.findById(userId).select('-password')
+    console.log('Getting profile for userId:', userId);
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false, 
+        message: 'Not Authorized'
+      });
+    }
 
-    res.json({success: true, userData})
+    const userData = await userModel.findById(userId).select('-password');
+    
+    if (!userData) {
+      return res.status(404).json({
+        success: false, 
+        message: 'User not found'
+      });
+    }
+
+    res.json({success: true, userData});
 
   } catch (error) {
-    console.log(error)
-    res.json({success: false, message: error.message})
+    console.log(error);
+    res.status(500).json({success: false, message: error.message});
   }
-}
+};
 
 // API to update user profile
 const updateProfile = async (req, res) => {
-  
   try {
+    // Get userId from middleware (authUser sets req.body.userId)
+    const userId = req.body.userId;
+    const { name, phone, address, dob, gender } = req.body;
+    const imageFile = req.file;
 
-    // prefer userId set by auth middleware, fall back to req.body for compatibility
-    const userId = req.userId || (req.body && req.body.userId)
-    const { name, phone, address, dob, gender } = req.body
-    const imageFile = req.file
+    console.log('Update profile request:', { userId, name, phone, hasImage: !!imageFile });
 
-    if (!name || !phone || !dob || !gender) {
-      return res.json({success: false, message: "Data Missing"})
+    if (!userId) {
+      return res.status(401).json({
+        success: false, 
+        message: 'Not Authorized'
+      });
     }
 
-    await userModel.findByIdAndUpdate(userId, {name, phone, address: JSON.parse(address), dob, gender })
+    if (!name || !phone || !dob || !gender) {
+      return res.json({success: false, message: "Data Missing"});
+    }
 
+    // Update basic user info
+    await userModel.findByIdAndUpdate(userId, {
+      name, 
+      phone, 
+      address: JSON.parse(address), 
+      dob, 
+      gender 
+    });
+
+    // Handle image upload if provided
     if (imageFile) {
       try {
-        // Import image compression utilities
-        const { compressImage, shouldCompress, getImageMetadata } = await import('../utils/imageCompression.js');
-        
+        // Check if image compression utilities exist
         let uploadPath = imageFile.path;
-        const needsCompression = await shouldCompress(uploadPath);
         
-        if (needsCompression) {
-          // Get original image metadata
-          const originalMeta = await getImageMetadata(uploadPath);
-          console.log('Original image:', originalMeta);
+        try {
+          const { compressImage, shouldCompress, getImageMetadata } = await import('../utils/imageCompression.js');
           
-          // Compress the image
-          uploadPath = await compressImage(uploadPath);
+          const needsCompression = await shouldCompress(uploadPath);
           
-          // Get compressed image metadata
-          const compressedMeta = await getImageMetadata(uploadPath);
-          console.log('Compressed image:', compressedMeta);
+          if (needsCompression) {
+            const originalMeta = await getImageMetadata(uploadPath);
+            console.log('Original image:', originalMeta);
+            
+            uploadPath = await compressImage(uploadPath);
+            
+            const compressedMeta = await getImageMetadata(uploadPath);
+            console.log('Compressed image:', compressedMeta);
+          }
+        } catch (compressionError) {
+          console.log('Image compression not available, uploading original:', compressionError.message);
         }
 
-        // Set a timeout for the Cloudinary upload
+        // Upload to Cloudinary with timeout
         const uploadPromise = cloudinary.uploader.upload(uploadPath, {
           resource_type: 'image',
-          timeout: 60000, // 60 seconds timeout
-          chunked: true, // Enable chunked uploads
-          chunk_size: 6000000, // 6MB chunks
+          timeout: 60000,
+          chunked: true,
+          chunk_size: 6000000,
           transformation: [
-            { quality: "auto:good" }, // Let Cloudinary optimize quality
-            { fetch_format: "auto" }  // Auto-select best format
+            { quality: "auto:good" },
+            { fetch_format: "auto" }
           ]
         });
 
-        // Add timeout promise
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => {
-            reject(new Error('Upload timeout'));
-          }, 60000);
+          setTimeout(() => reject(new Error('Upload timeout')), 60000);
         });
 
-        // Race between upload and timeout
         const imageUpload = await Promise.race([uploadPromise, timeoutPromise]);
         
         if (imageUpload && imageUpload.secure_url) {
@@ -165,23 +328,20 @@ const updateProfile = async (req, res) => {
       } catch (uploadError) {
         console.error('Cloudinary upload error:', uploadError);
         
-        // If it's a network error
         if (uploadError.code === 'ENOTFOUND') {
           return res.json({
             success: false,
-            message: "Unable to connect to image server. Please check your internet connection and try again."
+            message: "Unable to connect to image server. Please check your internet connection."
           });
         }
         
-        // If it's a timeout
         if (uploadError.message === 'Upload timeout' || uploadError.http_code === 499) {
           return res.json({
             success: false,
-            message: "Image upload timed out. Please try again with a smaller image or better connection."
+            message: "Image upload timed out. Please try a smaller image."
           });
         }
 
-        // For other errors
         return res.json({
           success: false,
           message: "Failed to upload image. Please try again later."
@@ -189,13 +349,13 @@ const updateProfile = async (req, res) => {
       }
     }
 
-    res.json({success: true, message: "Profile Updated"})
+    res.json({success: true, message: "Profile Updated"});
     
   } catch (error) {
-    console.log(error)
-    res.json({success: false, message: error.message})
+    console.log(error);
+    res.status(500).json({success: false, message: error.message});
   }
-}
+};
 
 // Fixed bookAppointment function for userController.js
 // Make sure to import both models at the top of your file:
@@ -333,60 +493,108 @@ const bookAppointment = async (req, res) => {
 };
 // API to get user appointments for frontend my-appointments page
 const listAppointment = async (req, res) => {
-  
   try {
+    const userId = req.body.userId;
     
-    const userId = req.userId
-    const appointments = await appointmentModel.find({ userId })
-
-    res.json({ success: true, appointments })
-
-  } catch (error) {
-    console.log(error)
-    res.json({success: false, message: error.message})
-  }
-}
-
-// API to cancel appointment
-const cancelAppointment = async (req, res) => {
-  
-  try {
-    
-    const { appointmentId } = req.body
-    const userId = req.userId
-
-    const appointmentData = await appointmentModel.findById(appointmentId)
-
-    // verify appointment user
-    if (appointmentData.userId !== userId) {
-      return res.json({success: false, message: "Unauthorized action"})
+    if (!userId) {
+      return res.status(401).json({
+        success: false, 
+        message: 'Not Authorized'
+      });
     }
 
-    await appointmentModel.findByIdAndUpdate(appointmentId, {cancelled: true})
+    const appointments = await appointmentModel.find({ userId });
 
-    // releasing doctor slot
-    const { docId, slotDate, slotTime } = appointmentData
-
-    const docData = await doctorModel.findById(docId)
-
-    let slots_booked = docData.slots_booked
-
-    slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
-
-    await doctorModel.findByIdAndUpdate(docId, {slots_booked})
-
-    res.json({success: true, message: "Appointment cancelled"})
+    res.json({ success: true, appointments });
 
   } catch (error) {
-    console.log(error)
-    res.json({success: false, message: error.message})
+    console.log(error);
+    res.status(500).json({success: false, message: error.message});
   }
-}
+};
+
+// API to cancel appointment - UPDATED to support both doctors and hospitals
+const cancelAppointment = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    const userId = req.body.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false, 
+        message: 'Not Authorized'
+      });
+    }
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    if (!appointmentData) {
+      return res.json({success: false, message: "Appointment not found"});
+    }
+
+    // Verify appointment belongs to user
+    if (appointmentData.userId !== userId) {
+      return res.json({success: false, message: "Unauthorized action"});
+    }
+
+    // Mark appointment as cancelled
+    await appointmentModel.findByIdAndUpdate(appointmentId, {cancelled: true});
+
+    // Release the slot based on provider type
+    const { providerType, docId, hospitalId, slotDate, slotTime } = appointmentData;
+
+    if (providerType === 'hospital' && hospitalId) {
+      // Release hospital slot
+      const hospitalData = await hospitalModel.findById(hospitalId);
+      
+      if (hospitalData) {
+        let slots_booked = hospitalData.slots_booked;
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime);
+        await hospitalModel.findByIdAndUpdate(hospitalId, {slots_booked});
+      }
+    } else if (docId) {
+      // Release doctor slot (default for backward compatibility)
+      const docData = await doctorModel.findById(docId);
+      
+      if (docData) {
+        let slots_booked = docData.slots_booked;
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime);
+        await doctorModel.findByIdAndUpdate(docId, {slots_booked});
+      }
+    }
+
+    res.json({success: true, message: "Appointment cancelled"});
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({success: false, message: error.message});
+  }
+};
 
 // Razorpay instance
 
+/*const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 // API to make payment of appointment using razorpay
+const makePayment = async (req, res) => {
+  const { amount, currency } = req.body;
 
+  try {
+    const options = {
+      amount: amount * 100,  // Convert to paise
+      currency: currency,
+      receipt: `receipt_${Date.now()}`
+    };
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment }
+    const order = await razorpay.orders.create(options);
+    res.json({ success: true, order });
+  } catch (error) {
+    console.log('Razorpay payment error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};*/
+
+export { registerUser, googleLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment, /*makePayment*/ };

@@ -227,12 +227,12 @@ const appointmentCancel = async (req, res) => {
     // releasing hospital slot if present
     try {
       const { hospitalId, slotDate, slotTime } = appointmentData
-      if (Id) {
+      if (hospitalId) {
         const hospitalData = await hospitalModel.findById(hospitalId)
         if (hospitalData && hospitalData.slots_booked && hospitalData.slots_booked[slotDate]) {
           let slots_booked = hospitalData.slots_booked
           slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
-          await hospitalModel.findByIdAndUpdate(Id, { slots_booked })
+          await hospitalModel.findByIdAndUpdate(hospitalId, { slots_booked })
         }
       }
     } catch (e) {

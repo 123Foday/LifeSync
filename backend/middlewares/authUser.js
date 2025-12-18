@@ -3,30 +3,26 @@ import jwt from "jsonwebtoken";
 // User authentication middleware
 const authUser = async (req, res, next) => {
   try {
-    const { token } = req.headers;
-
-    if (!token) {
-      return res.json({
-        success: false,
-        message: "Not Authorized. Login Again",
-      });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Not authorized. Login again" });
     }
 
+    const token = authHeader.split(" ")[1];
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
 
-    // IMPORTANT: Add userId to req.body so it's available in the controller
-    if (!req.body) {
-      req.body = {};
-    }
+    // Add userId to req.body for controllers
+    if (!req.body) req.body = {};
     req.body.userId = token_decode.id;
 
     next();
   } catch (error) {
     console.log("Auth error:", error);
-    res.json({
-      success: false,
-      message: error.message,
-    });
+    res
+      .status(401)
+      .json({ success: false, message: "Token invalid or expired" });
   }
 };
 

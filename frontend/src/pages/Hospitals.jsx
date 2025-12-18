@@ -54,41 +54,46 @@ const Hospitals = () => {
           >
             Government
           </p>
-
           <p
             onClick={() =>
-              speciality === ""
+              speciality === "Private"
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Private")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Private" ? "bg-indigo-100 text-black" : ""
+              speciality === "Private"
+                ? "bg-indigo-100 text-black"
+                : ""
             }`}
           >
             Private
           </p>
-
+          
           <p
             onClick={() =>
-              speciality === "Mission/Faith-Based"
+              speciality === "General Hospital"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Mission/Faith-Based")
+                : navigate("/hospitals/General Hospital")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Mission/Faith-Based" ? "bg-indigo-100 text-black" : ""
+              speciality === "General Hospital"
+                ? "bg-indigo-100 text-black"
+                : ""
             }`}
           >
-            Mission/Faith-Based
+            General Hospital
           </p>
 
           <p
             onClick={() =>
-              speciality === "NGO/Community"
+              speciality === "Community Health Center"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/NGO/Community")
+                : navigate("/hospitals/Community Health Center")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "NGO/Community" ? "bg-indigo-100 text-black" : ""
+              speciality === "Community Health Center"
+                ? "bg-indigo-100 text-black"
+                : ""
             }`}
           >
             NGO/Community
@@ -96,25 +101,72 @@ const Hospitals = () => {
 
           <p
             onClick={() =>
-              speciality === "Military/Police"
+              speciality === "Children's Hospital"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Militrary/Police")
+                : navigate("/hospitals/Children's Hospital")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Military/Police" ? "bg-indigo-100 text-black" : ""
+              speciality === "Children's Hospital"
+                ? "bg-indigo-100 text-black"
+                : ""
             }`}
           >
-            Military/Police
+            Children&apos;s Hospital
           </p>
 
           <p
             onClick={() =>
-              speciality === "Specialised/Teaching"
+              speciality === "Maternity Hospital"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Specialised/Teaching")
+                : navigate("/hospitals/Maternity Hospital")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Specialised/Teaching"
+              speciality === "Maternity Hospital"
+                ? "bg-indigo-100 text-black"
+                : ""
+            }`}
+          >
+            Maternity Hospital
+          </p>
+
+          <p
+            onClick={() =>
+              speciality === "Mental Health"
+                ? navigate("/hospitals")
+                : navigate("/hospitals/Mental Health")
+            }
+            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+              speciality === "Mental Health"
+                ? "bg-indigo-100 text-black"
+                : ""
+            }`}
+          >
+            Mental Health
+          </p>
+
+          <p
+            onClick={() =>
+              speciality === "Rehabilitation Center"
+                ? navigate("/hospitals")
+                : navigate("/hospitals/Rehabilitation Center")
+            }
+            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+              speciality === "Rehabilitation Center"
+                ? "bg-indigo-100 text-black"
+                : ""
+            }`}
+          >
+            Rehab Center
+          </p>
+
+          <p
+            onClick={() =>
+              speciality === "Teaching Hospital"
+                ? navigate("/hospitals")
+                : navigate("/hospitals/Teaching Hospital")
+            }
+            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+              speciality === "Teaching Hospital"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}

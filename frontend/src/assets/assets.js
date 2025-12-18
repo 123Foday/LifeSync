@@ -92,6 +92,7 @@ export const specialityData = [
 ]
 
 export const categoryData = [
+    
     {
         speciality: "Government",
         image: Government,
@@ -101,19 +102,31 @@ export const categoryData = [
         image: Private,
     },
     {
-        speciality: "Mission/Faith-Based",
+        speciality: "General Hospital",
         image: Mission_FaithBased,
     },
     {
-        speciality: "NGO/Community",
+        speciality: "Community Health Center",
         image: NGO_Community,
     },
     {
-        speciality: "Military/Police",
+        speciality: "Children's Hospital",
+        image: NGO_Community,
+    },
+    {
+        speciality: "Maternity Hospital",
         image: Military_Police,
     },
     {
-        speciality: "Specialised/Teaching",
+        speciality: "Mental Health",
+        image: Military_Police,
+    },
+    {
+        speciality: "Rehabilitation Center",
+        image: Specialised_teaching,
+    },
+    {
+        speciality: "Teaching Hospital",
         image: Specialised_teaching,
     },
 ];

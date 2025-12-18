@@ -25,7 +25,16 @@ const MyProfile = () => {
 
       image && formData.append('image', image)
 
-      const { data } = await axios.post(backendUrl + '/api/user/update-profile', formData, { headers: { token } })
+      if (!token) {
+        toast.error('Not authorized. Please log in again.')
+        return
+      }
+
+      const { data } = await axios.post(
+        backendUrl + '/api/user/update-profile',
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
 
       if (data.success) {
         toast.success(data.message)

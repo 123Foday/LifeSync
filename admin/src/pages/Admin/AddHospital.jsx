@@ -9,42 +9,61 @@ const AddHospital = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [experience, setExperience] = useState("1-5 Years");
+  const [experience, setExperience] = useState("1 Year");
   const [fees, setFees] = useState("");
   const [about, setAbout] = useState("");
-  const [speciality, setSpeciality] = useState("General Hospital");
-  const [degree, setDegree] = useState("Joint Commission International (JCI)");
+  const [speciality, setSpeciality] = useState("Government");
+  const [degree, setDegree] = useState("College of Medicine and Allied Health Sciences (COMAHS)");
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
 
   const hospitalTypes = [
+    "Government",
+    "Private",
     "General Hospital",
-    "Specialist Hospital",
     "Teaching Hospital",
-    "Private Hospital",
-    "Government Hospital",
     "Community Health Center",
     "Children's Hospital",
     "Maternity Hospital",
-    "Mental Health Facility",
-    "Rehabilitation Center"
+    "Mental Health",
+    "Rehabilitation Center",
   ];
 
   const certifications = [
+    "College of Medicine and Allied Health Sciences (COMAHS)",
     "Joint Commission International (JCI)",
     "National Healthcare Safety Network (NHSN)",
     "International Organization for Standardization (ISO)",
-    "College of Medicine and Allied Health Sciences (COMAHS)",
+    "Sierra Leone Medical and Dental Council (SLMDC)",
+    "Ministry of Health & Sanitation (MoHS)",
+    "University of Sierra Leone (USL)",
     "West African College of Physicians (WACP)",
-    "Sierra Leone Medical and Dental Council (SLMDC)"
   ];
 
   const experienceRanges = [
-    "1-5 Years",
-    "5-10 Years",
-    "10-15 Years",
+    "1 Year",
+    "2 Years",
+    "3 Years",
+    "4 Years",
+    "5 Years",
+    "6 Years",
+    "7 Years",
+    "8 Years",
+    "9 Years",
+    "10 Years",
+    "11 Years",
+    "12 Years",
+    "13 Years",
+    "14 Years",
+    "15 Years",
     "15-20 Years",
-    "20+ Years"
+    "20-25 Years",
+    "25-30 Years",
+    "30-35 Years",
+    "35-40 Years",
+    "40-45 Years",
+    "45-50 Years",
+    "50+ Years",
   ];
 
   const { backendUrl, aToken } = useContext(AdminContext);
@@ -105,9 +124,14 @@ const AddHospital = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Add New Hospital</h1>
-      
-      <form onSubmit={onSubmitHandler} className="bg-white rounded-xl shadow-sm p-6 max-w-4xl">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        Add New Hospital
+      </h1>
+
+      <form
+        onSubmit={onSubmitHandler}
+        className="bg-white rounded-xl shadow-sm p-6 max-w-4xl"
+      >
         <div className="flex items-center gap-4 mb-8">
           <label htmlFor="doc-img" className="relative group cursor-pointer">
             <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden border-2 border-blue-100 group-hover:border-blue-300 transition-all">
@@ -129,8 +153,12 @@ const AddHospital = () => {
             accept="image/*"
           />
           <div>
-            <h2 className="text-lg font-medium text-gray-800">Hospital Image</h2>
-            <p className="text-sm text-gray-500">Upload hospital logo or building image</p>
+            <h2 className="text-lg font-medium text-gray-800">
+              Hospital Image
+            </h2>
+            <p className="text-sm text-gray-500">
+              Upload hospital logo or building image
+            </p>
           </div>
         </div>
 
@@ -191,14 +219,19 @@ const AddHospital = () => {
                 <option value="8 Years">8 Years</option>
                 <option value="9 Years">9 Years</option>
                 <option value="10 Years">10 Years</option>
-                <option value="15 Year">15 Year</option>
-                <option value="20 Years">20 Years</option>
-                <option value="25 Years">25 Years</option>
-                <option value="30 Years">30 Years</option>
-                <option value="35 Years">35 Years</option>
-                <option value="40 Years">40 Years</option>
-                <option value="45 Years">45 Years</option>
-                <option value="50 Years">50 Years</option>
+                <option value="11 Years">11 Years</option>
+                <option value="12 Years">12 Years</option>
+                <option value="13 Years">13 Years</option>
+                <option value="14 Years">14 Years</option>
+                <option value="15 Years">15 Years</option>
+                <option value="15-20 Year">15-20 Years</option>
+                <option value="20-25 Years">20-25 Years</option>
+                <option value="25-30 Years">25-30 Years</option>
+                <option value="30-35 Years">30-35 Years</option>
+                <option value="35-40 Years">35-40 Years</option>
+                <option value="40-45 Years">40-45 Years</option>
+                <option value="45-50 Years">45-50 Years</option>
+                <option value="50+ Years">50+ Years</option>
               </select>
             </div>
 
@@ -225,14 +258,21 @@ const AddHospital = () => {
                 name=""
                 id=""
               >
-                <option value="Government">Government</option>
-                <option value="Private">Private</option>
-                <option value="Mission/Faith-Based">Mission/Faith-Based</option>
-                <option value="NGO/Community">NGO/Community</option>
-                <option value="Military/Police">Military/Police</option>
-                <option value="Specialized/Teaching">
-                  Specialized/Teaching
+                <option value="Government">Government Hospital</option>
+                <option value="Private">Private Hospital</option>
+                <option value="General Hospital">General Hospital</option>
+                <option value="Community Health Center">
+                  Community Health Center
                 </option>
+                <option value="Children's Hospital">Children's Hospital</option>
+                <option value="Maternity Hospital">Maternity Hospital</option>
+                <option value="Mental Health">
+                  Mental Health Facility
+                </option>
+                <option value="Rehabilitation Center">
+                  Rehabilitation Center
+                </option>
+                <option value="Teaching Hospital">Teaching Hospital</option>
               </select>
             </div>
 
@@ -246,15 +286,27 @@ const AddHospital = () => {
                 <option value="College of Medicine and Allied Health Sciences (COMAHS)">
                   College of Medicine and Allied Health Sciences (COMAHS)
                 </option>
-                <option value="Sierra Leone Medical and Dental Council">
-                  Accredited by the Sierra Leone Medical and Dental Council
+                <option value="Joint Commission International (JCI)">
+                  Joint Commission International (JCI)
                 </option>
-                <option value="Ministry of Health & Sanitation (MoHS)">
+                <option value="National Healthcare Safety Network (NHSN)">
+                  National Healthcare Safety Network (NHSN)
+                </option>
+                <option value="International Organization for Standardization (ISO)">
+                  International Organization for Standardization (ISO)
+                </option>
+                <option value="Sierra Leone Medical and Dental Council (SLMDC)">
+                  Accredited by the Sierra Leone Medical and Dental Council (SLMDC)
+                </option>
+                <option value="Ministry of Health & Sanitation (MoHS)"> 
                   Accredited by Ministry of Health & Sanitation (MoHS)
                 </option>
                 <option value="University of Sierra Leone (USL)">
                   University of Sierra Leone (USL)
                 </option>
+                <option value="West African College of Physicians (WACP)">
+                  West African College of Physicians (WACP)
+                  </option>
                 <option value="Other">Others</option>
               </select>
 

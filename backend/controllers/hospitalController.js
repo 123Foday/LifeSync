@@ -5,10 +5,18 @@ import appointmentModel from "../models/appointmentModel.js";
 
 const changeHospitalAvailability = async (req, res) => {
   try {
+    // Support hospitalId provided in body or injected by authHospital middleware
+    const hospitalId = req.body?.hospitalId || req.hospitalId
 
-    const { hospitalId } = req.body
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' })
+    }
 
-    const hospData = await doctorModel.findById(hospitalId)
+    const hospData = await hospitalModel.findById(hospitalId)
+    if (!hospData) {
+      return res.json({ success: false, message: 'Hospital not found' })
+    }
+
     await hospitalModel.findByIdAndUpdate(hospitalId, { available: !hospData.available })
     res.json({ success: true, message: 'Availability Changed' })
 
@@ -56,7 +64,13 @@ const loginHospital = async (req, res) => {
 // API to get hospital appointments for hospital panel
 const appointmentsHospital = async (req, res) => {
   try {
-    const { hospitalId } = req.body;
+    // Support hospitalId provided in body or injected by authHospital middleware
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' });
+    }
+
     const appointments = await appointmentModel.find({
       hospitalId,
       providerType: "hospital",
@@ -72,7 +86,13 @@ const appointmentsHospital = async (req, res) => {
 // API to mark appointment completed for hospital panel
 const appointmentComplete = async (req, res) => {
   try {
-    const { hospitalId, appointmentId } = req.body;
+    // Support hospitalId and appointmentId from body or injected data
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const { appointmentId } = req.body || {};
+
+    if (!hospitalId || !appointmentId) {
+      return res.json({ success: false, message: 'Missing hospitalId or appointmentId' });
+    }
 
     const appointmentData = await appointmentModel.findById(appointmentId);
 
@@ -93,7 +113,13 @@ const appointmentComplete = async (req, res) => {
 // API to cancel appointment for hospital panel
 const appointmentCancel = async (req, res) => {
   try {
-    const { hospitalId, appointmentId } = req.body;
+    // Support hospitalId and appointmentId from body or injected data
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const { appointmentId } = req.body || {};
+
+    if (!hospitalId || !appointmentId) {
+      return res.json({ success: false, message: 'Missing hospitalId or appointmentId' });
+    }
 
     const appointmentData = await appointmentModel.findById(appointmentId);
 
@@ -103,7 +129,7 @@ const appointmentCancel = async (req, res) => {
       });
 
       // Release the appointment slot
-      const { hospitalId, slotDate, slotTime } = appointmentData;
+      const { slotDate, slotTime } = appointmentData;
 
       const hospitalData = await hospitalModel.findById(hospitalId);
 
@@ -128,7 +154,12 @@ const appointmentCancel = async (req, res) => {
 // API to get dashboard data for hospital panel
 const hospitalDashboard = async (req, res) => {
   try {
-    const { hospitalId } = req.body;
+    // Support hospitalId from body or injected by authHospital middleware
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' });
+    }
 
     const appointments = await appointmentModel.find({
       hospitalId,
@@ -168,7 +199,13 @@ const hospitalDashboard = async (req, res) => {
 // API to get hospital profile for hospital panel
 const hospitalProfile = async (req, res) => {
   try {
-    const { hospitalId } = req.body;
+    // Support hospitalId from body or injected by authHospital middleware
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' });
+    }
+
     const profileData = await hospitalModel
       .findById(hospitalId)
       .select("-password");
@@ -182,7 +219,13 @@ const hospitalProfile = async (req, res) => {
 // API to update hospital profile data from hospital panel
 const updateHospitalProfile = async (req, res) => {
   try {
-    const { hospitalId, fees, address, available } = req.body;
+    // Support hospitalId from body or injected by authHospital middleware
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const { fees, address, available } = req.body || {};
+
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' });
+    }
 
     await hospitalModel.findByIdAndUpdate(hospitalId, {
       fees,

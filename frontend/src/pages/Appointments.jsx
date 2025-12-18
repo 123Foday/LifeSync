@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -31,7 +31,7 @@ const Appointments = () => {
   const [slotTime, setSlotTime] = useState("");
 
   // Fetch provider info (doctor or hospital)
-  const fetchProviderInfo = () => {
+  const fetchProviderInfo = useCallback(() => {
     if (!id) return;
 
     // First check if it's a doctor
@@ -53,9 +53,9 @@ const Appointments = () => {
     // If neither found, provider might not be loaded yet
     setProviderInfo(null);
     setProviderType(null);
-  };
+  }, [doctors, hospitals, id]);
 
-  const getAvailableSlots = () => {
+  const getAvailableSlots = useCallback(() => {
     if (!providerInfo || !providerInfo.slots_booked) {
       console.warn("Provider info not ready yet or missing slots_booked");
       return;
@@ -88,7 +88,7 @@ const Appointments = () => {
 
       let timeSlots = [];
 
-      while (currentDate < endTime) {
+  while (currentDate < endTime) {
         let formattedTime = currentDate.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -120,7 +120,7 @@ const Appointments = () => {
 
       setSlots((prev) => [...prev, timeSlots]);
     }
-  };
+  }, [providerInfo]);
 
   const bookAppointment = async () => {
     if (!token) {
@@ -150,10 +150,15 @@ const Appointments = () => {
         slotTime,
       };
 
+      if (!token) {
+        toast.warn("Login to book an appointment");
+        return navigate("/login");
+      }
+
       const { data } = await axios.post(
         `${backendUrl}/api/user/book-appointment`,
         appointmentData,
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (data.success) {

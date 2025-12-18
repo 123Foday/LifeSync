@@ -8,8 +8,8 @@ export const HospitalContext = createContext();
 const HospitalContextProvider = ({ children }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  const [dToken, setDToken] = useState(
-    localStorage.getItem("dToken") ? localStorage.getItem("dToken") : ""
+  const [hToken, setHToken] = useState(
+    localStorage.getItem("hToken") ? localStorage.getItem("hToken") : ""
   );
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
@@ -19,7 +19,7 @@ const HospitalContextProvider = ({ children }) => {
     try {
       const { data } = await axios.get(
         backendUrl + "/api/hospital/appointments",
-        { headers: { Authorization: `Bearer ${dToken}` } }
+        { headers: { Authorization: `Bearer ${hToken}` } }
       );
       if (data.success) {
         setAppointments(data.appointments);
@@ -31,14 +31,14 @@ const HospitalContextProvider = ({ children }) => {
       console.log(error);
       toast.error(error.message);
     }
-  }, [backendUrl, dToken]);
+  }, [backendUrl, hToken]);
 
   const completeAppointment = useCallback(async (appointmentId) => {
     try {
       const { data } = await axios.post(
         backendUrl + "/api/hospital/complete-appointment",
         { appointmentId },
-        { headers: { Authorization: `Bearer ${dToken}` } }
+        { headers: { Authorization: `Bearer ${hToken}` } }
       );
       if (data.success) {
         toast.success(data.message);
@@ -50,14 +50,14 @@ const HospitalContextProvider = ({ children }) => {
       console.log(error);
       toast.error(error.message);
     }
-  }, [backendUrl, dToken, getAppointments]);
+  }, [backendUrl, hToken, getAppointments]);
 
   const cancelAppointment = useCallback(async (appointmentId) => {
     try {
       const { data } = await axios.post(
         backendUrl + "/api/hospital/cancel-appointment",
         { appointmentId },
-        { headers: { Authorization: `Bearer ${dToken}` } }
+        { headers: { Authorization: `Bearer ${hToken}` } }
       );
       if (data.success) {
         toast.success(data.message);
@@ -69,12 +69,12 @@ const HospitalContextProvider = ({ children }) => {
       console.log(error);
       toast.error(error.message);
     }
-  }, [backendUrl, dToken, getAppointments]);
+  }, [backendUrl, hToken, getAppointments]);
 
   const getDashData = useCallback(async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/hospital/dashboard", {
-        headers: { Authorization: `Bearer ${dToken}` },
+        headers: { Authorization: `Bearer ${hToken}` },
       });
       if (data.success) {
         setDashData(data.dashData);
@@ -86,12 +86,12 @@ const HospitalContextProvider = ({ children }) => {
       console.log(error);
       toast.error(error.message);
     }
-  }, [backendUrl, dToken]);
+  }, [backendUrl, hToken]);
 
   const getProfileData = useCallback(async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/hospital/profile", {
-        headers: { Authorization: `Bearer ${dToken}` },
+        headers: { Authorization: `Bearer ${hToken}` },
       });
       if (data.success) {
         setProfileData(data.profileData);
@@ -101,11 +101,11 @@ const HospitalContextProvider = ({ children }) => {
       console.log(error);
       toast.error(error.message);
     }
-  }, [backendUrl, dToken]);
+  }, [backendUrl, hToken]);
 
   const value = {
-    dToken,
-    setDToken,
+    hToken,
+    setHToken,
     backendUrl,
     appointments,
     setAppointments,

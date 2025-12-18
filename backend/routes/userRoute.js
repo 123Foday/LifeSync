@@ -1,15 +1,17 @@
 import express from 'express'
-import { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment } from '../controllers/userController.js'
+import { registerUser, googleLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment } from '../controllers/userController.js'
 import authUser from '../middlewares/authUser.js'
 import upload from '../middlewares/multer.js'
 
 
 const userRouter = express.Router()
 
+// Public routes
 userRouter.post('/register', registerUser)
 userRouter.post('/login', loginUser)
 userRouter.post("/google-login", googleLoginController);
 
+// Protected routes
 userRouter.get('/get-profile',authUser, getProfile)
 userRouter.post('/update-profile', upload.single('image'), authUser, updateProfile)
 userRouter.post('/book-appointment', authUser, bookAppointment)
