@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
@@ -28,9 +28,9 @@ const Login = () => {
           email,
         });
         if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-          toast.success("Account created successfully!");
+          toast.success(data.message || "Registered. Please verify your email.")
+          // don't auto-login; user must verify email first
+          setState('Login')
         } else {
           toast.error(data.message);
         }
@@ -43,8 +43,17 @@ const Login = () => {
           localStorage.setItem("token", data.token);
           setToken(data.token);
           toast.success("Login successful!");
+          if (data.onboardingIncomplete) {
+            navigate('/onboarding')
+          } else {
+            navigate('/')
+          }
         } else {
-          toast.error(data.message);
+          if (data.needsVerification) {
+            toast.info('Account not verified. Please verify your email or phone before logging in.')
+          } else {
+            toast.error(data.message);
+          }
         }
       }
     } catch (error) {

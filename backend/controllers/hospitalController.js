@@ -2,6 +2,8 @@ import hospitalModel from "../models/hospitalModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
+import doctorModel from "../models/doctorModel.js";
+import { v2 as cloudinary } from 'cloudinary'
 
 const changeHospitalAvailability = async (req, res) => {
   try {
@@ -240,6 +242,139 @@ const updateHospitalProfile = async (req, res) => {
   }
 };
 
+// API to get hospital doctors
+const getHospitalDoctors = async (req, res) => {
+  try {
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' });
+    }
+
+    const doctors = await doctorModel.find({ hospitalId }).select('-password');
+    res.json({ success: true, doctors });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to add doctor to hospital
+const addDoctorToHospital = async (req, res) => {
+  try {
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const { doctorId } = req.body;
+
+    if (!hospitalId || !doctorId) {
+      return res.json({ success: false, message: 'Missing hospitalId or doctorId' });
+    }
+
+    const doctor = await doctorModel.findById(doctorId);
+    if (!doctor) {
+      return res.json({ success: false, message: 'Doctor not found' });
+    }
+
+    // Check if doctor is already assigned to this hospital
+    if (doctor.hospitalId === hospitalId) {
+      return res.json({ success: false, message: 'Doctor already assigned to this hospital' });
+    }
+
+    // Update doctor with hospitalId
+    await doctorModel.findByIdAndUpdate(doctorId, { hospitalId });
+
+    res.json({ success: true, message: 'Doctor added to hospital' });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to remove doctor from hospital
+const removeDoctorFromHospital = async (req, res) => {
+  try {
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const { doctorId } = req.body;
+
+    if (!hospitalId || !doctorId) {
+      return res.json({ success: false, message: 'Missing hospitalId or doctorId' });
+    }
+
+    const doctor = await doctorModel.findById(doctorId);
+    if (!doctor) {
+      return res.json({ success: false, message: 'Doctor not found' });
+    }
+
+    // Check if doctor belongs to this hospital
+    if (doctor.hospitalId !== hospitalId) {
+      return res.json({ success: false, message: 'Doctor not assigned to this hospital' });
+    }
+
+    // Remove hospitalId (set to null)
+    await doctorModel.findByIdAndUpdate(doctorId, { hospitalId: null });
+
+    res.json({ success: true, message: 'Doctor removed from hospital' });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API for hospital to create a new doctor (multipart/form-data)
+const hospitalAddDoctor = async (req, res) => {
+  try {
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const imageFile = req.file;
+
+    const { name, email, password, speciality, degree, experience, about, address } = req.body || {};
+
+    if (!hospitalId) {
+      return res.json({ success: false, message: 'Missing hospitalId' });
+    }
+
+    // basic validation similar to admin addDoctor
+    if (!name || !email || !password || !speciality || !degree || !experience || !about) {
+      return res.json({ success: false, message: 'Missing Details' });
+    }
+
+    if (password.length < 8) {
+      return res.json({ success: false, message: 'Please enter a strong password' });
+    }
+
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // upload image
+    let imageUrl = '';
+    if (imageFile) {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: 'image' });
+      imageUrl = imageUpload.secure_url;
+    }
+
+    const doctorData = {
+      name,
+      email,
+      image: imageUrl,
+      password: hashedPassword,
+      speciality,
+      degree,
+      experience,
+      about,
+      address: address ? JSON.parse(address) : {},
+      date: Date.now(),
+      hospitalId: hospitalId || null,
+    };
+
+    const newDoctor = new doctorModel(doctorData);
+    await newDoctor.save();
+
+    res.json({ success: true, message: 'Doctor Added' });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   hospitalList,
   loginHospital,
@@ -250,4 +385,8 @@ export {
   hospitalProfile,
   updateHospitalProfile,
   changeHospitalAvailability,
+  getHospitalDoctors,
+  addDoctorToHospital,
+  removeDoctorFromHospital,
+  hospitalAddDoctor,
 };

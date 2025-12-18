@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import Header from '../components/Header'
 import SpecialityMenu from '../components/SpecialityMenu'
 import TopDoctors from '../components/TopDoctors'
@@ -8,11 +8,13 @@ import CategoryMenu from '../components/CategoryMenu'
 
 
 const Home = () => {
+  const [selectedCategory, setSelectedCategory] = useState('')
+
   return (
-    <div>
+    <div className="pt-9">
       <Header />
-      <CategoryMenu />
-      <TopHospitals />
+      <CategoryMenu selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+      <TopHospitals selectedCategory={selectedCategory} />
       <SpecialityMenu />
       <TopDoctors />
       <Banner />

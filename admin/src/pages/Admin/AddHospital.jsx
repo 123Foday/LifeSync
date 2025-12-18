@@ -10,7 +10,6 @@ const AddHospital = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [experience, setExperience] = useState("1 Year");
-  const [fees, setFees] = useState("");
   const [about, setAbout] = useState("");
   const [speciality, setSpeciality] = useState("Government");
   const [degree, setDegree] = useState("College of Medicine and Allied Health Sciences (COMAHS)");
@@ -83,7 +82,6 @@ const AddHospital = () => {
       formData.append("email", email);
       formData.append("password", password);
       formData.append("experience", experience);
-      formData.append("fees", Number(fees));
       formData.append("about", about);
       formData.append("speciality", speciality);
       formData.append("degree", degree);
@@ -112,7 +110,6 @@ const AddHospital = () => {
         setAddress1("");
         setAddress2("");
         setAbout("");
-        setFees("");
       } else {
         toast.error(data.message);
       }
@@ -233,18 +230,6 @@ const AddHospital = () => {
                 <option value="45-50 Years">45-50 Years</option>
                 <option value="50+ Years">50+ Years</option>
               </select>
-            </div>
-
-            <div className="flex-1 flex flex-col gap-1">
-              <p>Fees</p>
-              <input
-                onChange={(e) => setFees(e.target.value)}
-                value={fees}
-                className="border rounded px-3 py-2"
-                type="number"
-                placeholder="fees"
-                required
-              />
             </div>
           </div>
 

@@ -87,7 +87,8 @@ const appointmentComplete = async (req, res) => {
 
     if (appointmentData && appointmentData.docId === docId) {
 
-      await appointmentModel.findByIdAndUpdate(appointmentId, { isComplete: true })
+      // Use the canonical property name `isCompleted` (matches the schema)
+      await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true })
       return res.json({ success: true, message: "Appointment Completed" })
 
     } else {
@@ -138,7 +139,8 @@ const doctorDashboard = async (req, res) => {
     let earnings = 0
 
     appointments.map((item) => {
-      if (item.isComplete || item.payment) {
+      // Use `isCompleted` to match saved documents
+      if (item.isCompleted || item.payment) {
         earnings += item.amount
       }
     })

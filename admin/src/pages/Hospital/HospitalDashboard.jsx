@@ -5,12 +5,13 @@ import { HospitalContext } from '../../context/HospitalContext'
 
 const HospitalDashboard = () => {
 
-  const { hToken, dashData, getDashData, completeAppointment, cancelAppointment } = useContext(HospitalContext)
+  const { hToken, dashData, getDashData, completeAppointment, cancelAppointment, doctors, getDoctors } = useContext(HospitalContext)
   const { currency, slotDateFormat } = useContext(AppContext)
 
   useEffect(() => {
     if (hToken) {
       getDashData()
+      getDoctors()
     }
   }, [hToken])
 
@@ -20,10 +21,10 @@ const HospitalDashboard = () => {
       <div className='flex flex-wrap gap-3'>
 
         <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
-          <img className='w-14' src={assets.earning_icon} alt="" />
+          <img className='w-14' src={assets.people_icon} alt="" />
           <div>
-            <p className='text-xl font-semibold text-gray-600'>{currency} {dashData.earnings}</p>
-            <p className='text-gray-400'>Earnings</p>
+            <p className='text-xl font-semibold text-gray-600'>{doctors.length}</p>
+            <p className='text-gray-400'>Doctors</p>
           </div>
         </div>
 
@@ -65,8 +66,8 @@ const HospitalDashboard = () => {
                 {
                   item.cancelled
                     ? <p className='text-red-400 text-xs font-medium'>Cancelled</p>
-                    : item.isComplete
-                      ? <p className='text-green-500 text-xs font-medium'>Completed</p>
+                    : item.isCompleted
+                      ? <p className='text-green-500 text-xs font-medium'>Booked</p>
                       : <div className='flex'>
                         <img onClick={() => cancelAppointment(item._id)} className='w-10 cursor-pointer' src={assets.cancel_icon} alt="" />
                         <img onClick={() => completeAppointment(item._id)} className='w-10 cursor-pointer' src={assets.tick_icon} alt="" />
@@ -77,6 +78,37 @@ const HospitalDashboard = () => {
           }
 
         </div>
+      </div>
+
+      {/* Hospital Doctors Section */}
+      <div className='bg-white mt-10'>
+        <div className='flex items-center gap-2.5 px-4 py-4 rounded-t border'>
+          <img src={assets.people_icon} alt="" />
+          <p className='font-semibold'>Your Doctors ({doctors.length})</p>
+        </div>
+
+        {doctors && doctors.length > 0 ? (
+          <div className='pt-4 border border-t-0'>
+            {
+              doctors.map((doctor, index) => (
+                <div className='flex items-center px-6 py-3 gap-3 hover:bg-gray-100 border-b last:border-b-0' key={index}>
+                  <img className='rounded-full w-10' src={doctor.image} alt="" />
+                  <div className='flex-1 text-sm'>
+                    <p className='text-gray-800 font-medium'>{doctor.name}</p>
+                    <p className='text-gray-600'>{doctor.speciality}</p>
+                  </div>
+                  <p className={`text-xs font-medium ${doctor.available ? 'text-green-500' : 'text-red-500'}`}>
+                    {doctor.available ? 'Available' : 'Not Available'}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        ) : (
+          <div className='px-6 py-6 text-center text-gray-600'>
+            <p>No doctors assigned to this hospital yet</p>
+          </div>
+        )}
       </div>
 
     </div>

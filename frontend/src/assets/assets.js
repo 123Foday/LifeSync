@@ -86,6 +86,10 @@ export const specialityData = [
         image: Neurologist
     },
     {
+        speciality: 'Psychologist',
+        image: Neurologist
+    },
+    {
         speciality: 'Gastroenterologist',
         image: Gastroenterologist
     },
@@ -102,27 +106,27 @@ export const categoryData = [
         image: Private,
     },
     {
-        speciality: "General Hospital",
+        speciality: "General",
         image: Mission_FaithBased,
     },
     {
-        speciality: "Community Health Center",
+        speciality: "Community",
         image: NGO_Community,
     },
     {
-        speciality: "Children's Hospital",
+        speciality: "Pediatrics",
         image: NGO_Community,
     },
     {
-        speciality: "Maternity Hospital",
+        speciality: "Maternity",
         image: Military_Police,
     },
     {
-        speciality: "Mental Health",
+        speciality: "Mental Asylum",
         image: Military_Police,
     },
     {
-        speciality: "Rehabilitation Center",
+        speciality: "Rehab Center",
         image: Specialised_teaching,
     },
     {

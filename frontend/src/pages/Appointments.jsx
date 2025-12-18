@@ -171,6 +171,14 @@ const Appointments = () => {
           getHospitalsData();
         }
 
+        // Notify other parts of the app (and other tabs) that appointments changed
+        try {
+          window.dispatchEvent(new Event('appointmentsUpdated'))
+          localStorage.setItem('appointments_update_ts', Date.now().toString())
+        } catch (e) {
+          console.log('Notify error:', e.message)
+        }
+
         navigate("/my-appointments");
       } else {
         toast.error(data.message);
@@ -184,14 +192,14 @@ const Appointments = () => {
   // Fetch provider info when doctors/hospitals data or id changes
   useEffect(() => {
     fetchProviderInfo();
-  }, [doctors, hospitals, id]);
+  }, [fetchProviderInfo]);
 
   // Get available slots when provider info changes
   useEffect(() => {
     if (providerInfo) {
       getAvailableSlots();
     }
-  }, [providerInfo]);
+  }, [getAvailableSlots, providerInfo]);
 
   // Show loading state
   if (!providerInfo) {
@@ -228,15 +236,19 @@ const Appointments = () => {
 
           {/* Provider Type Badge */}
           <div className="mt-2">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                providerType === "doctor"
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-green-100 text-green-700"
-              }`}
-            >
-              {providerType === "doctor" ? "👨‍⚕️ Private Doctor" : "🏥 Hospital"}
-            </span>
+            {providerType === "doctor" && providerInfo.hospitalId ? (
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                🏥 Institutional Doctor
+              </span>
+            ) : providerType === "doctor" ? (
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                👨‍⚕️ Private Doctor
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                🏥 Hospital
+              </span>
+            )}
           </div>
 
           {/*--------Provider About----------------*/}
@@ -248,13 +260,6 @@ const Appointments = () => {
               {providerInfo.about}
             </p>
           </div>
-          <p className="text-sm text-gray-500 mt-4 font-medium">
-            Appointment fee:{" "}
-            <span className="text-gray-600">
-              {currencySymbol}
-              {providerInfo.fees}
-            </span>
-          </p>
         </div>
       </div>
 

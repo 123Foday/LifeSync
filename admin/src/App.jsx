@@ -16,6 +16,8 @@ import { DoctorContext } from './context/DoctorContext.jsx';
 import HospitalDashboard from './pages/Hospital/HospitalDashboard.jsx';
 import HospitalAppointments from './pages/Hospital/HospitalAppointment.jsx';
 import HospitalProfile from './pages/Hospital/HospitalProfile.jsx';
+import HospitalAddDoctor from './pages/Hospital/HospitalAddDoctor.jsx';
+import HospitalDoctorList from './pages/Hospital/HospitalDoctorList.jsx';
 import DoctorDashboard from './pages/Doctor/DoctorDashboard.jsx';
 import DoctorAppointments from './pages/Doctor/DoctorAppointments.jsx';
 import DoctorProfile from './pages/Doctor/DoctorProfile.jsx';
@@ -54,6 +56,8 @@ const App = () => {
             {/* Hospital Routes */}
             <Route path='/hospital-dashboard' element={<HospitalDashboard />} />
             <Route path='/hospital-appointments' element={<HospitalAppointments />} />
+            <Route path='/hospital-add-doctor' element={<HospitalAddDoctor />} />
+            <Route path='/hospital-doctor-list' element={<HospitalDoctorList />} />
             <Route path='/hospital-profile' element={<HospitalProfile />} />
           </Routes>
         </main>

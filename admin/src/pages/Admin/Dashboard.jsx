@@ -140,7 +140,7 @@ const Dashboard = () => {
                   {item.cancelled ? (
                     <p className='text-red-400 text-xs font-medium'>Cancelled</p>
                   ) : item.isCompleted ? (
-                    <p className='text-green-500 text-xs font-medium'>Completed</p>
+                    <p className='text-green-500 text-xs font-medium'>Booked</p>
                   ) : (
                     <p className='text-blue-500 text-xs font-medium'>Scheduled</p>
                   )}

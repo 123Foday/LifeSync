@@ -8,8 +8,13 @@ import {
   hospitalDashboard,
   hospitalProfile,
   updateHospitalProfile,
+  getHospitalDoctors,
+  addDoctorToHospital,
+  removeDoctorFromHospital,
+  hospitalAddDoctor,
 } from "../controllers/hospitalController.js";
 import authHospital from "../middlewares/authHospital.js";
+import upload from "../middlewares/multer.js";
 
 const hospitalRouter = express.Router();
 
@@ -26,5 +31,10 @@ hospitalRouter.post("/cancel-appointment", authHospital, appointmentCancel);
 hospitalRouter.get("/dashboard", authHospital, hospitalDashboard);
 hospitalRouter.get("/profile", authHospital, hospitalProfile);
 hospitalRouter.post("/update-profile", authHospital, updateHospitalProfile);
+hospitalRouter.post("/add-doctor", authHospital, addDoctorToHospital);
+hospitalRouter.post("/remove-doctor", authHospital, removeDoctorFromHospital);
+hospitalRouter.get("/doctors", authHospital, getHospitalDoctors);
+// allow hospital to create a new doctor via multipart/form-data
+hospitalRouter.post("/create-doctor", authHospital, upload.single('image'), hospitalAddDoctor);
 
 export default hospitalRouter;

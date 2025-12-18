@@ -51,7 +51,6 @@ const HospitalDetail = () => {
                 <div className="space-y-2 text-gray-600">
                   <p><span className="font-medium">Type:</span> {hospital.speciality}</p>
                   <p><span className="font-medium">Experience:</span> {hospital.experience}</p>
-                  <p><span className="font-medium">Consultation Fee:</span> {currency}{hospital.fees}</p>
                   <p><span className="font-medium">Address:</span> {hospital.address?.line1}</p>
                 </div>
               </div>

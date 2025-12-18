@@ -1,11 +1,15 @@
-import React from "react";
+import PropTypes from 'prop-types'
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
-const TopHospitals = () => {
+const TopHospitals = ({ selectedCategory = '' }) => {
   const navigate = useNavigate();
   const { hospitals } = useContext(AppContext);
+
+  const filtered = selectedCategory
+    ? hospitals.filter((h) => h.speciality === selectedCategory)
+    : hospitals;
 
   return (
     <div className="flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10">
@@ -14,7 +18,7 @@ const TopHospitals = () => {
         Simply browse through our extensive list of trusted hospitals.
       </p>
       <div className="w-full grid grid-auto-cols gap-4 pt-5 gap-y-6 px-3 sm:px-0">
-        {hospitals.slice(0, 10).map((item, index) => (
+  {filtered.slice(0, 10).map((item, index) => (
           <div
             onClick={() => {
               navigate(`/appointment/${item._id}`);
@@ -57,3 +61,7 @@ const TopHospitals = () => {
 };
 
 export default TopHospitals;
+
+TopHospitals.propTypes = {
+  selectedCategory: PropTypes.string,
+}

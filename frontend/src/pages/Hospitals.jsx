@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
@@ -71,27 +70,27 @@ const Hospitals = () => {
           
           <p
             onClick={() =>
-              speciality === "General Hospital"
+              speciality === "General"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/General Hospital")
+                : navigate("/hospitals/General")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "General Hospital"
+              speciality === "General"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}
           >
-            General Hospital
+            General
           </p>
 
           <p
             onClick={() =>
-              speciality === "Community Health Center"
+              speciality === "Community"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Community Health Center")
+                : navigate("/hospitals/Community")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Community Health Center"
+              speciality === "Community"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}
@@ -101,57 +100,57 @@ const Hospitals = () => {
 
           <p
             onClick={() =>
-              speciality === "Children's Hospital"
+              speciality === "Pediatrics"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Children's Hospital")
+                : navigate("/hospitals/Pediatrics")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Children's Hospital"
+              speciality === "Pediatrics"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}
           >
-            Children&apos;s Hospital
+            Pediatrics
           </p>
 
           <p
             onClick={() =>
-              speciality === "Maternity Hospital"
+              speciality === "Maternity"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Maternity Hospital")
+                : navigate("/hospitals/Maternity")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Maternity Hospital"
+              speciality === "Maternity"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}
           >
-            Maternity Hospital
+            Maternity
           </p>
 
           <p
             onClick={() =>
-              speciality === "Mental Health"
+              speciality === "Mental Asylum"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Mental Health")
+                : navigate("/hospitals/Mental Asylum")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Mental Health"
+              speciality === "Mental Asylum"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}
           >
-            Mental Health
+            Mental Asylum
           </p>
 
           <p
             onClick={() =>
-              speciality === "Rehabilitation Center"
+              speciality === "Rehab Center"
                 ? navigate("/hospitals")
-                : navigate("/hospitals/Rehabilitation Center")
+                : navigate("/hospitals/Rehab Center")
             }
             className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-              speciality === "Rehabilitation Center"
+              speciality === "Rehab Center"
                 ? "bg-indigo-100 text-black"
                 : ""
             }`}

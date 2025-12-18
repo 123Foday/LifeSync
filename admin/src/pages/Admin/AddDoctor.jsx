@@ -11,7 +11,6 @@ const AddDoctor = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [experience, setExperience] = useState('1 Year')
-  const [fees, setFees] = useState('')
   const [about, setAbout] = useState('')
   const [speciality, setSpeciality] = useState('General physician')
   const [degree, setDegree] = useState('')
@@ -42,7 +41,6 @@ const AddDoctor = () => {
       formData.append('email', email)
       formData.append('password', password)
       formData.append('experience', experience)
-      formData.append('fees', Number(fees))
       formData.append('about', about)
       formData.append('speciality', speciality)
       formData.append('degree', degree)
@@ -65,7 +63,6 @@ const AddDoctor = () => {
         setAddress1('')
         setAddress2('')
         setAbout('')
-        setFees('')
       } else {
         toast.error(data.message)
       }
@@ -123,11 +120,6 @@ const AddDoctor = () => {
               </select>
             </div>
 
-            <div className='flex-1 flex flex-col gap-1'>
-              <p>Fees</p>
-              <input onChange={(e)=>setFees(e.target.value)} value={fees} className='border rounded px-3 py-2' type="number" placeholder='fees' required />
-            </div>
-
           </div>
 
           <div className='w-full lg:flex-1 flex flex-col gap-4'>
@@ -139,6 +131,7 @@ const AddDoctor = () => {
                 <option value="Gynecologist">Gynecologist</option>
                 <option value="Dermatologist">Dermatologist</option>
                 <option value="Pediatricians">Pediatricians</option>
+                <option value="Psychologist">Psychologist</option>
                 <option value="Neurologist">Neurologist</option>
                 <option value="Gastroenterologist">Gastroenterologist</option>
               </select>
@@ -156,15 +149,14 @@ const AddDoctor = () => {
             </div>
 
             <div className='flex-1 flex flex-col gap-1'>
-              <p>Hospital</p>
+              <p>Hospital (Optional - Leave empty for Private Doctor)</p>
               <select
                 onChange={(e) => setHospitalId(e.target.value)}
                 value={hospitalId}
                 className='border rounded px-3 py-2'
-                required
               >
-                <option value="">Select Hospital</option>
-                {hospitals.map((hospital) => (
+                <option value="">Private Doctor (No Hospital)</option>
+                {hospitals && hospitals.length > 0 && hospitals.map((hospital) => (
                   <option key={hospital._id} value={hospital._id}>
                     {hospital.name}
                   </option>

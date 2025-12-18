@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -34,7 +34,7 @@ const MyAppointments = () => {
 
   const navigate = useNavigate();
 
-  const getUserAppointments = async () => {
+  const getUserAppointments = useCallback(async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
         headers: { Authorization: `Bearer ${token}` },
@@ -48,7 +48,7 @@ const MyAppointments = () => {
       console.log(error);
       toast.error(error.message);
     }
-  };
+  }, [backendUrl, token]);
 
   const cancelAppointment = async (appointmentId) => {
     try {
@@ -63,6 +63,13 @@ const MyAppointments = () => {
         // Refresh both doctors and hospitals data
         getDoctorsData();
         getHospitalsData();
+        // Notify other parts of the app (and other tabs) that appointments changed
+        try {
+          window.dispatchEvent(new Event('appointmentsUpdated'))
+          localStorage.setItem('appointments_update_ts', Date.now().toString())
+        } catch (e) {
+          console.log('Notify error:', e.message)
+        }
       } else {
         toast.error(data.message);
       }
@@ -76,7 +83,28 @@ const MyAppointments = () => {
     if (token) {
       getUserAppointments();
     }
-  }, [token]);
+  }, [token, getUserAppointments]);
+
+  // Listen for appointment updates dispatched elsewhere in the app (other contexts/tabs)
+  useEffect(() => {
+    const handleUpdate = () => {
+      if (token) getUserAppointments();
+    };
+
+    const handleStorage = (e) => {
+      if (e.key === 'appointments_update_ts') {
+        if (token) getUserAppointments();
+      }
+    };
+
+    window.addEventListener('appointmentsUpdated', handleUpdate);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('appointmentsUpdated', handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [token, getUserAppointments]);
 
   return (
     <div>
@@ -126,7 +154,7 @@ const MyAppointments = () => {
                       </button>
                     ) : item.isCompleted ? (
                       <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">
-                        Completed
+                        Booked
                       </button>
                     ) : (
                       <button
@@ -223,10 +251,10 @@ const MyAppointments = () => {
                     </button>
                   )}
 
-                  {/* Completed Status */}
+                  {/* Booked Status */}
                   {item.isCompleted && (
                     <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">
-                      Completed
+                      Booked
                     </button>
                   )}
                 </div>

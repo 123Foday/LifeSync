@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback } from "react"
+import { createContext, useState, useCallback, useEffect } from "react"
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -102,6 +102,13 @@ const AdminContextProvider = ({ children }) => {
       if (data.success) {
         toast.success(data.message)
         getAllAppointments()
+        // Notify other parts of the app (and other tabs) that appointments changed
+        try {
+          window.dispatchEvent(new Event('appointmentsUpdated'))
+          localStorage.setItem('appointments_update_ts', Date.now().toString())
+        } catch (e) {
+          console.log('Notify error:', e.message)
+        }
       } else {
         toast.error(data.message)
       }
@@ -142,12 +149,38 @@ const AdminContextProvider = ({ children }) => {
     getDashData
   }
 
+  // Listen for updates (in-window or cross-tab) to refresh appointments
+  useEffect(() => {
+    const handleUpdate = () => {
+      if (aToken) getAllAppointments()
+    }
+
+    const handleStorage = (e) => {
+      if (e.key === 'appointments_update_ts') {
+        if (aToken) getAllAppointments()
+      }
+    }
+
+    window.addEventListener('appointmentsUpdated', handleUpdate)
+    window.addEventListener('storage', handleStorage)
+
+    return () => {
+      window.removeEventListener('appointmentsUpdated', handleUpdate)
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [aToken, getAllAppointments])
+
   return (
     <AdminContext.Provider value={value}>
         {children}
     </AdminContext.Provider>
   )
 }
+
+// Listen for cross-tab or in-window updates to refresh appointments
+// (kept outside the provider return to avoid re-creating listeners)
+// Note: We attach listeners when this module is evaluated; they call into the provider via window events.
+
 
 export default AdminContextProvider
 

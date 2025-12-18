@@ -1,7 +1,12 @@
-import React from 'react'
 import {assets} from '../assets/assets'
+import { useContext } from 'react'
+import { AppContext } from '../context/AppContext'
+import { useNavigate } from 'react-router-dom'
 
 const Header = () => {
+  const navigate = useNavigate();
+  const { token, userData } = useContext(AppContext)
+
   return (
     <div className='flex flex-col md:flex-row flex-wrap bg-[#5f6FFF] rounded-lg px-6 md:px-10'>    
       {/* -------left Side------- */ }
@@ -13,9 +18,23 @@ const Header = () => {
           <img className='w-28' src={assets.group_profiles} alt="" />
           <p>Simply browse through our extensive lists of trusted doctors, <br className='hidden sm:block' /> schedule your appointment hassle free</p>
         </div>
-        <a className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-600 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300' href="#speciality">
-          Book Appointment <img className='w-3' src={assets.arrow_icon} alt="" />
-        </a>
+        {token && userData ? (
+          <button
+          onClick={() => navigate("/hospitals")}
+          >
+            <a className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-600 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300' href="#speciality">
+              Book Appointment <img className='w-3' src={assets.arrow_icon} alt=""/>
+            </a>
+          </button>
+          ):(
+            <button
+            onClick={() => navigate("/login")}
+            >
+              <a className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-700 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300' href="#speciality">
+              Let&apos;s Dive In <img className='w-3' src={assets.arrow_icon} alt="" />
+            </a>
+          </button>
+          )}
       </div>    
 
       {/* -------Right Side------- */ }

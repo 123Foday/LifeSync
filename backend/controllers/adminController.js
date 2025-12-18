@@ -12,11 +12,11 @@ import hospitalModel from '../models/hospitalModel.js'
 const addDoctor = async (req, res) => {
   
   try {
-    const { name, email, password, speciality, degree, experience, about, fees, address } = req.body
+    const { name, email, password, speciality, degree, experience, about, hospitalId } = req.body
     const imageFile = req.file
 
     // checking for all data to add doctor
-    if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees) {
+    if (!name || !email || !password || !speciality || !degree || !experience || !about) {
       return res.json({success: false, message: "Missing Details"})
     }
 
@@ -47,9 +47,9 @@ const addDoctor = async (req, res) => {
       degree,
       experience,
       about,
-      fees,
       address: JSON.parse(address),
-      date: Date.now()
+      date: Date.now(),
+      hospitalId: hospitalId || null
     }
 
     const newDoctor = new doctorModel(doctorData)

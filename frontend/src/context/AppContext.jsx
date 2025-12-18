@@ -16,6 +16,18 @@ const AppContextProvider = ({ children }) => {
   );
   const [userData, setUserData] = useState(false);
 
+  // Centralized logout helper so both proactive checks and response interceptor can reuse it
+  const logout = (redirect = true) => {
+    setToken(false);
+    setUserData(false);
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common.Authorization;
+    if (redirect) {
+      // Use location assign so history is replaced and back doesn't restore the expired session
+      window.location.href = '/login';
+    }
+  }
+
   const getDoctorsData = useCallback(async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/doctor/list");
@@ -88,6 +100,84 @@ const AppContextProvider = ({ children }) => {
       setUserData(false);
     }
   }, [token, loadUserProfileData]);
+
+  // Proactively detect token expiry by decoding JWT payload and scheduling an auto-logout
+  useEffect(() => {
+    let timerId;
+
+    if (token) {
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          // Base64url -> Base64
+          const base64Url = parts[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+              })
+              .join('')
+          );
+          const payload = JSON.parse(jsonPayload);
+
+          if (payload && payload.exp) {
+            const expMs = payload.exp * 1000;
+            const now = Date.now();
+
+            if (expMs <= now) {
+              // Already expired — force logout immediately (no redirect to avoid double navigation)
+              logout(false);
+              toast.info('Session expired. Please log in again.');
+            } else {
+              // Schedule a logout slightly before actual expiry to be safe
+              const msUntilLogout = Math.max(expMs - now - 3000, 0);
+              timerId = setTimeout(() => {
+                logout(true);
+                toast.info('Session expired. Please log in again.');
+              }, msUntilLogout);
+            }
+          }
+        }
+      } catch (err) {
+        // If decoding fails, don't break the app; rely on interceptor as a fallback
+        console.warn('Failed to decode stored token for expiry check', err);
+      }
+    }
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
+  }, [token]);
+
+  // Intercept 401 / JWT expired responses globally so we can auto-logout the user
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const status = error?.response?.status;
+        const message = error?.response?.data?.message || error?.message || '';
+
+        // If the token is expired or the server returns 401, clear the session and redirect to login
+        if (status === 401 || /jwt expired|token expired|invalid token/i.test(message)) {
+          setToken(false);
+          setUserData(false);
+          localStorage.removeItem('token');
+          delete axios.defaults.headers.common.Authorization;
+          toast.info('Session expired. Please log in again.');
+          // Small timeout to allow the toast to render
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 600);
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    return () => axios.interceptors.response.eject(interceptor);
+  }, [setToken, setUserData]);
 
   const value = {
     doctors,

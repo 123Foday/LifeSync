@@ -20,13 +20,12 @@ const AllAppointments = () => {
       <p className="mb-3 text-lg font-medium">All Appointments</p>
 
       <div className="bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
-        <div className="hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b">
+        <div className="hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr] grid-flow-col py-3 px-6 border-b">
           <p>#</p>
           <p>Patient</p>
           <p>Age</p>
           <p>Date & Time</p>
           <p>Provider</p>
-          <p>Fees</p>
           <p>Action</p>
         </div>
 
@@ -53,7 +52,7 @@ const AllAppointments = () => {
           if (!providerData) {
             return (
               <div
-                className="flex flex-wrap justify-between max-sm:gap-2 sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
+                className="flex flex-wrap justify-between max-sm:gap-2 sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
                 key={index}
               >
                 <p className="max-sm:hidden">{index + 1}</p>
@@ -78,15 +77,11 @@ const AllAppointments = () => {
                   </div>
                   <p className="text-gray-400">Provider Unavailable</p>
                 </div>
-                <p>
-                  {currency}
-                  {item.amount || 0}
-                </p>
                 {item.cancelled ? (
                   <p className="text-red-400 text-xs font-medium">Cancelled</p>
                 ) : item.isCompleted ? (
                   <p className="text-green-500 text-xs font-medium">
-                    Completed
+                    Booked
                   </p>
                 ) : (
                   <img
@@ -152,17 +147,11 @@ const AllAppointments = () => {
                 </div>
               </div>
 
-              {/* Fees */}
-              <p>
-                {currency}
-                {item.amount || 0}
-              </p>
-
               {/* Action */}
               {item.cancelled ? (
                 <p className="text-red-400 text-xs font-medium">Cancelled</p>
               ) : item.isCompleted ? (
-                <p className="text-green-500 text-xs font-medium">Completed</p>
+                <p className="text-green-500 text-xs font-medium">Booked</p>
               ) : (
                 <img
                   onClick={() => cancelAppointment(item._id)}

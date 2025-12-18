@@ -21,6 +21,11 @@ const TopDoctors = () => {
               </div>
               <p className='text-gray-900 text-lg font-medium'>{item.name}</p>
               <p className='text-gray-600 text-sm'>{item.speciality}</p>
+              {item.hospitalId ? (
+                <p className='text-blue-600 text-xs font-semibold mt-1'>🏥 Institutional Doctor</p>
+              ) : (
+                <p className='text-orange-600 text-xs font-semibold mt-1'>👨‍⚕️ Private Doctor</p>
+              )}
             </div>
           </div>
         ))}
