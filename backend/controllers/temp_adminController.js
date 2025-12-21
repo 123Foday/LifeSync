@@ -10,11 +10,11 @@ import userModel from '../models/userModel.js'
 // API for adding hospital
 const addHospital = async (req, res) => {
   try {
-    const { name, email, password, speciality, degree, experience, about, fees, address } = req.body
+    const { name, email, password, speciality, degree, experience, about, address } = req.body
     const imageFile = req.file
 
     // checking for all data to add hospital
-    if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees) {
+    if (!name || !email || !password || !speciality || !degree || !experience || !about) {
       return res.json({success: false, message: "Missing Details"})
     }
 
@@ -51,7 +51,6 @@ const addHospital = async (req, res) => {
       degree,
       experience,
       about,
-      fees,
       address: JSON.parse(address),
       date: Date.now(),
       slot_booked: {}

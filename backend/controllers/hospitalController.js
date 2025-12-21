@@ -99,10 +99,8 @@ const appointmentComplete = async (req, res) => {
     const appointmentData = await appointmentModel.findById(appointmentId);
 
     if (appointmentData && appointmentData.hospitalId === hospitalId) {
-      await appointmentModel.findByIdAndUpdate(appointmentId, {
-        isCompleted: true,
-      });
-      return res.json({ success: true, message: "Appointment Completed" });
+      await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true, status: 'booked' });
+      return res.json({ success: true, message: "Appointment Booked" });
     } else {
       return res.json({ success: false, message: "Mark Failed" });
     }
@@ -128,6 +126,8 @@ const appointmentCancel = async (req, res) => {
     if (appointmentData && appointmentData.hospitalId === hospitalId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         cancelled: true,
+        cancelledBy: 'hospital',
+        status: 'rejected'
       });
 
       // Release the appointment slot
@@ -168,13 +168,8 @@ const hospitalDashboard = async (req, res) => {
       providerType: "hospital",
     });
 
-    let earnings = 0;
-
-    appointments.forEach((item) => {
-      if (item.isCompleted || item.payment) {
-        earnings += item.amount;
-      }
-    });
+    // Count booked appointments (no monetary earnings tracked anymore)
+    const bookedCount = appointments.filter((item) => item.status === 'booked').length;
 
     let patients = [];
 
@@ -184,8 +179,9 @@ const hospitalDashboard = async (req, res) => {
       }
     });
 
+    // Also include number of booked appointments and total appointments
     const dashData = {
-      earnings,
+      bookedCount,
       appointments: appointments.length,
       patients: patients.length,
       latestAppointments: appointments.reverse().slice(0, 5),
@@ -223,14 +219,13 @@ const updateHospitalProfile = async (req, res) => {
   try {
     // Support hospitalId from body or injected by authHospital middleware
     const hospitalId = req.body?.hospitalId || req.hospitalId;
-    const { fees, address, available } = req.body || {};
+    const { address, available } = req.body || {};
 
     if (!hospitalId) {
       return res.json({ success: false, message: 'Missing hospitalId' });
     }
 
     await hospitalModel.findByIdAndUpdate(hospitalId, {
-      fees,
       address,
       available,
     });

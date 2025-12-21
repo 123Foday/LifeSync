@@ -32,6 +32,16 @@ const MyAppointments = () => {
     );
   };
 
+  // Determine whether a 'pending' appointment should show as Pending... in the UI.
+  // Do not show Pending for appointments that are completed/booked/rejected/cancelled
+  const isPending = (item) => {
+    if (!item) return false;
+    if (item.cancelled) return false;
+    if (item.isCompleted) return false; // legacy flag
+    if (item.status && (item.status === 'booked' || item.status === 'rejected' || item.status === 'cancelled')) return false;
+    return item.status === 'pending';
+  };
+
   const navigate = useNavigate();
 
   const getUserAppointments = useCallback(async () => {
@@ -220,17 +230,10 @@ const MyAppointments = () => {
                 </div>
 
                 <div className="flex flex-col gap-2 justify-end">
-                  {/* Paid Status */}
-                  {!item.cancelled && item.payment && !item.isCompleted && (
-                    <button className="sm:min-w-48 py-2 border rounded text-stone-500 bg-indigo-50">
-                      Paid
-                    </button>
-                  )}
-
-                  {/* Pay Online Button */}
-                  {!item.cancelled && !item.payment && !item.isCompleted && (
-                    <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-[#5f6FFF] hover:text-white transition-all duration-300">
-                      Pay Online
+                  {/* Pending for any unaccepted appointment */}
+                  {isPending(item) && (
+                    <button className="sm:min-w-48 py-2 border rounded text-stone-500 bg-yellow-50">
+                      Pending...
                     </button>
                   )}
 
@@ -244,15 +247,21 @@ const MyAppointments = () => {
                     </button>
                   )}
 
-                  {/* Cancelled Status */}
+                  {/* Cancelled / Rejected Status */}
                   {item.cancelled && !item.isCompleted && (
-                    <button className="sm:min-w-48 py-2 border border-red-500 text-red-500">
-                      Appointment Cancelled
-                    </button>
+                    item.status === 'rejected' ? (
+                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500">
+                        Appointment Rejected
+                      </button>
+                    ) : (
+                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500">
+                        Appointment Cancelled
+                      </button>
+                    )
                   )}
 
                   {/* Booked Status */}
-                  {item.isCompleted && (
+                  {(item.status === 'booked' || item.isCompleted) && (
                     <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">
                       Booked
                     </button>

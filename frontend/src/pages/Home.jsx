@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Header from '../components/Header'
+import HealthAdvisorCard from '../components/HealthAdvisorCard'
 import SpecialityMenu from '../components/SpecialityMenu'
 import TopDoctors from '../components/TopDoctors'
 import TopHospitals from '../components/TopHospitals'
@@ -11,9 +12,18 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
 
   return (
-    <div className="pt-9">
+    <div className="pt-4 sm:pt-6 md:pt-9">
       <Header />
-      <CategoryMenu selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+      <div className="mt-6 sm:mt-8 md:mt-10"></div>
+      {/* MedicalAdvisor */}
+      <HealthAdvisorCard />
+      {/*add margin */}
+      <div className="mt-8 sm:mt-12 md:mt-16 lg:mt-20"></div>
+      {/* CategoryMenu */}
+      <CategoryMenu
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
       <TopHospitals selectedCategory={selectedCategory} />
       <SpecialityMenu />
       <TopDoctors />

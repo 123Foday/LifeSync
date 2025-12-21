@@ -50,12 +50,12 @@ const SpecialityMenu = () => {
   }, [hoverIndex, selectedSpeciality])
 
   return (
-    <section id="speciality" className="py-12 text-gray-800">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex flex-col gap-4 items-center">
+    <section id="speciality" className="py-8 sm:py-10 md:py-12 text-gray-800">
+      <div className="container px-4 sm:px-6">
+        <div className="flex flex-col gap-3 sm:gap-4 items-center">
           <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold">Find Doctors by Speciality</h2>
-            <p className="text-sm text-gray-600 mt-1 sm:w-[520px]">Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free</p>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">Find Doctors by Speciality</h2>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 w-full sm:w-[90%] md:w-[520px] px-4 sm:px-0">Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free</p>
           </div>
 
           <nav aria-label="Doctor specialities" className="w-full">

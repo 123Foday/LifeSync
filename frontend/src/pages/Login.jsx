@@ -98,7 +98,7 @@ const Login = () => {
 
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
-      <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg">
+      <div className="flex flex-col gap-3 w-full max-w-md mx-auto items-start p-6 sm:p-8 border rounded-xl text-zinc-600 text-sm shadow-lg">
         {/* Header */}
         <p className="text-2xl font-semibold">
           {state === "Sign Up" ? "Create Account" : "Login"}
@@ -178,7 +178,7 @@ const Login = () => {
               theme="outline"
               size="large"
               text={state === "Sign Up" ? "signup_with" : "signin_with"}
-              width="340"
+              style={{ width: '100%' }}
               logo_alignment="left"
               useOneTap={false}
             />

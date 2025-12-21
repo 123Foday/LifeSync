@@ -7,7 +7,12 @@ export const AppContext = createContext();
 
 const AppContextProvider = ({ children }) => {
   const currencySymbol = "$";
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  
+  // Log backend URL for debugging (remove in production)
+  if (import.meta.env.DEV) {
+    console.log("Backend URL:", backendUrl);
+  }
 
   const [doctors, setDoctors] = useState([]);
   const [hospitals, setHospitals] = useState([]);

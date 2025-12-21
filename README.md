@@ -17,10 +17,9 @@ To create a seamless healthcare experience for every user by bridging the gap be
 - **Appointment Booking** - Easy scheduling with real-time availability
 - **Profile Management** - Update personal information and medical details
 - **Appointment History** - View and manage past and upcoming appointments
-- **Payment Integration** - Secure payment processing for appointments
 
 ### For Doctors
-- **Doctor Dashboard** - Overview of appointments and earnings
+- **Doctor Dashboard** - Overview of appointments and statistics
 - **Appointment Management** - View and manage patient appointments
 - **Profile Management** - Update professional information and availability
 - **Slot Management** - Control appointment availability and timing
@@ -50,7 +49,7 @@ To create a seamless healthcare experience for every user by bridging the gap be
 - **bcrypt 6.0.0** - Password hashing
 - **Cloudinary 2.7.0** - Image upload and management
 - **Multer 2.0.2** - File upload middleware
-- **Razorpay 2.9.6** - Payment gateway integration
+
 - **CORS 2.8.5** - Cross-origin resource sharing
 
 ## 📁 Project Structure
@@ -64,9 +63,9 @@ LifeSync/
 │   │   ├── context/        # React context for state management
 │   │   └── assets/         # Images and static assets
 │   └── package.json
-├── admin/                   # Admin and Doctor panel React application
+├── admin/                   # Admin, Hospital and Doctor panel React application
 │   ├── src/
-│   │   ├── components/     # Admin/Doctor UI components
+│   │   ├── components/     # Admin/Hospital/Doctor UI components
 │   │   ├── pages/         # Admin and Doctor pages
 │   │   ├── context/       # Context for admin/doctor state
 │   │   └── assets/        # Admin panel assets
@@ -87,7 +86,6 @@ LifeSync/
 - Node.js (v16 or higher)
 - MongoDB (local or cloud instance)
 - Cloudinary account (for image uploads)
-- Razorpay account (for payments)
 
 ### Installation
 
@@ -124,8 +122,6 @@ LifeSync/
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   RAZORPAY_KEY_ID=your_razorpay_key_id
-   RAZORPAY_KEY_SECRET=your_razorpay_key_secret
    PORT=4000
    ```
 
@@ -193,16 +189,13 @@ The applications will be available at:
 - Role-based access control (Patient, Doctor, Admin)
 - Secure password hashing with bcrypt
 - Protected routes and API endpoints
+- Automatic session expiry handling: the frontend detects expired/invalid JWTs (401 responses or messages like "jwt expired"), automatically clears the session and redirects users to the login page. Backend auth middleware now returns standardized 401 responses with the underlying error message (e.g., "jwt expired") so the frontend can reliably detect this condition.
 
 ### Image Management
 - Cloudinary integration for profile pictures
 - Automatic image optimization and resizing
 - Secure file upload with validation
 
-### Payment Integration
-- Razorpay payment gateway
-- Secure payment processing
-- Payment status tracking
 
 ## 🤝 Contributing
 

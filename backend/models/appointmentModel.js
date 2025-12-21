@@ -10,10 +10,8 @@ const appointmentSchema = new mongoose.Schema({
   userData: { type: Object, required: true },
   docData: { type: Object }, // Optional - only for doctors
   hospitalData: { type: Object }, // Optional - only for hospitals
-  amount: { type: Number, required: true },
   date: { type: Number, required: true },
   cancelled: { type: Boolean, default: false },
-  payment: { type: Boolean, default: false },
   isCompleted: { type: Boolean, default: false },
   cancelledBy: { type: String, enum: ["user", "doctor", "hospital"], default: null },
   status: { type: String, enum: ["pending", "booked", "rejected", "cancelled"], default: "pending" },

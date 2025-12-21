@@ -69,7 +69,6 @@ describe('Booking Flow', () => {
     const mockDoctor = {
       _id: 'doctor123',
       available: true,
-      fees: 100,
       slots_booked: {}
     };
 
@@ -101,8 +100,7 @@ describe('Booking Flow', () => {
   test('fails when doctor not available', async () => {
     const mockDoctor = {
       _id: 'doctor123',
-      available: false,
-      fees: 100
+      available: false
     };
 
   doctorModel.findById.mockImplementationOnce(() => ({ select: () => Promise.resolve(mockDoctor) }));
@@ -119,7 +117,6 @@ describe('Booking Flow', () => {
     const mockDoctor = {
       _id: 'doctor123',
       available: true,
-      fees: 100,
       slots_booked: {
         '2025-11-01': ['10:00']
       }

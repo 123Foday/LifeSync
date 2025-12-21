@@ -3,39 +3,45 @@ import { assets } from '../assets/assets'
 
 const Footer = () => {
   return (
-    <div className='md:mx-10'>
-      <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
+    <div className='container px-4 sm:px-6'>
+      <div className='flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-[3fr_1fr_1fr] gap-8 sm:gap-10 lg:gap-14 my-8 sm:my-10 mt-20 sm:mt-32 md:mt-40 text-xs sm:text-sm'>
         {/*--------left section---------*/}
-        <div>
-          <img className='mb-5 w-40' src={assets.logo} alt="" />
-          <p className='w-full md:w-2/3 text-gray-600 leading-6'>Lorem Ipsumis simply dummy text of the printing and typesetting industry. Lorem ipsum ha s been the always statement primary text ever since the 1905s when an typewriter prince took a gallery of many embeded it to make a type specific boo.</p>
+        <div className='text-center sm:text-left'>
+          <img className='mb-4 sm:mb-5 w-32 sm:w-40 mx-auto sm:mx-0' src={assets.logo} alt="" />
+          <p className='w-full sm:w-full md:w-2/3 text-gray-600 leading-5 sm:leading-6 text-xs sm:text-sm'>Lorem Ipsumis simply dummy text of the printing and typesetting industry. Lorem ipsum ha s been the always statement primary text ever since the 1905s when an typewriter prince took a gallery of many embeded it to make a type specific boo.</p>
         </div>
 
         {/*--------center section---------*/}
-        <div>
-          <p className='text-xl font-medium mb-5'>LifeSync</p>
+        <div className='text-center sm:text-left'>
+          <p className='text-lg sm:text-xl font-medium mb-4 sm:mb-5'>LifeSync</p>
           <ul className='flex flex-col gap-2 text-gray-600'>
-            <li>Home</li>
-            <li>About us</li>
-            <li>Contact us</li>
-            <li>Privacy policy</li>
+            <li className='cursor-pointer hover:text-[#5f6FFF] transition-colors'>Home</li>
+            <li className='cursor-pointer hover:text-[#5f6FFF] transition-colors'>About us</li>
+            <li className='cursor-pointer hover:text-[#5f6FFF] transition-colors'>Privacy policy</li>
           </ul>
         </div>
 
         {/*--------right section---------*/}
-        <div>
-          <p  className='text-xl font-medium mb-5'>GET IN TOUCH</p>
-          <ul className='flex flex-col gap-2 text-gray-600'>
-            <li>+232-88-915-854</li>
-            <li>dtso.cbc.sl@gmail.com</li>
-          </ul>
+        <div className='text-center sm:text-left'>
+          <p className='text-lg sm:text-xl font-medium mb-4 sm:mb-5'>GET IN TOUCH</p>
+          <div className='flex flex-col gap-3 text-gray-600'>
+            <div>
+              <p className='font-semibold text-gray-700 mb-1 text-xs sm:text-sm'>Our Office</p>
+              <p className='text-xs sm:text-sm'>0050 Liverpool Street, Freetown, Sierra Leone</p>
+            </div>
+            <div>
+              <p className='font-semibold text-gray-700 mb-1 text-xs sm:text-sm'>Contact</p>
+              <p className='text-xs sm:text-sm'>Tel: (+232) 88-915-854</p>
+              <p className='text-xs sm:text-sm break-all'>Email: dtso.cbc.sl@gmail.com</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/*--------copyright section---------*/}
       <div>
-        <hr />
-        <p className='py-5 text-sm text-center'>Copyright © 2025 LifeSync. - All rights reserved.</p>
+        <hr className='my-4 sm:my-6' />
+        <p className='py-4 sm:py-5 text-xs sm:text-sm text-center'>Copyright © 2025 LifeSync. - All rights reserved.</p>
       </div>
     </div>
   )

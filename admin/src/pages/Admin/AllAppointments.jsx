@@ -52,22 +52,23 @@ const AllAppointments = () => {
           if (!providerData) {
             return (
               <div
-                className="flex flex-wrap justify-between max-sm:gap-2 sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
+                className="flex flex-col gap-3 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr] items-start sm:items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
                 key={index}
               >
-                <p className="max-sm:hidden">{index + 1}</p>
-                <div className="flex items-center gap-2">
-                  <img
-                    className="w-8 rounded-full"
-                    src={item.userData.image || "/default-avatar.png"}
-                    alt={item.userData.name || "Patient"}
-                    onError={(e) => (e.target.src = "/default-avatar.png")}
-                  />
-                  <p>{item.userData.name || "Unknown Patient"}</p>
+                <p className="hidden sm:block">{index + 1}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <img
+                      className="w-8 rounded-full"
+                      src={item.userData.image || "/default-avatar.png"}
+                      alt={item.userData.name || "Patient"}
+                      onError={(e) => (e.target.src = "/default-avatar.png")}
+                    />
+                    <p className="font-medium">{item.userData.name || "Unknown Patient"}</p>
+                  </div>
+                  <p className="text-xs text-gray-500 sm:hidden">Age: {calculateAge(item.userData.dob) || "N/A"}</p>
                 </div>
-                <p className="max-sm:hidden">
-                  {calculateAge(item.userData.dob) || "N/A"}
-                </p>
+                <p className="hidden sm:block">{calculateAge(item.userData.dob) || "N/A"}</p>
                 <p>
                   {slotDateFormat(item.slotDate)}, {item.slotTime}
                 </p>
@@ -97,24 +98,30 @@ const AllAppointments = () => {
 
           return (
             <div
-              className="flex flex-wrap justify-between max-sm:gap-2 sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
+              className="flex flex-col gap-3 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-start sm:items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
               key={index}
             >
-              <p className="max-sm:hidden">{index + 1}</p>
+              <p className="hidden sm:block">{index + 1}</p>
 
               {/* Patient Info */}
-              <div className="flex items-center gap-2">
-                <img
-                  className="w-8 rounded-full"
-                  src={item.userData.image || "/default-avatar.png"}
-                  alt={item.userData.name || "Patient"}
-                  onError={(e) => (e.target.src = "/default-avatar.png")}
-                />
-                <p>{item.userData.name || "Unknown Patient"}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <img
+                    className="w-8 rounded-full"
+                    src={item.userData.image || "/default-avatar.png"}
+                    alt={item.userData.name || "Patient"}
+                    onError={(e) => (e.target.src = "/default-avatar.png")}
+                  />
+                  <p className="font-medium">{item.userData.name || "Unknown Patient"}</p>
+                </div>
+                <div className="sm:hidden text-xs text-gray-500">
+                  <span className="mr-2">#{index + 1}</span>
+                  <span>Age: {calculateAge(item.userData.dob) || "N/A"}</span>
+                </div>
               </div>
 
               {/* Age */}
-              <p className="max-sm:hidden">
+              <p className="hidden sm:block">
                 {calculateAge(item.userData.dob) || "N/A"}
               </p>
 

@@ -87,9 +87,9 @@ const appointmentComplete = async (req, res) => {
 
     if (appointmentData && appointmentData.docId === docId) {
 
-      // Use the canonical property name `isCompleted` (matches the schema)
-      await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true })
-      return res.json({ success: true, message: "Appointment Completed" })
+      // When doctor accepts/completes the appointment, mark it as booked
+      await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true, status: 'booked' })
+      return res.json({ success: true, message: "Appointment Booked" })
 
     } else {
       return res.json({ success: false, message: "Mark Failed" })
@@ -114,7 +114,7 @@ const appointmentCancel = async (req, res) => {
 
     if (appointmentData && appointmentData.docId === docId) {
 
-      await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+      await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true, cancelledBy: 'doctor', status: 'rejected' })
       return res.json({ success: true, message: "Appointment Cancelled" })
 
     } else {
@@ -136,14 +136,8 @@ const doctorDashboard = async (req, res) => {
 
     const appointments = await appointmentModel.find({ docId })
 
-    let earnings = 0
-
-    appointments.map((item) => {
-      // Use `isCompleted` to match saved documents
-      if (item.isCompleted || item.payment) {
-        earnings += item.amount
-      }
-    })
+    // Count booked appointments (payments/earnings are not tracked in this version)
+    const bookedCount = appointments.filter((item) => item.status === 'booked').length
 
     let patients = []
 
@@ -154,7 +148,7 @@ const doctorDashboard = async (req, res) => {
     })
 
     const dashData = {
-      earnings,
+      bookedCount,
       appointments: appointments.length,
       patients: patients.length,
       latestAppointments: appointments.reverse().slice(0, 5)
@@ -191,10 +185,10 @@ const updateDoctorProfile = async (req, res) => {
 
   try {
 
-    const { fees, address, available } = req.body
+    const { address, available } = req.body
     const docId = req.docId
 
-    await doctorModel.findByIdAndUpdate(docId, { fees, address, available })
+    await doctorModel.findByIdAndUpdate(docId, { address, available })
 
     res.json({ success: true, message: "Profile Updated" })
 

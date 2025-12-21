@@ -45,7 +45,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Government")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Government"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -59,7 +59,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Private")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Private"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -74,7 +74,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/General")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "General"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -89,7 +89,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Community")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Community"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -104,7 +104,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Pediatrics")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Pediatrics"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -119,7 +119,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Maternity")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Maternity"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -134,7 +134,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Mental Asylum")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Mental Asylum"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -149,7 +149,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Rehab Center")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Rehab Center"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -164,7 +164,7 @@ const Hospitals = () => {
                 ? navigate("/hospitals")
                 : navigate("/hospitals/Teaching Hospital")
             }
-            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+            className={`w-full sm:w-auto pl-3 py-1.5 pr-6 border border-gray-300 rounded transition-all cursor-pointer ${
               speciality === "Teaching Hospital"
                 ? "bg-indigo-100 text-black"
                 : ""
@@ -174,11 +174,11 @@ const Hospitals = () => {
           </p>
         </div>
 
-        <div className="w-full grid grid-auto-cols gap-4 gap-y-6 ">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6 ">
           {filterDoc.map((item, index) => (
             <div
               onClick={() => navigate(`/appointment/${item._id}`)}
-              className="border border-blue-200 rounded=xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration 500"
+              className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:-translate-y-1 transition-all duration-300"
               key={index}
             >
               <img className="bg-blue-50" src={item.image} alt="" />

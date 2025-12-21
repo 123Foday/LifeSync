@@ -22,3 +22,114 @@
     @apply text-white bg-[#5f6FFF]
   }
 }
+
+/* Add these to your frontend/src/index.css file for enhanced animations */
+
+/* Fade in animation for tooltip */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Pulse animation for the button ring */
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping {
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Floating animation for the button */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Shadow glow effect */
+.shadow-3xl {
+  box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.5);
+}
+
+/* Optional: Bouncing entrance animation */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ----------------------------- */
+/* Responsive utilities - mobile-first */
+/* ----------------------------- */
+
+/* container helper (mobile first) */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
+  .container { max-width: 640px; }
+}
+@media (min-width: 768px) {
+  .container { max-width: 768px; }
+}
+@media (min-width: 1024px) {
+  .container { max-width: 1024px; }
+}
+@media (min-width: 1280px) {
+  .container { max-width: 1280px; }
+}
+
+/* make images & svgs responsive */
+img, svg { max-width: 100%; height: auto; }
+
+/* small button padding utility */
+.btn-compact { padding-left: 1rem; padding-right: 1rem; }
+
+/* form inputs should never exceed container width */
+input[type="text"], input[type="email"], input[type="password"], textarea, select {
+  max-width: 100%;
+}
+
+/* small-screen variant for grid auto columns */
+.grid-auto-cols-sm { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+/* reduce some large spacing on very small screens if needed */
+@media (max-width: 420px) {
+  .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+}

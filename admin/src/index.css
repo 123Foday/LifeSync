@@ -16,3 +16,16 @@
   @apply hidden
 }
 
+/* Responsive utilities for admin */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) { .container { max-width: 640px; } }
+@media (min-width: 768px) { .container { max-width: 768px; } }
+
+img, svg { max-width: 100%; height: auto; }
+
+
