@@ -17,7 +17,21 @@ connectCloudinary();
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+
+// DURING development (open - allow all origins):
+// app.use(cors());
+
+// AFTER deployment (secure - allow only your frontend):
+app.use(
+  cors({
+    origin: [
+      "https://life-sync-tau.vercel.app/", // Your Vercel URL
+      "http://localhost:5173", // Local development
+      // Your custom domain if any
+    ],
+    credentials: true,
+  })
+);
 
 // api endpoints
 app.use("/api/admin", adminRouter);
