@@ -1,9 +1,13 @@
+import PropTypes from 'prop-types'
 import { useState, useRef, useEffect } from 'react'
 import { specialityData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 
-const SpecialityMenu = () => {
-  const [selectedSpeciality, setSelectedSpeciality] = useState('')
+const SpecialityMenu = ({ selectedSpeciality: propSelectedSpeciality, onSelectSpeciality }) => {
+  const [internalSelected, setInternalSelected] = useState('')
+  const selectedSpeciality = propSelectedSpeciality !== undefined ? propSelectedSpeciality : internalSelected
+  const setSelectedSpeciality = onSelectSpeciality || setInternalSelected
+
   const navigate = useNavigate()
   const navRef = useRef(null)
   const itemRefs = useRef([])
@@ -50,12 +54,12 @@ const SpecialityMenu = () => {
   }, [hoverIndex, selectedSpeciality])
 
   return (
-    <section id="speciality" className="py-8 sm:py-10 md:py-12 text-gray-800">
+    <section id="speciality" className="py-8 sm:py-10 md:py-12 text-gray-800 dark:text-gray-100">
       <div className="container px-4 sm:px-6">
         <div className="flex flex-col gap-3 sm:gap-4 items-center">
           <div className="text-center">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">Find Doctors by Speciality</h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 w-full sm:w-[90%] md:w-[520px] px-4 sm:px-0">Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free</p>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 w-full sm:w-[90%] md:w-[520px] px-4 sm:px-0">Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free</p>
           </div>
 
           <nav aria-label="Doctor specialities" className="w-full">
@@ -70,8 +74,16 @@ const SpecialityMenu = () => {
                     onFocus={() => setHoverIndex(0)}
                     onBlur={() => setTimeout(() => setHoverIndex(null), 80)}
                     aria-pressed={!selectedSpeciality}
-                    onClick={() => { setSelectedSpeciality(''); navigate('/doctors'); window.scrollTo(0,0) }}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${!selectedSpeciality ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50'} border border-gray-200`}
+                    onClick={() => { 
+                      if (onSelectSpeciality) {
+                        onSelectSpeciality('');
+                      } else {
+                        setSelectedSpeciality(''); 
+                        navigate('/doctors'); 
+                        window.scrollTo(0, 0); 
+                      }
+                    }}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${!selectedSpeciality ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-black text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
                   >
                     <span className="truncate">ALL</span>
                   </button>
@@ -87,11 +99,15 @@ const SpecialityMenu = () => {
                         type="button"
                         aria-pressed={isActive}
                         onClick={() => {
-                          setSelectedSpeciality(item.speciality)
-                          navigate(`/doctors/${item.speciality}`)
-                          window.scrollTo(0, 0)
+                          if (onSelectSpeciality) {
+                            onSelectSpeciality(item.speciality);
+                          } else {
+                            setSelectedSpeciality(item.speciality)
+                            navigate(`/doctors/${item.speciality}`)
+                            window.scrollTo(0, 0)
+                          }
                         }}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${isActive ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50'} border border-gray-200`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${isActive ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-black text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
                       >
                         <span className="text-base">{item.emoji || ''}</span>
                         <span className="truncate">{item.speciality}</span>
@@ -123,6 +139,11 @@ const SpecialityMenu = () => {
       </div>
     </section>
   )
+}
+
+SpecialityMenu.propTypes = {
+  selectedSpeciality: PropTypes.string,
+  onSelectSpeciality: PropTypes.func,
 }
 
 export default SpecialityMenu

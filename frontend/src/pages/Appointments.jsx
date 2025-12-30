@@ -204,12 +204,12 @@ const Appointments = () => {
   // Show loading state
   if (!providerInfo) {
     return (
-      <div className="text-center py-10 text-gray-500">Loading details...</div>
+      <div className="text-center py-10 text-gray-500 dark:text-gray-400">Loading details...</div>
     );
   }
 
   return (
-    <div>
+    <div className="transition-all duration-300">
       {/*-------------Provider Info------------------*/}
       <div className="flex flex-col sm:flex-row gap-4">
         <div>
@@ -219,33 +219,33 @@ const Appointments = () => {
             alt=""
           />
         </div>
-        <div className="flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0">
+        <div className="flex-1 border border-gray-400 dark:border-gray-700 rounded-lg p-8 py-7 bg-white dark:bg-black mx-2 sm:mx-0 mt-[-80px] sm:mt-0 shadow-sm">
           {/*--------Provider Info: name, degree/accreditation, experience----------------*/}
-          <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
+          <p className="flex items-center gap-2 text-2xl font-medium text-gray-900 dark:text-gray-100">
             {providerInfo.name}
-            <img className="w-5" src={assets.verified_icon} alt="" />
+            <img className="w-5 dark:brightness-200" src={assets.verified_icon} alt="" />
           </p>
-          <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
+          <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
             <p>
               {providerInfo.degree} - {providerInfo.speciality}
             </p>
-            <button className="py-0.5 px-2 border text-xs rounded-full">
+            <button className="py-0.5 px-2 border dark:border-gray-600 text-xs rounded-full">
               {providerInfo.experience}
             </button>
           </div>
 
           {/* Provider Type Badge */}
-          <div className="mt-2">
+          <div className="mt-3">
             {providerType === "doctor" && providerInfo.hospitalId ? (
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                 🏥 Institutional Doctor
               </span>
             ) : providerType === "doctor" ? (
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
                 👨‍⚕️ Private Doctor
               </span>
             ) : (
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
                 🏥 Hospital
               </span>
             )}
@@ -253,10 +253,10 @@ const Appointments = () => {
 
           {/*--------Provider About----------------*/}
           <div>
-            <p className="flex items-center gap-1 text-sm font-medium text-gray-900 mt-3">
-              About <img src={assets.info_icon} alt="" />
+            <p className="flex items-center gap-1 text-sm font-medium text-gray-900 dark:text-gray-200 mt-4">
+              About <img className="dark:brightness-200" src={assets.info_icon} alt="" />
             </p>
-            <p className="text-sm text-gray-500 max-w-[700px] mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-[700px] mt-1">
               {providerInfo.about}
             </p>
           </div>
@@ -264,17 +264,17 @@ const Appointments = () => {
       </div>
 
       {/*-------------Booking slots------------------*/}
-      <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
-        <p>Booking slots</p>
-        <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
+      <div className="sm:ml-72 sm:pl-4 mt-8 pt-4 font-medium text-gray-700 dark:text-gray-300 border-t dark:border-gray-800 sm:border-t-0">
+        <p className="text-lg">Booking slots</p>
+        <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4 pb-2">
           {slots.length > 0 &&
             slots.map((item, index) => (
               <div
                 onClick={() => setSlotIndex(index)}
-                className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
+                className={`text-center py-6 min-w-16 rounded-full cursor-pointer transition-all duration-200 ${
                   slotIndex === index
-                    ? "bg-[#5f6FFF] text-white"
-                    : "border border-gray-200"
+                    ? "bg-[#5f6FFF] text-white shadow-lg shadow-blue-200 dark:shadow-none"
+                    : "border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
                 key={index}
               >
@@ -284,15 +284,15 @@ const Appointments = () => {
             ))}
         </div>
 
-        <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
+        <div className="flex items-center gap-3 w-full overflow-x-scroll mt-6 pb-2">
           {slots.length > 0 &&
             slots[slotIndex]?.map((item, index) => (
               <p
                 onClick={() => setSlotTime(item.time)}
-                className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${
+                className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer transition-all duration-200 ${
                   item.time === slotTime
-                    ? "bg-[#5f6FFF] text-white"
-                    : "text-gray-400 border border-gray-300"
+                    ? "bg-[#5f6FFF] text-white shadow-md shadow-blue-200 dark:shadow-none"
+                    : "text-gray-400 dark:text-gray-500 border border-gray-300 dark:border-gray-700 hover:border-[#5f6FFF] dark:hover:border-[#5f6FFF]"
                 }`}
                 key={index}
               >
@@ -302,21 +302,23 @@ const Appointments = () => {
         </div>
         <button
           onClick={bookAppointment}
-          className="bg-[#5f6FFF] text-white text-sm font-light px-14 py-3 rounded-full my-6 cursor-pointer hover:bg-[#4f5fef] transition-all"
+          className="bg-[#5f6FFF] text-white text-sm font-medium px-14 py-4 rounded-full my-8 cursor-pointer hover:bg-[#4f5fef] hover:scale-105 transition-all shadow-lg shadow-blue-100 dark:shadow-none"
         >
           Book an appointment
         </button>
       </div>
 
       {/*-------------Related Providers------------------*/}
-      {providerType === "doctor" ? (
-        <RelatedDoctors docId={id} speciality={providerInfo.speciality} />
-      ) : (
-        <RelatedHospitals
-          hospitalId={id}
-          speciality={providerInfo.speciality}
-        />
-      )}
+      <div className="mt-10 pt-10 border-t dark:border-gray-800">
+        {providerType === "doctor" ? (
+          <RelatedDoctors docId={id} speciality={providerInfo.speciality} />
+        ) : (
+          <RelatedHospitals
+            hospitalId={id}
+            speciality={providerInfo.speciality}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -10,15 +10,13 @@ import MyAppointments from "./pages/MyAppointments";
 import Appointments from "./pages/Appointments";
 import HospitalDetail from "./pages/HospitalDetail";
 import MedicalAdvisor from "./pages/MedicalAdvisor";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import MedicalBotButton from "./components/MedicalBotButton"; // ✅ NEW
+import Layout from "./components/Layout";
+import MedicalBotButton from "./components/MedicalBotButton";
 
 const App = () => {
   return (
-    <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-[8%] xl:mx-[10%]">
+    <Layout>
       <ToastContainer />
-      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/doctors" element={<Doctors />} />
@@ -33,12 +31,12 @@ const App = () => {
         <Route path="/hospital/:hospitalId" element={<HospitalDetail />} />
         <Route path="/medical-advisor" element={<MedicalAdvisor />} />
       </Routes>
-      <Footer />
 
       {/* ✅ NEW: Floating Medical Bot Button - Accessible from all pages */}
       <MedicalBotButton />
-    </div>
+    </Layout>
   );
 };
+
 
 export default App;

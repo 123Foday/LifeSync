@@ -51,12 +51,12 @@ const CategoryMenu = ({ selectedCategory, onSelectCategory }) => {
   }, [hoverIndex, selectedCategory])
 
   return (
-    <section id="speciality" className="py-8 sm:py-10 md:py-12 text-gray-800">
+    <section id="speciality" className="py-8 sm:py-10 md:py-12 text-gray-800 dark:text-gray-100">
       <div className="container px-4 sm:px-6">
         <div className="flex flex-col gap-3 sm:gap-4 items-center">
           <div className="text-center">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">Find Hospitals by Category</h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 w-full sm:w-[90%] md:w-[520px] px-4 sm:px-0">Browse trusted hospitals by category and jump straight to the list — fast, simple, and user-friendly.</p>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 w-full sm:w-[90%] md:w-[520px] px-4 sm:px-0">Browse trusted hospitals by category and jump straight to the list — fast, simple, and user-friendly.</p>
           </div>
 
           {/* Centered text navbar - horizontally scrollable on small screens */}
@@ -76,8 +76,8 @@ const CategoryMenu = ({ selectedCategory, onSelectCategory }) => {
                     onFocus={() => setHoverIndex(0)}
                     onBlur={() => setTimeout(() => setHoverIndex(null), 80)}
                     aria-pressed={!selectedCategory}
-                    onClick={() => { if (typeof onSelectCategory === 'function') { onSelectCategory('') } else { navigate('/hospitals') }; window.scrollTo(0, 0) }}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${!selectedCategory ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50'} border border-gray-200`}
+                    onClick={() => { if (typeof onSelectCategory === 'function') { onSelectCategory('') } else { navigate('/hospitals'); window.scrollTo(0, 0) } }}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${!selectedCategory ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-black text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
                   >
                     <span className="truncate">ALL</span>
                   </button>
@@ -103,12 +103,12 @@ const CategoryMenu = ({ selectedCategory, onSelectCategory }) => {
                             onSelectCategory(item.speciality);
                           } else {
                             navigate(`/hospitals/${item.speciality}`);
+                            window.scrollTo(0, 0);
                           }
-                          window.scrollTo(0, 0);
                         }}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${isActive ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50'} border border-gray-200`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${isActive ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-black text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
                       >
-                        <span className="hidden sm:inline-block text-xs text-gray-400">{item.emoji || ''}</span>
+                        <span className="hidden sm:inline-block text-xs text-gray-400 dark:text-gray-500">{item.emoji || ''}</span>
                         <span className="truncate">{item.speciality}</span>
                       </button>
                     </li>

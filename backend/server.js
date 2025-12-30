@@ -27,6 +27,8 @@ app.use(
     origin: [
       "https://life-sync-tau.vercel.app/", // Your Vercel URL
       "http://localhost:5173", // Local development
+      "http://localhost:5174", // Local development
+      "http://localhost:5175", // Local development
       // Your custom domain if any
     ],
     credentials: true,

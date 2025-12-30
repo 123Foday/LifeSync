@@ -24,9 +24,9 @@ const HospitalDetail = () => {
   }
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-black shadow dark:shadow-gray-900 rounded-lg overflow-hidden border dark:border-gray-800">
           <div className="relative h-96">
             <img
               src={hospital.image}
@@ -43,27 +43,27 @@ const HospitalDetail = () => {
           </div>
 
           <div className="p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{hospital.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{hospital.name}</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Hospital Information</h2>
-                <div className="space-y-2 text-gray-600">
-                  <p><span className="font-medium">Type:</span> {hospital.speciality}</p>
-                  <p><span className="font-medium">Experience:</span> {hospital.experience}</p>
-                  <p><span className="font-medium">Address:</span> {hospital.address?.line1}</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">Hospital Information</h2>
+                <div className="space-y-2 text-gray-600 dark:text-gray-400">
+                  <p><span className="font-medium dark:text-gray-300">Type:</span> {hospital.speciality}</p>
+                  <p><span className="font-medium dark:text-gray-300">Experience:</span> {hospital.experience}</p>
+                  <p><span className="font-medium dark:text-gray-300">Address:</span> {hospital.address?.line1}</p>
                 </div>
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Accreditation</h2>
-                <p className="text-gray-600">{hospital.degree}</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">Accreditation</h2>
+                <p className="text-gray-600 dark:text-gray-400">{hospital.degree}</p>
               </div>
             </div>
 
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">About Hospital</h2>
-              <p className="text-gray-600 whitespace-pre-line">{hospital.about}</p>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">About Hospital</h2>
+              <p className="text-gray-600 dark:text-gray-400 whitespace-pre-line">{hospital.about}</p>
             </div>
           </div>
         </div>

@@ -11,6 +11,8 @@ import CategoryMenu from '../components/CategoryMenu'
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
 
+  const [selectedSpeciality, setSelectedSpeciality] = useState('')
+
   return (
     <div className="pt-4 sm:pt-6 md:pt-9">
       <Header />
@@ -25,8 +27,12 @@ const Home = () => {
         onSelectCategory={setSelectedCategory}
       />
       <TopHospitals selectedCategory={selectedCategory} />
-      <SpecialityMenu />
-      <TopDoctors />
+      {/* SpecialityMenu */}
+      <SpecialityMenu 
+        selectedSpeciality={selectedSpeciality}
+        onSelectSpeciality={setSelectedSpeciality}
+      />
+      <TopDoctors speciality={selectedSpeciality} />
       <Banner />
     </div>
   );

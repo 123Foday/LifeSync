@@ -12,6 +12,21 @@
   --spacing-card: 2rem;
 }
 
+.dark {
+  --background: #000000;
+  --foreground: #f3f4f6;
+  color-scheme: dark;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark {
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
 ::-webkit-scrollbar{
   @apply hidden
 }

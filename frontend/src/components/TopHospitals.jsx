@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
+const Icons = {
+  Hospital: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="9" width="18" height="12" rx="2" ry="2" /><path d="M12 9V3" /><path d="M12 13v4" /><path d="M10 15h4" /><path d="M9 3h6" /></svg>
+  ),
+  ArrowRight: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+  ),
+};
+
 const TopHospitals = ({ selectedCategory = '' }) => {
   const navigate = useNavigate();
   const { hospitals } = useContext(AppContext);
@@ -12,62 +21,74 @@ const TopHospitals = ({ selectedCategory = '' }) => {
     : hospitals;
 
   return (
-    <div className="container flex flex-col items-center gap-3 sm:gap-4 my-12 sm:my-16 text-gray-900 px-4 sm:px-6">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-center">
-        Easy Appointment with Top Hospitals
-      </h1>
-      <p className="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 text-center text-xs sm:text-sm px-4">
-        Simply scroll through our extensive list of trusted hospitals.
-      </p>
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 pt-5 gap-y-6">
-        {filtered.slice(0, 10).map((item, index) => (
+    <div className="flex flex-col items-center gap-6 my-20 text-gray-900 dark:text-gray-100 px-4">
+      <div className="text-center space-y-2">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+          World-Class <span className="text-[#5f6FFF]">Hospitals</span>
+        </h2>
+        <p className="max-w-xl mx-auto text-sm sm:text-base text-gray-500 dark:text-gray-400">
+          Partnering with leading medical institutions to ensure you receive the highest quality diagnostics and treatment.
+        </p>
+      </div>
+
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pt-10">
+        {filtered.slice(0, 8).map((item, index) => (
           <div
+            key={index}
             onClick={() => {
               navigate(`/appointment/${item._id}`);
-              scrollTo(0, 0);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:-translate-y-1 transition-all duration-300"
-            key={index}
+            className="premium-card group cursor-pointer overflow-hidden flex flex-col h-full"
           >
-            <img
-              className="w-full h-44 object-cover bg-blue-50"
-              src={item.image}
-              alt=""
-            />
-            <div className="p-4">
-              <div
-                className={`flex items-center gap-2 text-sm text-center ${
-                  item.available ? "text-green-500" : "text-gray-500"
-                } `}
-              >
-                <p
-                  className={`w-2 h-2 ${
-                    item.available ? "bg-green-500" : "bg-gray-500"
-                  }  rounded-full`}
-                ></p>
-                <p>{item.available ? "Available" : "Not Available"}</p>
+            <div className="relative overflow-hidden aspect-[16/9]">
+              <img
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                src={item.image}
+                alt={item.name}
+              />
+              <div className="absolute top-4 right-4">
+                 <div className="bg-white/90 dark:bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/20 shadow-lg">
+                    <Icons.Hospital size={18} className="text-[#5f6FFF]" />
+                 </div>
               </div>
-              <p className="text-gray-900 text-lg font-medium">{item.name}</p>
-              <p className="text-gray-600 text-sm">{item.speciality}</p>
+            </div>
+
+            <div className="p-6 flex flex-col flex-1 gap-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.available ? "Open Now" : "Emergency Only"}</span>
+              </div>
+              
+              <h3 className="text-xl font-bold group-hover:text-[#5f6FFF] transition-colors line-clamp-1">{item.name}</h3>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">{item.speciality} • {item.address?.line1 || 'Medical Center'}</p>
+              
+              <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+                <button className="w-full py-3 rounded-xl bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-white text-sm font-bold transition-all group-hover:bg-[#5f6FFF] group-hover:text-white">
+                  View Medical Staff
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
+
       <button
         onClick={() => {
           navigate("/hospitals");
-          scrollTo(0, 0);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        className="bg-blue-100 text-gray-600 text-sm sm:text-base px-6 sm:px-8 md:px-12 py-2.5 sm:py-3 rounded-full mt-8 sm:mt-10 hover:bg-blue-200 transition-colors"
+        className="group flex items-center gap-2 mt-8 px-10 py-4 rounded-2xl bg-gray-100 dark:bg-zinc-900 text-gray-900 dark:text-white font-bold hover:bg-gray-200 dark:hover:bg-zinc-800 transition-all active:scale-95"
       >
-        More
+        Explore All Hospitals
+        <Icons.ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
       </button>
     </div>
   );
 };
 
-export default TopHospitals;
-
 TopHospitals.propTypes = {
   selectedCategory: PropTypes.string,
 }
+
+export default TopHospitals;

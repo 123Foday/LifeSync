@@ -117,8 +117,8 @@ const MyAppointments = () => {
   }, [token, getUserAppointments]);
 
   return (
-    <div>
-      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
+    <div className="transition-all duration-300">
+      <p className="pb-3 mt-12 font-medium text-zinc-700 dark:text-zinc-300 border-b dark:border-gray-800">
         My Appointments
       </p>
 
@@ -136,21 +136,21 @@ const MyAppointments = () => {
             if (!providerData) {
               return (
                 <div
-                  className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
+                  className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-4 border-b dark:border-gray-800"
                   key={index}
                 >
                   <div>
-                    <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-400 text-xs">No Image</span>
+                    <div className="w-32 h-32 bg-gray-200 dark:bg-zinc-950 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-400 dark:text-gray-500 text-xs">No Image</span>
                     </div>
                   </div>
 
-                  <div className="flex-1 text-sm text-zinc-600">
-                    <p className="text-neutral-800 font-semibold">
+                  <div className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="text-neutral-800 dark:text-neutral-100 font-semibold text-base">
                       Provider Unavailable
                     </p>
                     <p className="text-xs mt-1">
-                      <span className="text-sm text-neutral-700 font-medium">
+                      <span className="text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                         Date & Time:
                       </span>{" "}
                       {slotDateFormat(item.slotDate)} | {item.slotTime}
@@ -159,7 +159,7 @@ const MyAppointments = () => {
 
                   <div className="flex flex-col gap-2 justify-end">
                     {item.cancelled ? (
-                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500">
+                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500 rounded">
                         Appointment Cancelled
                       </button>
                     ) : item.isCompleted ? (
@@ -169,7 +169,7 @@ const MyAppointments = () => {
                     ) : (
                       <button
                         onClick={() => cancelAppointment(item._id)}
-                        className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300"
+                        className="text-sm text-stone-500 dark:text-stone-400 text-center sm:min-w-48 py-2 border dark:border-gray-700 rounded hover:bg-red-600 hover:text-white transition-all duration-300"
                       >
                         Cancel appointment
                       </button>
@@ -181,12 +181,12 @@ const MyAppointments = () => {
 
             return (
               <div
-                className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
+                className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-4 border-b dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-zinc-950/30 transition-colors"
                 key={index}
               >
                 <div>
                   <img
-                    className="w-32 bg-indigo-50 rounded-lg"
+                    className="w-32 bg-indigo-50 dark:bg-zinc-950 rounded-lg"
                     src={providerData.image}
                     alt={providerData.name || "Provider"}
                     onError={(e) => {
@@ -196,44 +196,44 @@ const MyAppointments = () => {
                   />
                 </div>
 
-                <div className="flex-1 text-sm text-zinc-600">
+                <div className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">
                   {/* Provider Name with Badge */}
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-neutral-800 font-semibold">
+                    <p className="text-neutral-800 dark:text-neutral-100 font-semibold text-base">
                       {providerData.name || "Unknown Provider"}
                     </p>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                         providerType === "doctor"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-green-100 text-green-700"
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                          : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                       }`}
                     >
                       {providerType === "doctor" ? "👨‍⚕️ Doctor" : "🏥 Hospital"}
                     </span>
                   </div>
 
-                  <p>{providerData.speciality || "Speciality not specified"}</p>
+                  <p className="text-indigo-600 dark:text-indigo-400 font-medium">{providerData.speciality || "Speciality not specified"}</p>
 
-                  <p className="text-zinc-700 font-medium mt-1">Address:</p>
-                  <p className="text-xs">
+                  <p className="text-zinc-700 dark:text-zinc-300 font-medium mt-2">Address:</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
                     {providerData.address?.line1 || "No address available"}
+                    {providerData.address?.line2 ? `, ${providerData.address.line2}` : ""}
                   </p>
-                  <p className="text-xs">{providerData.address?.line2 || ""}</p>
 
-                  <p className="text-xs mt-1">
-                    <span className="text-sm text-neutral-700 font-medium">
+                  <p className="text-xs mt-3 flex items-center gap-1">
+                    <span className="text-sm text-neutral-700 dark:text-neutral-300 font-medium tracking-wide">
                       Date & Time:
                     </span>{" "}
-                    {slotDateFormat(item.slotDate)} | {item.slotTime}
+                    <span className="text-gray-500 dark:text-gray-400">{slotDateFormat(item.slotDate)} | {item.slotTime}</span>
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-2 justify-end">
                   {/* Pending for any unaccepted appointment */}
                   {isPending(item) && (
-                    <button className="sm:min-w-48 py-2 border rounded text-stone-500 bg-yellow-50">
-                      Pending...
+                    <button className="sm:min-w-48 py-2 border dark:border-yellow-900/50 rounded text-stone-500 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-900/10 font-medium">
+                      Pending Approval
                     </button>
                   )}
 
@@ -241,20 +241,20 @@ const MyAppointments = () => {
                   {!item.cancelled && !item.isCompleted && (
                     <button
                       onClick={() => cancelAppointment(item._id)}
-                      className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300"
+                      className="text-sm text-stone-500 dark:text-stone-400 text-center sm:min-w-48 py-2 border dark:border-gray-700 rounded hover:bg-red-600 hover:text-white dark:hover:bg-red-700 transition-all duration-300"
                     >
-                      Cancel appointment
+                      Cancel Appointment
                     </button>
                   )}
 
                   {/* Cancelled / Rejected Status */}
                   {item.cancelled && !item.isCompleted && (
                     item.status === 'rejected' ? (
-                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500">
+                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500 rounded font-medium">
                         Appointment Rejected
                       </button>
                     ) : (
-                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500">
+                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500 rounded font-medium">
                         Appointment Cancelled
                       </button>
                     )
@@ -262,8 +262,8 @@ const MyAppointments = () => {
 
                   {/* Booked Status */}
                   {(item.status === 'booked' || item.isCompleted) && (
-                    <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">
-                      Booked
+                    <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500 font-medium bg-green-50/50 dark:bg-green-900/10">
+                      Payment Confirmed
                     </button>
                   )}
                 </div>
@@ -271,14 +271,17 @@ const MyAppointments = () => {
             );
           })
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <p className="text-lg mb-2">No appointments yet</p>
-            <p className="text-sm">Book an appointment to get started</p>
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-600 transition-all">
+             <div className="w-20 h-20 bg-gray-100 dark:bg-zinc-950 rounded-full flex items-center justify-center mb-4">
+               <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+             </div>
+            <p className="text-xl font-medium mb-1">No appointments yet</p>
+            <p className="text-sm">Your scheduled visits will appear here</p>
             <button
               onClick={() => navigate("/doctors")}
-              className="mt-4 px-6 py-2 bg-[#5f6FFF] text-white rounded-full hover:bg-[#4f5fef] transition-all"
+              className="mt-6 px-10 py-3 bg-[#5f6FFF] text-white rounded-full hover:bg-[#4f5fef] hover:scale-105 transition-all shadow-lg shadow-blue-100 dark:shadow-none font-medium"
             >
-              Find Doctors
+              Start Booking
             </button>
           </div>
         )}

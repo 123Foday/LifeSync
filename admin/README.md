@@ -1,8 +1,26 @@
-# React + Vite
+# LifeSync Admin & Doctor Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The management dashboard for LifeSync, used by administrators and healthcare providers to oversee system operations and manage appointments.
 
-Currently, two official plugins are available:
+## 🔑 Key Features
+- **Admin Dashboard**: Analytics and system-wide overview.
+- **Doctor Portal**: Manage schedules, view patient appointments, and update status.
+- **System Management**: Add/Edit doctors and monitor all users.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack
+- **React** (v18.x)
+- **Vite** (Build tool)
+- **Tailwind CSS** (Styling)
+
+## 🚀 Development
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+   The app will be available at `http://localhost:5174`.

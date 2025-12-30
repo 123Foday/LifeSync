@@ -285,7 +285,7 @@ const MedicalAdvisor = () => {
     <div className="max-w-5xl mx-auto my-8 px-4">
       {/* Profile Data Missing Prompt */}
       {showProfilePrompt && (
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg">
+        <div className="bg-blue-50 dark:bg-blue-900/10 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="font-semibold text-blue-800 mb-2">
@@ -296,7 +296,7 @@ const MedicalAdvisor = () => {
               </p>
               <ul className="list-disc list-inside text-sm text-blue-700 mb-3">
                 {missingFields.map((field, idx) => (
-                  <li key={idx}>{field}</li>
+                  <li key={idx} className="dark:text-blue-300">{field}</li>
                 ))}
               </ul>
               <div className="flex gap-3">
@@ -308,7 +308,7 @@ const MedicalAdvisor = () => {
                 </button>
                 <button
                   onClick={handleSkipPrompt}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition"
+                  className="bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-zinc-700 transition"
                 >
                   Continue Anyway
                 </button>
@@ -316,7 +316,7 @@ const MedicalAdvisor = () => {
             </div>
             <button
               onClick={handleSkipPrompt}
-              className="text-blue-600 hover:text-blue-800 ml-4"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 ml-4"
               aria-label="Close"
             >
               ×
@@ -327,23 +327,23 @@ const MedicalAdvisor = () => {
 
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
           🏥 Medical Health Advisor
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           AI-Powered Preliminary Health Assessment
         </p>
       </div>
 
       {/* Disclaimer */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+      <div className="bg-yellow-50 dark:bg-yellow-900/10 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
         <div className="flex items-start">
           <span className="text-2xl mr-3">⚠️</span>
           <div>
-            <h3 className="font-semibold text-yellow-800 mb-1">
+            <h3 className="font-semibold text-yellow-800 dark:text-yellow-500 mb-1">
               Medical Disclaimer
             </h3>
-            <p className="text-sm text-yellow-700">
+            <p className="text-sm text-yellow-700 dark:text-yellow-400">
               This is a preliminary assessment tool only. Results are NOT a
               diagnosis. Always consult with a qualified healthcare professional
               for medical advice, diagnosis, and treatment. In case of
@@ -354,11 +354,11 @@ const MedicalAdvisor = () => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
+      <div className="bg-white dark:bg-black rounded-xl shadow-lg dark:shadow-none p-6 md:p-8 mb-8 border dark:border-gray-800">
         {/* Step 1: Patient Information */}
         {step === "info" && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
               Patient Information
             </h2>
 
@@ -377,7 +377,7 @@ const MedicalAdvisor = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, age: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-zinc-900 dark:text-white"
                 placeholder="Enter your age"
                 min="0"
                 max="120"
@@ -401,7 +401,7 @@ const MedicalAdvisor = () => {
                     className={`px-6 py-3 rounded-lg font-medium transition-all ${
                       formData.gender === g
                         ? "bg-[#5f6FFF] text-white shadow-lg"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        : "bg-gray-100 dark:bg-zinc-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-800"
                     }`}
                   >
                     {g}
@@ -423,7 +423,7 @@ const MedicalAdvisor = () => {
         {step === "symptoms" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Select Symptoms
               </h2>
               <button
@@ -436,7 +436,7 @@ const MedicalAdvisor = () => {
 
             {/* Custom Symptom Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
                 Add Custom Symptom
               </label>
               <div className="flex gap-2">
@@ -447,7 +447,7 @@ const MedicalAdvisor = () => {
                   onKeyPress={(e) =>
                     e.key === "Enter" && handleAddSymptom(symptomInput)
                   }
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-zinc-900 dark:text-white"
                   placeholder="Type a symptom and press Enter"
                 />
                 <button
@@ -528,7 +528,7 @@ const MedicalAdvisor = () => {
         {step === "results" && results && (
           <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Assessment Results
               </h2>
               <span className="text-sm text-gray-500">
@@ -556,26 +556,26 @@ const MedicalAdvisor = () => {
             )}
 
             {/* Patient Summary */}
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-900 mb-2">
+            <div className="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-4">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
                 Patient Profile
               </h3>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <span className="text-blue-700">Age:</span>
-                  <p className="font-semibold text-blue-900">
+                  <p className="font-semibold text-blue-900 dark:text-blue-100">
                     {formData.age} years
                   </p>
                 </div>
                 <div>
-                  <span className="text-blue-700">Gender:</span>
-                  <p className="font-semibold text-blue-900">
+                  <span className="text-blue-700 dark:text-blue-400">Gender:</span>
+                  <p className="font-semibold text-blue-900 dark:text-blue-100">
                     {formData.gender}
                   </p>
                 </div>
                 <div>
-                  <span className="text-blue-700">Symptoms:</span>
-                  <p className="font-semibold text-blue-900">
+                  <span className="text-blue-700 dark:text-blue-400">Symptoms:</span>
+                  <p className="font-semibold text-blue-900 dark:text-blue-100">
                     {symptoms.length} reported
                   </p>
                 </div>
@@ -584,7 +584,7 @@ const MedicalAdvisor = () => {
 
             {/* Possible Conditions */}
             <div>
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-3 flex items-center">
                 📊 Possible Conditions (ranked by likelihood)
               </h3>
 
@@ -593,7 +593,7 @@ const MedicalAdvisor = () => {
                   {results.diseases.map((disease, idx) => (
                     <div
                       key={idx}
-                      className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100"
+                      className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-zinc-900 dark:to-zinc-900 rounded-lg p-4 border border-purple-100 dark:border-gray-800"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -601,7 +601,7 @@ const MedicalAdvisor = () => {
                             <span className="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded mr-2">
                               #{idx + 1}
                             </span>
-                            <h4 className="font-semibold text-gray-800">
+                            <h4 className="font-semibold text-gray-800 dark:text-white">
                               {disease.name}
                             </h4>
                           </div>
@@ -615,7 +615,7 @@ const MedicalAdvisor = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
+                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 mt-3">
                         <div
                           className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${disease.probability * 100}%` }}
@@ -638,15 +638,15 @@ const MedicalAdvisor = () => {
             </div>
 
             {/* Symptoms Review */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-2">
+            <div className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
                 Reported Symptoms
               </h3>
               <div className="flex flex-wrap gap-2">
                 {symptoms.map((symptom) => (
                   <span
                     key={symptom}
-                    className="bg-white px-3 py-1 rounded-full text-sm text-gray-700 border border-gray-200"
+                    className="bg-white dark:bg-black px-3 py-1 rounded-full text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800"
                   >
                     {symptom}
                   </span>
@@ -658,7 +658,7 @@ const MedicalAdvisor = () => {
             <div className="flex gap-3">
               <button
                 onClick={handleReset}
-                className="flex-1 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
+                className="flex-1 bg-gray-600 dark:bg-zinc-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 dark:hover:bg-zinc-700 transition"
               >
                 New Assessment
               </button>
@@ -671,7 +671,7 @@ const MedicalAdvisor = () => {
             </div>
 
             {/* Important Notice */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/20 rounded-lg p-4">
               <h4 className="font-semibold text-red-800 mb-2">⚠️ Next Steps</h4>
               <p className="text-sm text-red-700">
                 These results are for informational purposes only. Please
@@ -686,9 +686,9 @@ const MedicalAdvisor = () => {
 
       {/* Assessment History - Lazy loaded */}
       {history.length > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+        <div className="bg-white dark:bg-black rounded-xl shadow-lg dark:shadow-none p-6 md:p-8 border dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
               Recent Assessments
             </h2>
             <button
@@ -702,11 +702,11 @@ const MedicalAdvisor = () => {
             {history.slice(0, 5).map((assessment) => (
               <div
                 key={assessment.id}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                className="border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:shadow-md transition"
               >
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="font-medium text-gray-800">
+                    <p className="font-medium text-gray-800 dark:text-white">
                       {assessment.age} years old, {assessment.gender}
                     </p>
                     <p className="text-sm text-gray-500">

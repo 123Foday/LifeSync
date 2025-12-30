@@ -53,10 +53,10 @@ const MedicalBotButton = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Welcome Popup */}
       {showWelcome && (
-        <div className="absolute bottom-20 right-0 w-64 bg-white rounded-xl shadow-2xl p-4 mb-2 animate-bounce-in border border-gray-100">
+        <div className="absolute bottom-20 right-0 w-64 bg-white dark:bg-black rounded-xl shadow-2xl p-4 mb-2 animate-bounce-in border border-gray-100 dark:border-gray-800">
           <button
             onClick={handleCloseWelcome}
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             aria-label="Close"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -74,10 +74,10 @@ const MedicalBotButton = () => {
               </div>
             </div>
             <div className="flex-1">
-              <h4 className="font-bold text-gray-800 mb-1">
+              <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
                 Hi! I'm LifeSync your Health Bot
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Need a quick health check? I can help assess your symptoms!
               </p>
               <button
@@ -89,15 +89,15 @@ const MedicalBotButton = () => {
             </div>
           </div>
           {/* Arrow pointing to button */}
-          <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white transform rotate-45 border-r border-b border-gray-100"></div>
+          <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white dark:bg-black transform rotate-45 border-r border-b border-gray-100 dark:border-gray-800"></div>
         </div>
       )}
 
       {/* Tooltip */}
       {showTooltip && !showWelcome && (
-        <div className="absolute bottom-full right-0 mb-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
+        <div className="absolute bottom-full right-0 mb-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm rounded-lg shadow-lg whitespace-nowrap animate-fade-in font-medium">
           🩺 AI Medical Advisor
-          <div className="absolute top-full right-6 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-gray-900"></div>
+          <div className="absolute top-full right-6 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
         </div>
       )}
 

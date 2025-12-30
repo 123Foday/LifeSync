@@ -2,9 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-- Docs: Update `README.md` and `CHANGELOG.md` with project overview and setup instructions.
-- Doc: Add notes about ports and asset keys.
+## [2025-12-29] - Major UI Overhaul (Frontend)
+- **Design System**: Refactored the entire frontend to use a "Premium" design system featuring glassmorphism, rich gradients, and animation-heavy interactables.
+- **Redesign**:
+    - **Banner**: Redesigned with a split-layout, premium gradients, and interactive CTA buttons.
+    - **Header**: Updated to a modern Hero section with dynamic typography.
+    - **TopDoctors & TopHospitals**: Converted to premium card grids with hover effects and status indicators.
+    - **About Page**: Completely revamped with a dark-themed hero section, floating badges, and an icon-rich "Why Choose Us" section.
+    - **Footer**: Redesigned with a spacious, 4-column aesthetic layout, status indicators, and enhanced hover interactions.
+- **Performance & Fixes**:
+    - **Icons**: Replaced external icon libraries with inline SVGs to fix rendering issues and improve load times.
+    - **Bug Fix**: Resolved a critical "blank screen" rendering crash caused by icon hoisting issues.
+    - **Bug Fix**: Fixed an object rendering crash in `TopHospitals` by safely accessing address properties.
+    - **Header Optimization**: Reduced padding, gap, and font sizes in `Header` component for a more compact and visible default view.
+
+## [2025-12-29] - Documentation & Ecosystem Sync
+- **Docs**: Created comprehensive `setup.md` with detailed installation guides and development history.
+- **Docs**: Synchronized all sub-package READMEs (`backend`, `frontend`, `admin`, `mobile`) with project-specific details.
+- **Docs**: Updated root `README.md` to include documented support for the mobile application and link to detailed setup logs.
+- **Docs**: Added ports and environment configuration notes to central documentation.
 
 ## [2025-12-18] - Authentication & Session Handling
 - Frontend: Added global axios response interceptor to detect expired/invalid JWTs and automatically clear the session, show a toast message "Session expired. Please log in again.", and redirect the user to `/login`.

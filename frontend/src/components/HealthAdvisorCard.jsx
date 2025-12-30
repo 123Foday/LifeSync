@@ -1,152 +1,97 @@
 import { useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 
+const Icons = {
+  Bot: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg>
+  ),
+  Check: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="20 6 9 17 4 12" /></svg>
+  ),
+  Sparkles: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" /></svg>
+  ),
+  HeartPulse: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" /></svg>
+  ),
+  Zap: ({ size = 24, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+  ),
+};
+
 const MedicalAdvisorCard = () => {
   const navigate = useNavigate();
 
   return (
-    <>
-      <div className="flex flex-col items-center justify-center text-center px-4 sm:px-6">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium">
-          Health Answers, When You Need Them Most
-        </h1>
-        <p className="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 text-xs sm:text-sm mt-2 sm:mt-3">
-          LifeSync&apos;s AI Medical Advisor delivers instant, reliable health insights.
-          Get clear answers to your health questions, whenever you need them.
+    <div className="flex flex-col gap-12 my-20">
+      <div className="flex flex-col items-center justify-center text-center px-4 space-y-4">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+          Health Answers, <span className="text-[#5f6FFF]">Instantly</span>
+        </h2>
+        <p className="max-w-xl text-sm sm:text-base text-gray-500 dark:text-gray-400">
+          LifeSync's AI Medical Advisor delivers reliable health insights 24/7. Get clear, evidence-based answers to your medical questions.
         </p>
       </div>
-      <div className="mb-6 sm:mb-8 md:mb-10"></div>
-      <div className="container relative flex flex-col md:flex-row bg-[#5f6FFF] rounded-lg px-4 sm:px-6 md:px-8 lg:px-10 mt-4 sm:mt-6 mb-6 sm:mb-8 text-white overflow-hidden">
-        {/* Left - content */}
-        <div className="flex-1 py-6 sm:py-8 md:py-10 relative z-10">
-          <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold">
-            <p>🏥 Health Advisor</p>
-            <p className="mt-2 text-xs sm:text-sm md:text-base text-blue-100">
-              AI-Powered Medical Assessment
+
+      <div className="relative flex flex-col md:flex-row bg-[#5f6FFF] dark:bg-[#1e1e2d] rounded-[2.5rem] p-8 md:p-12 lg:p-16 text-white overflow-hidden shadow-2xl transition-all duration-500 group border border-white/10">
+        
+        {/* Glow Effects */}
+        <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-white/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-white/20 transition-all duration-700"></div>
+        
+        {/* Left Content */}
+        <div className="flex-1 relative z-10 space-y-8">
+          <div className="flex items-center gap-3">
+             <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
+                <Icons.Bot size={32} className="text-blue-100" />
+             </div>
+             <div>
+                <h3 className="text-2xl font-bold">Health Advisor</h3>
+                <p className="text-blue-100/60 text-sm font-medium">AI-Powered Assessment</p>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+             {[
+               "Preliminary assessments",
+               "Condition identification",
+               "Triage recommendations",
+               "Health history tracking"
+             ].map((feature, i) => (
+               <div key={i} className="flex items-center gap-4 group/item">
+                  <div className="w-6 h-6 rounded-full bg-blue-400/20 border border-blue-300/30 flex items-center justify-center group-hover/item:bg-blue-400 transition-colors">
+                     <Icons.Check size={14} className="text-white" />
+                  </div>
+                  <p className="text-blue-50/90 text-sm md:text-base font-medium">{feature}</p>
+               </div>
+             ))}
+          </div>
+
+          <div className="pt-8 flex flex-col sm:flex-row items-center gap-6">
+            <button
+              onClick={() => navigate("/medical-advisor")}
+              className="group flex items-center justify-center gap-3 bg-white text-black px-10 py-5 rounded-2xl font-bold transition-all hover:bg-gray-100 hover:shadow-xl active:scale-95 w-full sm:w-auto overflow-hidden"
+            >
+              Ask LifeSync AI
+              <Icons.Sparkles size={18} className="text-[#5f6FFF] transition-transform group-hover:scale-125" />
+            </button>
+            <p className="text-[10px] uppercase font-bold tracking-widest text-blue-100/40 max-w-[200px] text-center sm:text-left leading-relaxed">
+              * Non-substitute for professional medical advice.
             </p>
           </div>
-          {/* Mobile icon - visible on small screens */}
-          <div className="absolute right-4 top-4 sm:right-6 sm:top-6 md:hidden bg-green-300 backdrop-blur-sm rounded-full p-3 sm:p-4 flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20">
-            <span className="text-3xl sm:text-4xl">🩺</span>
-          </div>
-          <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6 pr-16 sm:pr-20 md:pr-0">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <span className="text-xl sm:text-2xl text-green-300 flex-shrink-0">✓</span>
-              <p className="text-white/90 text-xs sm:text-sm md:text-base">
-                Get preliminary health assessments
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <span className="text-xl sm:text-2xl text-green-300 flex-shrink-0">✓</span>
-              <p className="text-white/90 text-xs sm:text-sm md:text-base">Identify possible conditions</p>
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <span className="text-xl sm:text-2xl text-green-300 flex-shrink-0">✓</span>
-              <p className="text-white/90 text-xs sm:text-sm md:text-base">Know when to see a doctor</p>
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <span className="text-xl sm:text-2xl text-green-300 flex-shrink-0">✓</span>
-              <p className="text-white/90 text-xs sm:text-sm md:text-base">Track your health history</p>
-            </div>
-          </div>
-          <button
-            onClick={() => navigate("/medical-advisor")}
-            className="flex items-center gap-2 bg-white text-xs sm:text-sm md:text-base text-gray-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full mt-4 sm:mt-6 hover:scale-105 transition-all md:hidden w-full sm:w-auto justify-center"
-          >
-            Ask LifeSync
-            <img className="w-3" src={assets.arrow_icon} alt="" />
-          </button>
-
-          <p className="text-[10px] sm:text-xs text-red-100 mt-4 sm:mt-6 text-center md:text-left">
-            * For informational purposes only. Not a substitute for professional
-            medical advice.
-          </p>
         </div>
 
-        {/* Icon - center-right (absolute) */}
-        <div className="hidden md:block md:w-1/2 lg:w-2/5 relative">
-          <div className="absolute right-4 md:right-6 lg:right-8 top-1/2 transform -translate-y-1/2 flex flex-col items-center justify-center">
-            <p className="text-xs md:text-sm lg:text-base text-blue-100 mb-2 text-center max-w-[200px]">
-              Hey Dear, I&apos;m LifeSync your Health Advisor!
-            </p>
-            <span
-              className="absolute w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-blue-400 opacity-60 animate-ping"
-              aria-hidden="true"
-            />
-
-            <button
-              onClick={() => navigate("/medical-advisor")}
-              aria-label="Open Medical Advisor"
-              className="relative z-10 bg-white/20 backdrop-blur-sm rounded-full p-2 md:p-3 w-24 h-24 md:w-28 md:h-28 lg:w-36 lg:h-36 flex items-center justify-center hover:scale-105 transition-transform"
-            >
-              <svg
-                className="w-12 h-12 md:w-16 md:h-16 lg:w-24 lg:h-24 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {/* Robot Head */}
-                <rect
-                  x="6"
-                  y="8"
-                  width="12"
-                  height="10"
-                  rx="2"
-                  strokeWidth="2"
-                />
-                {/* Antenna */}
-                <line x1="12" y1="4" x2="12" y2="8" strokeWidth="2" />
-                <circle cx="12" cy="3" r="1.5" fill="currentColor" />
-                {/* Eyes */}
-                <circle
-                  cx="9.5"
-                  cy="12"
-                  r="1.5"
-                  fill="currentColor"
-                  className="animate-pulse"
-                />
-                <circle
-                  cx="14.5"
-                  cy="12"
-                  r="1.5"
-                  fill="currentColor"
-                  className="animate-pulse"
-                  style={{ animationDelay: "0.2s" }}
-                />
-                {/* Smile */}
-                <path d="M9 15 Q12 17 15 15" strokeWidth="1.5" />
-                {/* Body */}
-                <rect
-                  x="8"
-                  y="18"
-                  width="8"
-                  height="3"
-                  rx="1"
-                  strokeWidth="2"
-                />
-                {/* Left Arm */}
-                <line x1="6" y1="12" x2="4" y2="14" strokeWidth="2" />
-                <circle cx="4" cy="14" r="1" fill="currentColor" />
-                {/* Right Arm */}
-                <line x1="18" y1="12" x2="20" y2="14" strokeWidth="2" />
-                <circle cx="20" cy="14" r="1" fill="currentColor" />
-              </svg>
-            </button>
-
-            <button
-              onClick={() => navigate("/medical-advisor")}
-              className="mt-4 md:mt-5 flex items-center gap-2 bg-white text-xs md:text-sm lg:text-base text-gray-600 px-6 md:px-8 py-2.5 md:py-3 rounded-full hover:scale-105 transition-all"
-            >
-              Ask LifeSync
-              <img className="w-3" src={assets.arrow_icon} alt="" />
-            </button>
-          </div>
+        {/* Right Content - Visual */}
+        <div className="hidden md:flex flex-1 items-center justify-center relative z-10 bg-white/5 border border-white/10 backdrop-blur-md rounded-[2rem] p-12 ml-12">
+            <div className="relative">
+               <div className="absolute inset-0 bg-blue-400 rounded-full blur-[60px] opacity-20 animate-pulse"></div>
+               <Icons.HeartPulse size={120} strokeWidth={1} className="text-white relative z-10 drop-shadow-2xl animate-float" />
+               <div className="absolute -top-4 -right-4 p-4 rounded-full bg-[#5f6FFF] border-4 border-[#1e1e2d] shadow-xl">
+                  <Icons.Zap size={24} className="text-white" />
+               </div>
+            </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

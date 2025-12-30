@@ -24,11 +24,24 @@ To create a seamless healthcare experience for every user by bridging the gap be
 - **Profile Management** - Update professional information and availability
 - **Slot Management** - Control appointment availability and timing
 
+### For Hospitals
+- **Hospital Dashboard** - Overview of appointments and statistics
+- **Appointment Management** - View and manage patient appointments
+- **Profile Management** - Update professional information and availability
+- **Slot Management** - Control appointment availability and timing
+
 ### For Administrators
 - **Admin Dashboard** - System overview and analytics
 - **Doctor Management** - Add, edit, and manage doctor profiles
+- **Hospital Management** - Add, edit, and manage doctor profiles
 - **Appointment Oversight** - Monitor all system appointments
 - **User Management** - Manage patient and doctor accounts
+
+### Mobile Application
+- **Cross-platform** - Available for iOS and Android via Expo
+- **Dark Mode Support** - Dynamic theme switching
+- **Push Notifications** - Real-time updates for appointments
+- **Seamless Sync** - Shared backend with Web and Admin panels
 
 ## 🛠️ Technology Stack
 
@@ -49,12 +62,16 @@ To create a seamless healthcare experience for every user by bridging the gap be
 - **bcrypt 6.0.0** - Password hashing
 - **Cloudinary 2.7.0** - Image upload and management
 - **Multer 2.0.2** - File upload middleware
-
 - **CORS 2.8.5** - Cross-origin resource sharing
+
+### Mobile
+- **React Native** - Cross-platform framework
+- **Expo** - Development platform
+- **Expo Router** - File-based routing
+- **NativeWind** - Styling engine
 
 ## 📁 Project Structure
 
-```
 LifeSync/
 ├── frontend/                 # Patient-facing React application
 │   ├── src/
@@ -63,29 +80,35 @@ LifeSync/
 │   │   ├── context/        # React context for state management
 │   │   └── assets/         # Images and static assets
 │   └── package.json
-├── admin/                   # Admin, Hospital and Doctor panel React application
+├── admin/                   # Admin and Doctor panel React application
 │   ├── src/
-│   │   ├── components/     # Admin/Hospital/Doctor UI components
-│   │   ├── pages/         # Admin and Doctor pages
-│   │   ├── context/       # Context for admin/doctor state
+│   │   ├── components/     # UI components
+│   │   ├── pages/         # Admin/Doctor pages
+│   │   ├── context/       # Context state
 │   │   └── assets/        # Admin panel assets
+│   └── package.json
+├── mobile/                  # Expo/React Native application
+│   ├── app/                # Main application screens (Expo Router)
+│   ├── components/         # Mobile-specific UI components
 │   └── package.json
 ├── backend/                 # Node.js/Express API server
 │   ├── controllers/        # Request handlers
 │   ├── models/            # Database schemas
 │   ├── routes/            # API routes
-│   ├── middlewares/       # Authentication and validation
-│   ├── config/            # Database and service configurations
 │   └── package.json
-└── README.md
+├── README.md                # Project overview
+└── setup.md                 # Detailed setup and dev logs
 ```
 
 ## 🚀 Getting Started
+
+For a comprehensive guide on setting up each module and viewing the development history, please refer to the **[setup.md](./setup.md)** file.
 
 ### Prerequisites
 - Node.js (v16 or higher)
 - MongoDB (local or cloud instance)
 - Cloudinary account (for image uploads)
+- Expo Dev App
 
 ### Installation
 
@@ -112,8 +135,12 @@ LifeSync/
    cd ../admin
    npm install
    ```
-
-5. **Environment Configuration**
+5. **Install mobile dependencies**
+   ```bash
+   cd ../mobile && 
+   npm install
+   ```
+6. **Environment Configuration**
    
    Create a `.env` file in the `backend` directory with the following variables:
    ```env
@@ -147,10 +174,17 @@ LifeSync/
    npm run dev
    ```
 
+4. **Start the mobile app**
+   ```bash
+   cd mobile
+   npx expo start
+   ```
+
 The applications will be available at:
 - Frontend: `http://localhost:5173`
 - Admin Panel: `http://localhost:5174` (or next available port)
 - Backend API: `http://localhost:4000`
+- Expo Dev Menu
 
 ## 🔧 API Endpoints
 
@@ -169,6 +203,15 @@ The applications will be available at:
 - `POST /update-profile` - Update doctor profile
 - `GET /appointments` - Get doctor appointments
 
+### Hospital Routes (`/api/doctor`)
+- `POST /register` - Hospital registration
+- `POST /login` - Hospital login
+- `GET /get-profile` - Get Hospital profile
+- `GET /get-doctors` - Get institutional doctors
+- `POST /add-doctor` - Add new doctor to your hospital
+- `POST /update-profile` - Update Hospital profile
+- `GET /appointments` - Get Hospital and their doctors appointments
+
 ### Admin Routes (`/api/admin`)
 - `POST /login` - Admin login
 - `GET /get-doctors` - Get all doctors
@@ -186,7 +229,7 @@ The applications will be available at:
 
 ### User Authentication
 - JWT-based authentication
-- Role-based access control (Patient, Doctor, Admin)
+- Role-based access control (Patient, Doctor, Hospital, Admin)
 - Secure password hashing with bcrypt
 - Protected routes and API endpoints
 - Automatic session expiry handling: the frontend detects expired/invalid JWTs (401 responses or messages like "jwt expired"), automatically clears the session and redirects users to the login page. Backend auth middleware now returns standardized 401 responses with the underlying error message (e.g., "jwt expired") so the frontend can reliably detect this condition.
@@ -211,9 +254,9 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Phone**: +232-88-915-854
-- **Email**: dtso.cbc.sl@gmail.com
-- **Project Link**: [LifeSync Repository](https://github.com/yourusername/LifeSync)
+- **Phone**: +232-74-841-741, +232-88-915-854
+- **Email**: ctso.cbc.sl@gmail.com, dtso.cbc.sl@gmail.com
+- **Project Link**: [LifeSync Repository](https://github.com/ADBangs-CBC/LifeSync)
 
 ## 🙏 Acknowledgments
 
