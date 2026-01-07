@@ -100,6 +100,15 @@ LifeSync/
 └── setup.md                 # Detailed setup and dev logs
 ```
 
+## 📚 Documentation & References
+
+We believe in maintaining professional, up-to-date documentation. Please refer to the following documents for deep dives into specific aspects of the project:
+
+- **[Implementation Summary](./IMPLEMENTATION_SUMMARY.md)**: A high-level report of recent changes, features, and system status.
+- **[System Architecture](./ARCHITECTURE.md)**: Technical overview of the MERN stack, database schema, and data flow.
+- **[Setup Guide](./SETUP.md)**: Detailed step-by-step instructions to get the environment running.
+- **[Changelog](./CHANGELOG.md)**: Chronological history of all changes and updates.
+
 ## 🚀 Getting Started
 
 For a comprehensive guide on setting up each module and viewing the development history, please refer to the **[setup.md](./setup.md)** file.

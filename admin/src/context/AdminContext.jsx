@@ -12,9 +12,23 @@ const AdminContextProvider = ({ children }) => {
   const [doctors, setDoctors] = useState([])
   const [hospitals, setHospitals] = useState([])
   const [appointments, setAppointments] = useState([])
+  const [users, setUsers] = useState([])
   const [dashData, setDashData] = useState(false)
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL
+
+  const getAllUsers = useCallback(async () => {
+    try {
+      const { data } = await axios.post(backendUrl + '/api/admin/all-users', {}, { headers: { atoken: aToken } })
+      if (data.success) {
+        setUsers(data.users)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }, [backendUrl, aToken])
 
   const getAllDoctors = useCallback(async () => {
     try {
@@ -137,8 +151,10 @@ const AdminContextProvider = ({ children }) => {
     backendUrl,
     doctors,
     hospitals,
+    users,
     getAllDoctors,
     getAllHospitals,
+    getAllUsers,
     changeHospitalAvailability,
     changeAvailability,
     appointments,

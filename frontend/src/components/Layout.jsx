@@ -3,6 +3,7 @@ import Sidebar from './navigation/Sidebar';
 import TopBar from './navigation/TopBar';
 import BottomBar from './navigation/BottomBar';
 import Footer from './Footer';
+import PageSearchBar from './PageSearchBar';
 
 const Layout = ({ children }) => {
   return (
@@ -30,6 +31,9 @@ const Layout = ({ children }) => {
       {/* Main Content Area */}
       <main className="transition-all duration-300 xl:ml-64 pb-20 md:pb-0">
         <div className="max-w-[1600px] mx-auto p-4 md:p-8 lg:p-12">
+          {/* Desktop Page Search Bar */}
+          <PageSearchBar />
+          
           {children}
         </div>
         <Footer />

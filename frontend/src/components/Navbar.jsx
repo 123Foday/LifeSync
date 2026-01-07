@@ -4,6 +4,8 @@ import {assets} from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { useTheme } from '../context/ThemeContext'
 import { toast } from 'react-toastify' 
+import { Search } from 'lucide-react' 
+import Fuse from 'fuse.js'
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -13,7 +15,9 @@ const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [hasShadow, setHasShadow] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedTerm, setDebouncedTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   const [hoverIndex, setHoverIndex] = useState(null);
 
   // ... (rest of the code)
@@ -154,11 +158,35 @@ const Navbar = () => {
     setTimeout(() => navigate('/login'), 400)
   }
 
-  // Filter hospitals and doctors based on search term
-  const searchResults = searchTerm.trim() ? [
-    ...hospitals.filter(h => h.name?.toLowerCase().includes(searchTerm.toLowerCase()) || h.speciality?.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 3),
-    ...doctors.filter(d => d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || d.speciality?.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 3)
-  ] : []
+ 
+  // Filter hospitals and doctors using Fuse.js
+  const allData = useMemo(() => {
+    const h = hospitals.map(item => ({ ...item, type: 'Hospital' }))
+    const d = doctors.map(item => ({ ...item, type: 'Doctor' }))
+    return [...h, ...d]
+  }, [hospitals, doctors])
+
+  const fuse = useMemo(() => new Fuse(allData, {
+    keys: ['name', 'speciality', 'address.line1', 'address.line2'],
+    threshold: 0.3,
+    distance: 100
+  }), [allData])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTerm(searchTerm)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  useEffect(() => {
+    if (debouncedTerm.trim()) {
+      const results = fuse.search(debouncedTerm).map(res => res.item).slice(0, 5)
+      setSearchResults(results)
+    } else {
+      setSearchResults([])
+    }
+  }, [debouncedTerm, fuse])
 
   const handleSearchSelect = (item, type) => {
     setSearchTerm('')
@@ -243,7 +271,10 @@ const Navbar = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="hidden md:flex items-center relative">
+        <div className="hidden md:flex items-center relative flex-1 max-w-xs lg:max-w-sm ml-4 mr-4">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+             <Search size={16} />
+          </div>
           <input
             type="text"
             placeholder="Search hospitals, doctors..."
@@ -254,7 +285,7 @@ const Navbar = () => {
             }}
             onFocus={() => setShowSearchResults(searchTerm.trim().length > 0)}
             onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-            className="px-2 md:px-3 py-1.5 md:py-2 border border-gray-300 dark:border-gray-800 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm w-32 md:w-40 lg:w-48 xl:w-64"
+            className="w-full pl-9 pr-3 py-1.5 md:py-2 border border-gray-300 dark:border-gray-800 bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5f6FFF] text-xs md:text-sm transition-all"
           />
 
           {/* Search Results Dropdown */}
@@ -266,17 +297,24 @@ const Navbar = () => {
                   onClick={() =>
                     handleSearchSelect(
                       item,
-                      item.availableSlots ? "doctor" : "hospital"
+                      item.type?.toLowerCase() || (item.availableSlots ? "doctor" : "hospital")
                     )
                   }
-                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                  className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex justify-between items-center group"
                 >
-                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {item.speciality || item.address}
-                  </p>
+                   <div>
+                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {item.speciality || item.address?.line1 || item.address}
+                    </p>
+                  </div>
+                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full 
+                    ${item.type === 'Doctor' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 
+                      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'}`}>
+                    {item.type}
+                  </span>
                 </div>
               ))}
             </div>
@@ -543,18 +581,25 @@ const Navbar = () => {
                     onClick={() => {
                       handleSearchSelect(
                         item,
-                        item.availableSlots ? "doctor" : "hospital"
+                        item.type?.toLowerCase() || (item.availableSlots ? "doctor" : "hospital")
                       );
                       setShowSearchMobile(false);
                     }}
-                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                    className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0 flex justify-between items-center group"
                   >
-                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {item.speciality || item.address}
-                    </p>
+                     <div>
+                      <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {item.speciality || item.address?.line1 || item.address}
+                      </p>
+                    </div>
+                    <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full 
+                      ${item.type === 'Doctor' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 
+                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'}`}>
+                      {item.type}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -1,0 +1,13 @@
+
+== ADMIN LOGIN ==
+Email: dtso.cbc.sl@gmail.com
+Password: 112001kai
+
+== PATIENT / USER LOGIN ==
+Email: ctso.cbc.sl@gmail.com
+Password: ADBangs@cbc.Sl
+
+== NOTES ==
+- Admin login is handled via /api/admin/login
+- User login is handled via /api/user/login
+- Ensure the backend server is running on port 4000.
