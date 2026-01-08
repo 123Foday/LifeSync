@@ -28,7 +28,7 @@ const App = () => {
   const { hToken } = useContext(HospitalContext)
 
   return aToken || dToken || hToken ? (
-    <div className='flex flex-col min-h-screen bg-[#F8F9FD] dark:bg-black transition-colors duration-300'>
+    <div className='flex flex-col min-h-screen bg-[#F8F9FD] dark:bg-[#121212] transition-colors duration-300'>
       <ToastContainer />
       <div className='fixed top-0 left-0 right-0 z-50'>
         <Navbar />

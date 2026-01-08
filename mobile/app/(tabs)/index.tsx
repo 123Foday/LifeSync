@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,12 +9,14 @@ import {
   Image,
   Dimensions,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { AppContext } from '@/context/AppContext';
-import { Search, MapPin, Star, ChevronRight, Bell } from 'lucide-react-native';
+import { Search, MapPin, Star, ChevronRight, Bell, X } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 import { useRouter } from 'expo-router';
+import Fuse from 'fuse.js';
 
 const { width } = Dimensions.get('window');
 
@@ -33,10 +35,83 @@ export default function HomeScreen() {
   const theme = Colors[themeName as 'light' | 'dark'];
   const router = useRouter();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+
+  // Fuse configuration
+  const allData = useMemo(() => {
+    const d = doctors.map(doc => ({ ...doc, type: 'Doctor' }));
+    const h = hospitals.map(hos => ({ ...hos, type: 'Hospital' }));
+    return [...d, ...h];
+  }, [doctors, hospitals]);
+
+  const fuse = useMemo(() => new Fuse(allData, {
+    keys: ['name', 'speciality', 'address.line1'],
+    threshold: 0.3,
+  }), [allData]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Perform search
+  useEffect(() => {
+    if (debouncedSearch.trim()) {
+      const results = fuse.search(debouncedSearch).map(result => result.item);
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
+    }
+  }, [debouncedSearch, fuse]);
+
+  const renderSearchResult = ({ item }: { item: any }) => (
+    <TouchableOpacity 
+      style={[styles.resultItem, { backgroundColor: theme.card, borderColor: theme.border }]}
+      onPress={() => {
+        // Navigate logic
+        if (item.type === 'Doctor') {
+           // router.push(`/doctor/${item._id}`); // Assuming route exists or will be created
+           console.log('Navigate to doctor', item._id);
+        } else {
+           console.log('Navigate to hospital', item._id);
+        }
+      }}
+    >
+      <View style={[styles.resultImageContainer, { backgroundColor: theme.background }]}>
+         {item.image ? (
+            <Image source={{ uri: item.image }} style={styles.resultImage} />
+         ) : (
+            <View style={[styles.placeholderImage, { backgroundColor: item.type === 'Doctor' ? '#eff6ff' : '#f0fdf4' }]}>
+               <Text style={{ fontSize: 18 }}>{item.type === 'Doctor' ? '👨‍⚕️' : '🏥'}</Text>
+            </View>
+         )}
+      </View>
+      <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+           <Text style={[styles.resultName, { color: theme.text }]} numberOfLines={1}>{item.name}</Text>
+           <View style={[styles.typeBadge, { 
+             backgroundColor: item.type === 'Doctor' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)'
+           }]}>
+             <Text style={[styles.typeText, { 
+               color: item.type === 'Doctor' ? '#3b82f6' : '#10b981'
+             }]}>{item.type}</Text>
+           </View>
+        </View>
+        <Text style={[styles.resultSub, { color: theme.icon }]} numberOfLines={1}>
+          {item.speciality || item.address?.line1 || 'Healthcare Provider'}
+        </Text>
+      </View>
+      <ChevronRight size={16} color={theme.icon} />
+    </TouchableOpacity>
+  );
 
   const renderDoctorItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={[styles.doctorCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <Image source={{ uri: item.image }} style={[styles.doctorImage, { backgroundColor: themeName === 'dark' ? '#0f172a' : '#eff6ff' }]} />
+      <Image source={{ uri: item.image }} style={[styles.doctorImage, { backgroundColor: themeName === 'dark' ? '#1e1e1e' : '#eff6ff' }]} />
       <View style={styles.doctorInfo}>
         <View style={styles.availabilityRow}>
           <View style={[styles.dot, { backgroundColor: item.available ? '#10b981' : '#ef4444' }]} />
@@ -55,112 +130,145 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={[styles.welcomeText, { color: theme.icon }]}>Welcome back,</Text>
-          <Text style={[styles.userName, { color: theme.text }]}>Patient</Text>
-        </View>
-        <TouchableOpacity style={[styles.notificationBtn, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Bell size={22} color={theme.text} />
-          <View style={styles.badge} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={[styles.searchContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <Search size={20} color={theme.icon} />
-        <TextInput
-          placeholder="Search doctors, hospitals..."
-          placeholderTextColor={theme.icon}
-          style={[styles.searchInput, { color: theme.text }]}
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
-
-      {/* Hero Banner */}
-      <View style={styles.banner}>
-        <View style={styles.bannerContent}>
-          <Text style={styles.bannerTitle}>AI Health{"\n"}Advisor</Text>
-          <Text style={styles.bannerSubtitle}>Chat with our bot for instant advice</Text>
-          <TouchableOpacity 
-            style={styles.bannerBtn}
-            onPress={() => router.push('/medical-advisor')}
-          >
-            <Text style={styles.bannerBtnText}>Start Chat</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView 
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={[1]} // Make search bar sticky if desired, index 1 is search input view wrapper
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={[styles.welcomeText, { color: theme.icon }]}>Welcome back,</Text>
+            <Text style={[styles.userName, { color: theme.text }]}>Patient</Text>
+          </View>
+          <TouchableOpacity style={[styles.notificationBtn, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Bell size={22} color={theme.text} />
+            <View style={styles.badge} />
           </TouchableOpacity>
         </View>
-        <View style={styles.bannerImageContainer}>
-           <Image
-            source={require('@/assets/images/header_img.png')}
-            style={styles.bannerImage}
-           />
+
+        {/* Search Bar - Sticky Context */}
+        <View style={{ backgroundColor: theme.background, paddingBottom: 10 }}> 
+          <View style={[styles.searchContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Search size={20} color={theme.icon} />
+            <TextInput
+              placeholder="Search doctors, hospitals..."
+              placeholderTextColor={theme.icon}
+              style={[styles.searchInput, { color: theme.text }]}
+              value={search}
+              onChangeText={setSearch}
+            />
+            {search.length > 0 && (
+              <TouchableOpacity onPress={() => setSearch('')}>
+                <X size={18} color={theme.icon} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-
-      {/* Specialities */}
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Specialities</Text>
-        <TouchableOpacity>
-          <Text style={[styles.seeAll, { color: theme.tint }]}>See All</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.specialityList}>
-        {specialities.map((item: any, index: number) => (
-          <TouchableOpacity key={index} style={styles.specialityItem}>
-            <View style={[styles.specialityIcon, { backgroundColor: theme.card, borderColor: theme.border }]}>
-              <Text style={styles.specialityEmoji}>{item.emoji}</Text>
-            </View>
-            <Text style={[styles.specialityName, { color: theme.text }]} numberOfLines={1}>{item.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Top Doctors */}
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Top Doctors</Text>
-        <TouchableOpacity onPress={() => router.push('/explore')}>
-          <Text style={[styles.seeAll, { color: theme.tint }]}>Find more</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={doctors.slice(0, 4)}
-        renderItem={renderDoctorItem}
-        keyExtractor={(item) => item._id}
-        numColumns={2}
-        scrollEnabled={false}
-        contentContainerStyle={styles.doctorGrid}
-      />
-
-      {/* Featured Hospitals */}
-      <View style={[styles.sectionHeader, { marginTop: 25 }]}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Top Hospitals</Text>
-        <TouchableOpacity>
-          <Text style={[styles.seeAll, { color: theme.tint }]}>View All</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hospitalList}>
-        {hospitals.slice(0, 3).map((item, index) => (
-          <TouchableOpacity key={index} style={[styles.hospitalCard, { backgroundColor: theme.card, borderColor: theme.border, borderWidth: 1 }]}>
-            <Image source={{ uri: item.image }} style={styles.hospitalImage} />
-            <View style={styles.hospitalBadge}>
-              <Text style={styles.hospitalBadgeText}>Top Rated</Text>
-            </View>
-            <View style={styles.hospitalInfo}>
-              <Text style={[styles.hospitalName, { color: theme.text }]} numberOfLines={1}>{item.name}</Text>
-              <View style={styles.addressRow}>
-                <MapPin size={12} color={theme.tint} />
-                <Text style={[styles.addressText, { color: theme.icon }]} numberOfLines={1}>{item.speciality}</Text>
+        
+        {/* Conditional Content */}
+        {search.length > 0 ? (
+          <View style={styles.resultsContainer}>
+             <Text style={[styles.sectionTitle, { color: theme.text, marginLeft: 20, marginBottom: 15 }]}>
+               Search Results
+             </Text>
+             {searchResults.length > 0 ? (
+                searchResults.map((item, index) => (
+                   <View key={index} style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+                      {renderSearchResult({ item })}
+                   </View>
+                ))
+             ) : (
+                <View style={{ alignItems: 'center', marginTop: 50 }}>
+                   <Text style={{ color: theme.icon }}>No results found for "{search}"</Text>
+                </View>
+             )}
+          </View>
+        ) : (
+          <>
+            {/* Hero Banner */}
+            <View style={styles.banner}>
+              <View style={styles.bannerContent}>
+                <Text style={styles.bannerTitle}>AI Health{"\n"}Advisor</Text>
+                <Text style={styles.bannerSubtitle}>Chat with our bot for instant advice</Text>
+                <TouchableOpacity 
+                  style={styles.bannerBtn}
+                  onPress={() => router.push('/medical-advisor')}
+                >
+                  <Text style={styles.bannerBtnText}>Start Chat</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.bannerImageContainer}>
+                <Image
+                  source={require('@/assets/images/header_img.png')}
+                  style={styles.bannerImage}
+                />
               </View>
             </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
 
-      <View style={{ height: 100 }} />
-    </ScrollView>
+            {/* Specialities */}
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Specialities</Text>
+              <TouchableOpacity>
+                <Text style={[styles.seeAll, { color: theme.tint }]}>See All</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.specialityList}>
+              {specialities.map((item: any, index: number) => (
+                <TouchableOpacity key={index} style={styles.specialityItem}>
+                  <View style={[styles.specialityIcon, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                    <Text style={styles.specialityEmoji}>{item.emoji}</Text>
+                  </View>
+                  <Text style={[styles.specialityName, { color: theme.text }]} numberOfLines={1}>{item.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {/* Top Doctors */}
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Top Doctors</Text>
+              <TouchableOpacity onPress={() => router.push('/explore')}>
+                <Text style={[styles.seeAll, { color: theme.tint }]}>Find more</Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={doctors.slice(0, 4)}
+              renderItem={renderDoctorItem}
+              keyExtractor={(item) => item._id}
+              numColumns={2}
+              scrollEnabled={false}
+              contentContainerStyle={styles.doctorGrid}
+            />
+
+            {/* Featured Hospitals */}
+            <View style={[styles.sectionHeader, { marginTop: 25 }]}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Top Hospitals</Text>
+              <TouchableOpacity>
+                <Text style={[styles.seeAll, { color: theme.tint }]}>View All</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hospitalList}>
+              {hospitals.slice(0, 3).map((item, index) => (
+                <TouchableOpacity key={index} style={[styles.hospitalCard, { backgroundColor: theme.card, borderColor: theme.border, borderWidth: 1 }]}>
+                  <Image source={{ uri: item.image }} style={styles.hospitalImage} />
+                  <View style={styles.hospitalBadge}>
+                    <Text style={styles.hospitalBadgeText}>Top Rated</Text>
+                  </View>
+                  <View style={styles.hospitalInfo}>
+                    <Text style={[styles.hospitalName, { color: theme.text }]} numberOfLines={1}>{item.name}</Text>
+                    <View style={styles.addressRow}>
+                      <MapPin size={12} color={theme.tint} />
+                      <Text style={[styles.addressText, { color: theme.icon }]} numberOfLines={1}>{item.speciality}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -202,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ef4444',
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: theme.background,
+    borderColor: '#fff', // fallback
   },
   searchContainer: {
     flexDirection: 'row',
@@ -212,7 +320,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 16,
     borderWidth: 1,
-    marginBottom: 20,
+    // marginBottom removed to handle wrapper
   },
   searchInput: {
     flex: 1,
@@ -220,13 +328,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   banner: {
-    backgroundColor: themeName === 'dark' ? '#4a58e6' : '#5f6FFF',
+    // backgroundColor handled dynamically
     marginHorizontal: 20,
     borderRadius: 24,
     height: 160,
     flexDirection: 'row',
     overflow: 'hidden',
     marginBottom: 25,
+    backgroundColor: '#5f6FFF' // fallback
   },
   bannerContent: {
     flex: 1,
@@ -423,4 +532,52 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginLeft: 4,
   },
+  // Result Styles
+  resultsContainer: {
+    paddingTop: 10,
+  },
+  resultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  resultImageContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resultImage: {
+    width: '100%',
+    height: '100%',
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resultName: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+  },
+  resultSub: {
+    fontSize: 12,
+  },
+  typeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  typeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  }
 });

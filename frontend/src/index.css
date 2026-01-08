@@ -19,8 +19,8 @@
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #f8fafc;
+  --background: #121212;
+  --foreground: #f3f4f6;
   --primary: #5f6FFF;
   --primary-hover: #7b8aff;
   --secondary: #94a3b8;

@@ -75,9 +75,9 @@ const Navbar = () => {
   }
 
   return (
-    <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white dark:bg-black dark:border-zinc-800 sticky top-0 z-50 transition-colors duration-300'>
+    <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white dark:bg-[#121212] dark:border-zinc-800 sticky top-0 z-50 transition-colors duration-300'>
       <div className='flex items-center gap-2 text-xs'>
-        <img className='w-36 sm:w-40 cursor-pointer dark:brightness-200 transition-all' src={assets.admin_logo} alt="" />
+        <img className='w-36 sm:w-40 cursor-pointer transition-all' src={assets.admin_logo} alt="" />
         <p className='border px-2.5 py-0.5 rounded-full border-gray-500 dark:text-gray-300 dark:border-gray-500'>{aToken ? 'Admin' : dToken ? 'Doctor' : 'Hospital'}</p>
       </div>
       

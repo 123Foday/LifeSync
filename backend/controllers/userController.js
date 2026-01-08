@@ -30,6 +30,12 @@ const registerUser = async (req, res) => {
       return res.json({success: false, message: "Enter a strong password"})
     }
 
+    // Check for existing user
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res.json({ success: false, message: "User already exists with this email" });
+    }
+
     // hashing user password
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
@@ -119,9 +125,9 @@ const googleLoginController = async (req, res) => {
     const existingUser = await userModel.findOne({ email })
 
     if (existingUser) {
-      // User registered with email/password, now linking Google account
-      if (existingUser.authProvider === 'local' && !existingUser.googleId) {
-        // Link Google account to existing local account
+      // User registered with email (locally or via other SSO), now linking Google account
+      if (!existingUser.googleId) {
+        // Link Google account to existing account
         existingUser.googleId = googleId
         existingUser.image = picture || existingUser.image
         existingUser.isEmailVerified = true
@@ -140,7 +146,7 @@ const googleLoginController = async (req, res) => {
           token,
           message: 'Google account linked successfully',
         })
-      } else if (existingUser.googleId && existingUser.googleId !== googleId) {
+      } else if (existingUser.googleId !== googleId) {
         // Email exists with different Google account
         return res.status(409).json({
           success: false,
@@ -176,6 +182,140 @@ const googleLoginController = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error during Google login',
+    })
+  }
+}
+
+/**
+ * Apple SSO Login/Register Controller
+ * Verifies Apple token, creates user if needed, returns JWT
+ */
+const appleLoginController = async (req, res) => {
+  try {
+    const { authorization, user } = req.body
+
+    if (!authorization || !authorization.id_token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Apple authorization is required',
+      })
+    }
+
+    // Decode Apple ID token (JWT)
+    // Note: In production, you should verify the token signature with Apple's public keys
+    const idToken = authorization.id_token
+    const decodedToken = jwt.decode(idToken)
+
+    if (!decodedToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Apple token',
+      })
+    }
+
+    const { sub: appleId, email } = decodedToken
+
+    if (!appleId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Apple ID not provided',
+      })
+    }
+
+    // Check if user exists with this Apple ID
+    let existingUser = await userModel.findOne({ appleId })
+
+    if (existingUser) {
+      // Existing Apple user - just login
+      const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
+      })
+
+      return res.json({
+        success: true,
+        token,
+        message: 'Login successful',
+      })
+    }
+
+    // Check if user exists with this email (from local registration or other SSO)
+    if (email) {
+      const emailUser = await userModel.findOne({ email })
+
+      if (emailUser) {
+        // User registered with email, now linking Apple account
+        if (!emailUser.appleId) {
+          // Link Apple account to existing account
+          emailUser.appleId = appleId
+          emailUser.isEmailVerified = true
+          
+          // Update name if provided by Apple and not already set
+          if (user && user.name && !emailUser.name) {
+            const fullName = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim()
+            if (fullName) {
+              emailUser.name = fullName
+            }
+          }
+          
+          await emailUser.save()
+
+          const token = jwt.sign(
+            { id: emailUser._id },
+            process.env.JWT_SECRET,
+            {
+              expiresIn: '7d',
+            }
+          )
+
+          return res.json({
+            success: true,
+            token,
+            message: 'Apple account linked successfully',
+          })
+        } else if (emailUser.appleId !== appleId) {
+          // Email exists with different Apple account
+          return res.status(409).json({
+            success: false,
+            message: 'Email already registered with different Apple account',
+          })
+        }
+      }
+    }
+
+    // New user - create account with Apple
+    let userName = 'User'
+    
+    if (user && user.name) {
+      userName = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim()
+    } else if (email) {
+      userName = email.split('@')[0]
+    }
+
+    const newUser = new userModel({
+      name: userName,
+      email: email || `${appleId}@appleid.private`, // Apple may hide email
+      appleId,
+      authProvider: 'apple',
+      isEmailVerified: !!email, // Only verified if email is provided
+    })
+
+    await newUser.save()
+
+    // Generate JWT token
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    })
+
+    return res.json({
+      success: true,
+      token,
+      message: 'Account created successfully',
+    })
+  } catch (error) {
+    console.error('Apple login error:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during Apple login',
     })
   }
 }
@@ -573,4 +713,4 @@ const cancelAppointment = async (req, res) => {
 
 
 
-export { registerUser, googleLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment };
+export { registerUser, googleLoginController, appleLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment };

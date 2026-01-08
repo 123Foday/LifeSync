@@ -26,7 +26,7 @@ export default function DoctorsScreen() {
 
   const renderDoctorItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <Image source={{ uri: item.image }} style={[styles.image, { backgroundColor: themeName === 'dark' ? '#0f172a' : '#eff6ff' }]} />
+      <Image source={{ uri: item.image }} style={[styles.image, { backgroundColor: themeName === 'dark' ? '#1e1e1e' : '#eff6ff' }]} />
       <View style={styles.info}>
         <View style={styles.headerRow}>
           <Text style={[styles.name, { color: theme.text }]}>{item.name}</Text>

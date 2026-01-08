@@ -18,7 +18,7 @@ const Dashboard = () => {
   console.log("dashData:", dashData)
 
   return dashData && (
-    <div className='p-6 bg-gray-50 dark:bg-black min-h-screen transition-all duration-300'>
+    <div className='p-6 bg-gray-50 dark:bg-[#121212] min-h-screen transition-all duration-300'>
       <h1 className='text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6'>Dashboard Overview</h1>
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>

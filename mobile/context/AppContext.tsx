@@ -8,6 +8,7 @@ export const AppContext = createContext({
   hospitals: [] as any[],
   currencySymbol: '$',
   token: null as string | null,
+  isAuthLoading: true,
   setToken: (token: string | null) => {},
   backendUrl: '',
   userData: null as any,
@@ -22,6 +23,7 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
   const [hospitals, setHospitals] = useState<any[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   const loadToken = async () => {
     try {
@@ -31,6 +33,8 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
       }
     } catch (e) {
       console.error("Failed to load token", e);
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -96,6 +100,7 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
     hospitals,
     currencySymbol,
     token,
+    isAuthLoading,
     setToken: async (newToken: string | null) => {
       setToken(newToken);
       if (newToken) {

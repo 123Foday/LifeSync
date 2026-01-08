@@ -18,7 +18,7 @@ const Sidebar = () => {
     }`
 
   return (
-    <div className="h-full bg-white dark:bg-black border-r dark:border-zinc-800 transition-colors duration-300">
+    <div className="h-full bg-white dark:bg-[#121212] border-r dark:border-zinc-800 transition-colors duration-300">
       {aToken && (
         <ul className="py-5">
           <NavLink className={activeStyle} to={"/admin-dashboard"}>

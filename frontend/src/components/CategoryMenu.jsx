@@ -77,7 +77,7 @@ const CategoryMenu = ({ selectedCategory, onSelectCategory }) => {
                     onBlur={() => setTimeout(() => setHoverIndex(null), 80)}
                     aria-pressed={!selectedCategory}
                     onClick={() => { if (typeof onSelectCategory === 'function') { onSelectCategory('') } else { navigate('/hospitals'); window.scrollTo(0, 0) } }}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${!selectedCategory ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-black text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${!selectedCategory ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-[#121212] text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
                   >
                     <span className="truncate">ALL</span>
                   </button>
@@ -106,7 +106,7 @@ const CategoryMenu = ({ selectedCategory, onSelectCategory }) => {
                             window.scrollTo(0, 0);
                           }
                         }}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${isActive ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-black text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${isActive ? 'bg-[#5f6FFF] text-white shadow-md' : 'bg-white dark:bg-[#121212] text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-900'} border border-gray-200 dark:border-gray-700`}
                       >
                         <span className="hidden sm:inline-block text-xs text-gray-400 dark:text-gray-500">{item.emoji || ''}</span>
                         <span className="truncate">{item.speciality}</span>

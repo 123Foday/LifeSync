@@ -53,7 +53,7 @@ const MedicalBotButton = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Welcome Popup */}
       {showWelcome && (
-        <div className="absolute bottom-20 right-0 w-64 bg-white dark:bg-black rounded-xl shadow-2xl p-4 mb-2 animate-bounce-in border border-gray-100 dark:border-gray-800">
+        <div className="absolute bottom-20 right-0 w-64 bg-white dark:bg-[#121212] rounded-xl shadow-2xl p-4 mb-2 animate-bounce-in border border-gray-100 dark:border-gray-800">
           <button
             onClick={handleCloseWelcome}
             className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -89,7 +89,7 @@ const MedicalBotButton = () => {
             </div>
           </div>
           {/* Arrow pointing to button */}
-          <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white dark:bg-black transform rotate-45 border-r border-b border-gray-100 dark:border-gray-800"></div>
+          <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white dark:bg-[#121212] transform rotate-45 border-r border-b border-gray-100 dark:border-gray-800"></div>
         </div>
       )}
 

@@ -41,7 +41,7 @@ export default function AppointmentsScreen() {
   const renderAppointment = ({ item }: { item: any }) => (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
       <View style={styles.cardHeader}>
-        <Image source={{ uri: item.image }} style={[styles.doctorImg, { backgroundColor: themeName === 'dark' ? '#0f172a' : '#f5f7ff' }]} />
+        <Image source={{ uri: item.image }} style={[styles.doctorImg, { backgroundColor: themeName === 'dark' ? '#1e1e1e' : '#f5f7ff' }]} />
         <View style={styles.doctorInfo}>
           <Text style={[styles.doctorName, { color: theme.text }]}>{item.doctorName}</Text>
           <Text style={[styles.speciality, { color: theme.icon }]}>{item.speciality}</Text>

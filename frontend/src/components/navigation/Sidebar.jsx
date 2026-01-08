@@ -61,13 +61,13 @@ const Sidebar = () => {
 
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 transition-all duration-300">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-[#121212] border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 transition-all duration-300">
       <div className="p-6">
         <img 
           onClick={() => navigate('/')} 
           src={assets.logo} 
           alt="LifeSync Logo" 
-          className="w-32 cursor-pointer dark:brightness-200 transition-all hover:scale-105"
+          className="w-32 cursor-pointer transition-all hover:scale-105"
         />
       </div>
 

@@ -80,7 +80,7 @@ const MyProfile = () => {
 
       <hr className='bg-zinc-200 dark:bg-zinc-900 h-[1px] border-none my-2' />
       
-      <div className='bg-white dark:bg-black p-6 rounded-2xl border dark:border-gray-800 shadow-sm'>
+      <div className='bg-white dark:bg-[#121212] p-6 rounded-2xl border dark:border-gray-800 shadow-sm'>
         <p className='text-neutral-500 dark:text-gray-400 font-bold uppercase tracking-widest text-xs mb-4'>CONTACT INFORMATION</p>
         <div className='grid grid-cols-[1fr_2.5fr] gap-y-4 items-center text-neutral-700 dark:text-neutral-300'>
           <p className='font-semibold'>Email Address:</p>

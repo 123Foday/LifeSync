@@ -354,7 +354,7 @@ const MedicalAdvisor = () => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-white dark:bg-black rounded-xl shadow-lg dark:shadow-none p-6 md:p-8 mb-8 border dark:border-gray-800">
+      <div className="bg-white dark:bg-[#121212] rounded-xl shadow-lg dark:shadow-none p-6 md:p-8 mb-8 border dark:border-gray-800">
         {/* Step 1: Patient Information */}
         {step === "info" && (
           <div className="space-y-6">
@@ -646,7 +646,7 @@ const MedicalAdvisor = () => {
                 {symptoms.map((symptom) => (
                   <span
                     key={symptom}
-                    className="bg-white dark:bg-black px-3 py-1 rounded-full text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800"
+                    className="bg-white dark:bg-zinc-800 px-3 py-1 rounded-full text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800"
                   >
                     {symptom}
                   </span>
@@ -686,7 +686,7 @@ const MedicalAdvisor = () => {
 
       {/* Assessment History - Lazy loaded */}
       {history.length > 0 && (
-        <div className="bg-white dark:bg-black rounded-xl shadow-lg dark:shadow-none p-6 md:p-8 border dark:border-gray-800">
+        <div className="bg-white dark:bg-[#121212] rounded-xl shadow-lg dark:shadow-none p-6 md:p-8 border dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
               Recent Assessments

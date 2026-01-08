@@ -22,10 +22,8 @@ const Layout = ({ children }) => {
       {/* Actually the user said Mobile gets bottomNavbar with icons. 
           Usually we still need a simplified TopBar or just the content. 
           Let's add a simplified mobile header. */}
-      <div className="md:hidden">
-        <div className="glass-morphism h-14 border-b border-gray-100 dark:border-gray-900 flex items-center justify-between px-4 sticky top-0 z-40">
-           <TopBar /> {/* We can reuse TopBar but hide links in CSS/Tailwind */}
-        </div>
+      <div className="md:hidden sticky top-0 z-40">
+        <TopBar />
       </div>
 
       {/* Main Content Area */}

@@ -210,7 +210,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`sticky top-0 z-50 bg-white dark:bg-black transition-shadow ${
+      className={`sticky top-0 z-50 bg-white dark:bg-[#121212] transition-shadow ${
         hasShadow ? "shadow-md dark:shadow-gray-900" : ""
       }`}
     >
@@ -472,7 +472,7 @@ const Navbar = () => {
               role="dialog"
               aria-modal={showMenu}
               aria-hidden={!showMenu}
-              className={`absolute right-0 top-0 bottom-0 w-3/4 sm:w-1/2 bg-white dark:bg-black transform ${
+              className={`absolute right-0 top-0 bottom-0 w-3/4 sm:w-1/2 bg-white dark:bg-[#121212] transform ${
                 showMenu ? "translate-x-0" : "translate-x-full"
               } transition-transform duration-300 overflow-auto border-l dark:border-gray-800`}
             >
@@ -540,7 +540,7 @@ const Navbar = () => {
             role="dialog"
             aria-modal={showSearchMobile}
             aria-hidden={!showSearchMobile}
-            className="fixed inset-0 z-50 bg-white dark:bg-black p-4 overflow-auto md:hidden"
+            className="fixed inset-0 z-50 bg-white dark:bg-[#121212] p-4 overflow-auto md:hidden"
           >
             <div className="flex items-center gap-2 mb-4">
               <button
