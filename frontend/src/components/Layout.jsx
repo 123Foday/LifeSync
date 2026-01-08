@@ -30,10 +30,10 @@ const Layout = ({ children }) => {
 
       {/* Main Content Area */}
       <main className="transition-all duration-300 xl:ml-64 pb-20 md:pb-0">
+        {/* Desktop Page Search Bar - Sticky at top */}
+        <PageSearchBar />
+
         <div className="max-w-[1600px] mx-auto p-4 md:p-8 lg:p-12">
-          {/* Desktop Page Search Bar */}
-          <PageSearchBar />
-          
           {children}
         </div>
         <Footer />
