@@ -1,3 +1,4 @@
+import axios from 'axios'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -79,30 +80,58 @@ const googleLoginController = async (req, res) => {
       })
     }
 
-    // Verify the Google token
-    let ticket
-    try {
-      ticket = await client.verifyIdToken({
-        idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      })
-    } catch (verifyError) {
-      console.error('Google token verification failed:', verifyError)
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid Google token',
-      })
-    }
+    // Verify the Google token or access token
+    let googleId, email, name, picture;
 
-    // Extract user info from verified token
-    const payload = ticket.getPayload()
-    const { sub: googleId, email, name, picture } = payload
+    if (credential) {
+      // Verify the Google ID token
+      let ticket;
+      try {
+        ticket = await client.verifyIdToken({
+          idToken: credential,
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        googleId = payload.sub;
+        email = payload.email;
+        name = payload.name;
+        picture = payload.picture;
+      } catch (verifyError) {
+        console.error('Google ID token verification failed:', verifyError);
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid Google ID token',
+        });
+      }
+    } else if (accessToken) {
+      // Fetch user info using Google access token
+      try {
+        const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        googleId = response.data.sub;
+        email = response.data.email;
+        name = response.data.name;
+        picture = response.data.picture;
+      } catch (fetchError) {
+        console.error('Fetching Google user info failed:', fetchError);
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid Google access token',
+        });
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'No Google credential or access token provided',
+      });
+    }
 
     if (!email) {
       return res.status(400).json({
         success: false,
         message: 'Email not provided by Google',
-      })
+      });
     }
 
     // Check if user exists with this Google ID

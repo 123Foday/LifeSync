@@ -242,17 +242,39 @@ const Login = () => {
 
         {/* SSO Buttons */}
         <View style={styles.ssoContainer}>
-          <TouchableOpacity style={styles.ssoButton} onPress={() => Alert.alert("Info", "Google Sign-In not fully configured in this demo")}>
-            <Image source={{ uri: "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" }} style={{ width: 20, height: 20, marginRight: 10 }} /> 
-             {/* Using text "G" as placeholder if image fails, or require local asset if available. sticking to text for reliability if no asset */}
-            <Text style={styles.ssoButtonText}>{state === "Sign Up" ? "Sign up with Google" : "Sign in with Google"}</Text>
+          {/* Google Sign-In */}
+          <TouchableOpacity 
+            style={styles.ssoButton} 
+            onPress={() => Alert.alert("Info", "Google Sign-In not fully configured in this demo")}
+            activeOpacity={0.7}
+          >
+            <View style={styles.ssoIconContainer}>
+              <Image 
+                source={{ uri: "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" }} 
+                style={styles.ssoIcon} 
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.ssoButtonText}>
+              {state === "Sign Up" ? "Sign up with Google" : "Sign in with Google"}
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.ssoButton} onPress={() => Alert.alert("Info", "Apple Sign-In not fully configured in this demo")}>
-             {/* Simple Apple Icon SVG representation or text */}
-             <Text style={[styles.ssoButtonText, {fontWeight: '600'}]}>  {state === "Sign Up" ? "Sign up with Apple" : "Sign in with Apple"}</Text>
+          {/* Apple Sign-In */}
+          <TouchableOpacity 
+            style={styles.ssoButton} 
+            onPress={() => Alert.alert("Info", "Apple Sign-In not fully configured in this demo")}
+            activeOpacity={0.7}
+          >
+            <View style={styles.ssoIconContainer}>
+              <Text style={styles.appleIconText}></Text>
+            </View>
+            <Text style={styles.ssoButtonText}>
+              {state === "Sign Up" ? "Sign up with Apple" : "Sign in with Apple"}
+            </Text>
           </TouchableOpacity>
         </View>
+
 
       </ScrollView>
     </KeyboardAvoidingView>
@@ -447,17 +469,39 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
+    height: 48,
     borderWidth: 1,
     borderColor: "#E4E4E7",
-    borderRadius: 999, // Pill shape
+    borderRadius: 999,
     backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  ssoIconContainer: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ssoIcon: {
+    width: 20,
+    height: 20,
+  },
+  appleIconText: {
+    fontSize: 20,
+    color: "#000",
+    marginTop: -2, // Optical adjustment for  character
   },
   ssoButtonText: {
     fontSize: 14,
     color: "#52525B",
-    fontWeight: "500",
+    fontWeight: "600",
   },
 });
+
 
 export default Login;
