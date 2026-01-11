@@ -7,34 +7,39 @@ import userModel from '../models/userModel.js'
 import doctorModel from '../models/doctorModel.js'
 import hospitalModel from '../models/hospitalModel.js'
 import appointmentModel from '../models/appointmentModel.js'
-import { OAuth2Client } from "google-auth-library";// your User schema
+import otpModel from '../models/otpModel.js'
+import { sendOTPEmail, sendPasswordResetEmail, sendAccountDeletionEmail } from '../utils/emailService.js'
+import crypto from 'crypto'
+import { OAuth2Client } from "google-auth-library";
 
 
 // API to register user
 const registerUser = async (req, res) => {
-  
   try {
-    
     const { name, email, password } = req.body
 
     if (!name || !email || !password) {
-      return res.json({success: false, message: "Missing Details"})
-    } 
+      return res.status(400).json({ success: false, message: "Missing Details" })
+    }
 
     // validating email format
     if (!validator.isEmail(email)) {
-      return res.json({success: false, message: "Enter a valid email"})
+      return res.status(400).json({ success: false, message: "Enter a valid email" })
     }
 
-    // validating a strong password
-    if (password.length < 8) {
-      return res.json({success: false, message: "Enter a strong password"})
+    // validating a strong password (min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Password must be at least 8 characters, include uppercase, lowercase, number and symbol" 
+      })
     }
 
     // Check for existing user
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
-      return res.json({ success: false, message: "User already exists with this email" });
+      return res.status(409).json({ success: false, message: "User already registered with this email" });
     }
 
     // hashing user password
@@ -44,20 +49,381 @@ const registerUser = async (req, res) => {
     const userData = {
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      is_verified: false // Set to false, user needs OTP
     }
 
     const newUser = new userModel(userData)
-    const user = await newUser.save()
-    
-    const token = jwt.sign({id:user._id}, process.env.JWT_SECRET )
-    res.json({ success: true, token })
+    await newUser.save()
+
+    // Generate 6-digit OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otp_hash = await bcrypt.hash(otp, salt); // Using same salt for simplicity, though bcrypt.hash(otp, 10) is also fine
+
+    // Store OTP in database
+    await otpModel.findOneAndUpdate(
+      { email, purpose: 'verification' },
+      { 
+        otp_hash, 
+        expires_at: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        attempts: 0 
+      },
+      { upsert: true, new: true }
+    );
+
+    // Send OTP to user's email
+    const emailResult = await sendOTPEmail(email, otp);
+    if (!emailResult.success) {
+      // In production, you might want to log this or handle differently
+      console.warn('Registration: OTP email failed to send to', email);
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Registration successful. Please check your email for verification code."
+    })
 
   } catch (error) {
-    console.log(error)
-    res.json({success: false, message: error.message})
+    console.error('Registration error:', error)
+    res.status(500).json({ success: false, message: "Internal server error" })
   }
 }
+
+// API to verify OTP for registration
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: "Email and OTP are required" });
+    }
+
+    const otpRecord = await otpModel.findOne({ email, purpose: 'verification' });
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: "No verification request found for this email" });
+    }
+
+    // Check expiry
+    if (otpRecord.expires_at < new Date()) {
+      return res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
+    }
+
+    // Rate limiting for attempts (Brute force protection)
+    if (otpRecord.attempts >= 5) {
+      return res.status(429).json({ success: false, message: "Too many failed attempts. Please request a new OTP." });
+    }
+
+    // Verify OTP
+    const isMatch = await bcrypt.compare(otp, otpRecord.otp_hash);
+
+    if (!isMatch) {
+      // Increment attempts
+      otpRecord.attempts += 1;
+      await otpRecord.save();
+      return res.status(400).json({ success: false, message: "Invalid OTP code" });
+    }
+
+    // Success: Verify user
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.is_verified = true;
+    await user.save();
+
+    // Invalidate OTP (Delete it)
+    await otpModel.deleteOne({ _id: otpRecord._id });
+
+    // Generate token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ 
+      success: true, 
+      token,
+      message: "Account verified successfully" 
+    });
+
+  } catch (error) {
+    console.error('OTP Verification error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to resend OTP
+const resendOTP = async (req, res) => {
+  try {
+    const { email, purpose = 'verification' } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Generate new 6-digit OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const salt = await bcrypt.genSalt(10);
+    const otp_hash = await bcrypt.hash(otp, salt);
+
+    // Update or Create OTP record
+    await otpModel.findOneAndUpdate(
+      { email, purpose },
+      { 
+        otp_hash, 
+        expires_at: new Date(Date.now() + 10 * 60 * 1000), 
+        attempts: 0 
+      },
+      { upsert: true }
+    );
+
+    // Send email
+    const emailResult = await sendOTPEmail(email, otp);
+    
+    res.json({ 
+      success: true, 
+      message: "New OTP sent successfully" 
+    });
+
+  } catch (error) {
+    console.error('Resend OTP error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to initiate password reset
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      // Return success even if email not found to prevent email enumeration
+      return res.json({ success: true, message: "If an account exists with this email, a reset link has been sent." });
+    }
+
+    // Generate token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = await bcrypt.hash(resetToken, 10);
+
+    // Store token in OTP model (reusing for simplicity or can create a dedicated Token model)
+    await otpModel.findOneAndUpdate(
+      { email, purpose: 'password_reset' },
+      { 
+        otp_hash: tokenHash, 
+        expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+        attempts: 0 
+      },
+      { upsert: true }
+    );
+
+    // Send email
+    await sendPasswordResetEmail(email, resetToken);
+
+    res.json({ 
+      success: true, 
+      message: "If an account exists with this email, a reset link has been sent." 
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to reset password using token
+const resetPassword = async (req, res) => {
+  try {
+    const { token, email, newPassword } = req.body;
+
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    // Validate new password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Password must be at least 8 characters, include uppercase, lowercase, number and symbol" 
+      });
+    }
+
+    const tokenRecord = await otpModel.findOne({ email, purpose: 'password_reset' });
+
+    if (!tokenRecord) {
+      return res.status(400).json({ success: false, message: "Invalid or expired reset link" });
+    }
+
+    if (tokenRecord.expires_at < new Date()) {
+      return res.status(400).json({ success: false, message: "Reset link has expired" });
+    }
+
+    // Verify token
+    const isMatch = await bcrypt.compare(token, tokenRecord.otp_hash);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid reset token" });
+    }
+
+    // Update password
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+    user.password = hashedPassword;
+    await user.save();
+
+    // Delete token
+    await otpModel.deleteOne({ _id: tokenRecord._id });
+
+    res.json({ success: true, message: "Password updated successfully. You can now login." });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to request email change (Step 1: Verify old email)
+const requestEmailChange = async (req, res) => {
+  try {
+    const { userId } = req.body; // From authUser middleware
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Generate and send OTP to old email
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const salt = await bcrypt.genSalt(10);
+    const otp_hash = await bcrypt.hash(otp, salt);
+
+    await otpModel.findOneAndUpdate(
+      { email: user.email, purpose: 'email_change_old' },
+      { 
+        otp_hash, 
+        expires_at: new Date(Date.now() + 10 * 60 * 1000),
+        attempts: 0 
+      },
+      { upsert: true }
+    );
+
+    await sendOTPEmail(user.email, otp);
+
+    res.json({ success: true, message: "Verification code sent to your current email" });
+
+  } catch (error) {
+    console.error('Request email change error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to verify old email and submit new email (Step 2: Send OTP to new email)
+const verifyOldEmailAndSendNewOTP = async (req, res) => {
+  try {
+    const { userId, otp, newEmail } = req.body;
+    
+    if (!otp || !newEmail) {
+      return res.status(400).json({ success: false, message: "OTP and new email are required" });
+    }
+
+    if (!validator.isEmail(newEmail)) {
+      return res.status(400).json({ success: false, message: "Invalid new email format" });
+    }
+
+    const user = await userModel.findById(userId);
+    const oldEmail = user.email;
+
+    // Check if new email is already taken
+    const existing = await userModel.findOne({ email: newEmail });
+    if (existing) {
+      return res.status(409).json({ success: false, message: "New email is already in use" });
+    }
+
+    // Verify old email OTP
+    const otpRecord = await otpModel.findOne({ email: oldEmail, purpose: 'email_change_old' });
+    if (!otpRecord || otpRecord.expires_at < new Date()) {
+      return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
+    }
+
+    const isMatch = await bcrypt.compare(otp, otpRecord.otp_hash);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid verification code" });
+    }
+
+    // Delete old email OTP
+    await otpModel.deleteOne({ _id: otpRecord._id });
+
+    // Generate and send OTP to NEW email
+    const newOtp = crypto.randomInt(100000, 999999).toString();
+    const salt = await bcrypt.genSalt(10);
+    const newOtpHash = await bcrypt.hash(newOtp, salt);
+
+    await otpModel.findOneAndUpdate(
+      { email: newEmail, purpose: 'email_change_new' },
+      { 
+        otp_hash: newOtpHash, 
+        expires_at: new Date(Date.now() + 10 * 60 * 1000),
+        attempts: 0 
+      },
+      { upsert: true }
+    );
+
+    await sendOTPEmail(newEmail, newOtp);
+
+    res.json({ success: true, message: "Current email verified. Now verify the code sent to your NEW email." });
+
+  } catch (error) {
+    console.error('Verify old email error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to finalize email change (Step 3: Verify new email)
+const finalizeEmailChange = async (req, res) => {
+  try {
+    const { userId, otp, newEmail } = req.body;
+
+    if (!otp || !newEmail) {
+      return res.status(400).json({ success: false, message: "OTP and new email are required" });
+    }
+
+    const otpRecord = await otpModel.findOne({ email: newEmail, purpose: 'email_change_new' });
+    if (!otpRecord || otpRecord.expires_at < new Date()) {
+      return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
+    }
+
+    const isMatch = await bcrypt.compare(otp, otpRecord.otp_hash);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid verification code" });
+    }
+
+    // Success: Update user email
+    await userModel.findByIdAndUpdate(userId, { email: newEmail });
+    
+    // Delete OTP record
+    await otpModel.deleteOne({ _id: otpRecord._id });
+
+    res.json({ success: true, message: "Email updated successfully" });
+
+  } catch (error) {
+    console.error('Finalize email change error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 // Google SSO login controller
 
@@ -349,6 +715,122 @@ const appleLoginController = async (req, res) => {
   }
 }
 
+/**
+ * Microsoft SSO Login/Register Controller
+ * Verifies Microsoft access token, creates user if needed, returns JWT
+ */
+const microsoftLoginController = async (req, res) => {
+  try {
+    const { accessToken } = req.body
+
+    if (!accessToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Microsoft access token is required',
+      })
+    }
+
+    // Fetch user info from Microsoft Graph API
+    let microsoftId, email, name;
+    try {
+      const response = await axios.get('https://graph.microsoft.com/v1.0/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      microsoftId = response.data.id;
+      email = response.data.mail || response.data.userPrincipalName;
+      name = response.data.displayName;
+    } catch (fetchError) {
+      console.error('Fetching Microsoft user info failed:', fetchError);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Microsoft access token',
+      });
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email not provided by Microsoft',
+      });
+    }
+
+    // Check if user exists with this Microsoft ID
+    let user = await userModel.findOne({ microsoftId })
+
+    if (user) {
+      // Existing Microsoft user - just login
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
+      })
+
+      return res.json({
+        success: true,
+        token,
+        message: 'Login successful',
+      })
+    }
+
+    // Check if user exists with this email
+    const existingUser = await userModel.findOne({ email })
+
+    if (existingUser) {
+      // User registered with email, linking Microsoft account
+      if (!existingUser.microsoftId) {
+        existingUser.microsoftId = microsoftId
+        existingUser.is_verified = true
+        await existingUser.save()
+
+        const token = jwt.sign(
+          { id: existingUser._id },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: '7d',
+          }
+        )
+
+        return res.json({
+          success: true,
+          token,
+          message: 'Microsoft account linked successfully',
+        })
+      } else if (existingUser.microsoftId !== microsoftId) {
+        return res.status(409).json({
+          success: false,
+          message: 'Email already registered with different Microsoft account',
+        })
+      }
+    }
+
+    // New user - create account with Microsoft
+    const newUser = new userModel({
+      name: name || email.split('@')[0],
+      email,
+      microsoftId,
+      authProvider: 'microsoft',
+      is_verified: true,
+    })
+
+    await newUser.save()
+
+    // Generate JWT token
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    })
+
+    return res.json({
+      success: true,
+      token,
+      message: 'Account created successfully',
+    })
+  } catch (error) {
+    console.error('Microsoft login error:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during Microsoft login',
+    })
+  }
+}
+
 // API for user login
 const loginUser = async (req, res) => {
   try {
@@ -356,7 +838,16 @@ const loginUser = async (req, res) => {
     const user = await userModel.findOne({ email })
 
     if (!user) {
-      return res.json({ success: false, message: 'User does not exist' })
+      return res.status(401).json({ success: false, message: 'Invalid credentials' })
+    }
+
+    // Check if user is verified
+    if (!user.is_verified) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Account not verified. Please verify your email first.',
+        needsVerification: true 
+      })
     }
 
     // Check if user registered with SSO
@@ -742,4 +1233,122 @@ const cancelAppointment = async (req, res) => {
 
 
 
-export { registerUser, googleLoginController, appleLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment };
+// API to request account deletion OTP (For SSO users or as extra security)
+const requestDeletionOTP = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Generate 6-digit OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const salt = await bcrypt.genSalt(10);
+    const otp_hash = await bcrypt.hash(otp, salt);
+
+    // Save to database
+    await otpModel.findOneAndUpdate(
+      { email: user.email, purpose: 'account_deletion' },
+      { 
+        otp_hash, 
+        expires_at: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        attempts: 0 
+      },
+      { upsert: true }
+    );
+
+    // Send email
+    // Reuse sendOTPEmail but maybe we should have a specific one. 
+    // For now, sendOTPEmail is generic enough.
+    await sendOTPEmail(user.email, otp);
+
+    res.json({ success: true, message: "Verification code sent to your email" });
+
+  } catch (error) {
+    console.error('Request deletion OTP error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API to delete user account
+const deleteAccount = async (req, res) => {
+  try {
+    const { userId, password, otp } = req.body;
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // If password is provided, verify it (Local users or SSO with password)
+    if (password) {
+      const isMatch = await bcrypt.compare(password, user.password || "");
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: "Incorrect password" });
+      }
+    } 
+    // If OTP is provided, verify it (SSO users without password)
+    else if (otp) {
+      const otpRecord = await otpModel.findOne({ email: user.email, purpose: 'account_deletion' });
+      
+      if (!otpRecord || otpRecord.expires_at < new Date()) {
+        return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
+      }
+
+      const isMatch = await bcrypt.compare(otp, otpRecord.otp_hash);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: "Invalid verification code" });
+      }
+
+      // Delete OTP record
+      await otpModel.deleteOne({ _id: otpRecord._id });
+    }
+    // Neither password nor OTP provided
+    else {
+      return res.status(400).json({ success: false, message: "Password or verification code is required" });
+    }
+
+    // Store user data for email before deletion
+    const { email, name } = user;
+
+    // Delete user from database
+    await userModel.findByIdAndDelete(userId);
+
+    // Optional: Delete user's appointments or other related data
+    await appointmentModel.deleteMany({ userId });
+    await otpModel.deleteMany({ email });
+
+    // Send confirmation email
+    await sendAccountDeletionEmail(email, name);
+
+    res.json({ success: true, message: "Account deleted successfully. We're sorry to see you go." });
+
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export { 
+  registerUser, 
+  verifyOTP, 
+  resendOTP, 
+  forgotPassword, 
+  resetPassword, 
+  requestEmailChange, 
+  verifyOldEmailAndSendNewOTP, 
+  finalizeEmailChange, 
+  googleLoginController, 
+  appleLoginController, 
+  microsoftLoginController,
+  loginUser, 
+  getProfile, 
+  updateProfile, 
+  bookAppointment, 
+  listAppointment, 
+  cancelAppointment,
+  deleteAccount,
+  requestDeletionOTP
+}

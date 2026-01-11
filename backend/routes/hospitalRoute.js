@@ -15,6 +15,7 @@ import {
 } from "../controllers/hospitalController.js";
 import authHospital from "../middlewares/authHospital.js";
 import upload from "../middlewares/multer.js";
+import { loginLimiter } from "../middlewares/rateLimiter.js";
 
 const hospitalRouter = express.Router();
 
@@ -22,7 +23,7 @@ const hospitalRouter = express.Router();
 hospitalRouter.get("/list", hospitalList);
 
 // Authentication route
-hospitalRouter.post("/login", loginHospital);
+hospitalRouter.post("/login", loginLimiter, loginHospital);
 
 // Protected routes - require authentication
 hospitalRouter.get("/appointments", authHospital, appointmentsHospital);

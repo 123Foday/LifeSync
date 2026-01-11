@@ -30,6 +30,13 @@ The mobile companion for the LifeSync healthcare ecosystem, built with React Nat
    - Download the **Expo Go** app on your phone.
    - Scan the QR code displayed in your terminal.
 
+---
+
+> **Note**: For detailed configuration of the mobile environment and production SSO setup, please refer to:
+> - **[Mobile Setup Guide](../MOBILE_SETUP.md)**: Detailed Expo setup and local testing.
+> - **[Google SSO Setup](../GOOGLE_SSO_SETUP.md)**: Production OAuth configuration.
+> - **[Apple SSO Setup](../APPLE_SSO_SETUP.md)**: Production Sign-In configuration.
+
 ## 📁 Structure
 - `/app`: Main application screens using Expo Router.
 - `/components`: Reusable UI components.

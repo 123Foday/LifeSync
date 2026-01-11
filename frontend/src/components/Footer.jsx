@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const Icons = {
@@ -13,6 +14,7 @@ const Icons = {
 };
 
 const Footer = () => {
+  const navigate = useNavigate()
   return (
     <footer className='border-t border-gray-100 dark:border-gray-900 bg-gray-50/50 dark:bg-[#0a0a0a] pt-20 pb-10 text-gray-800 dark:text-gray-100 mt-20'>
       <div className='max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20'>
@@ -36,10 +38,10 @@ const Footer = () => {
           <div>
             <h4 className='text-sm font-bold uppercase tracking-widest mb-8 text-gray-900 dark:text-white'>Platform</h4>
             <ul className='flex flex-col gap-4 text-sm font-medium text-gray-600 dark:text-gray-400'>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Home</li>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Find Doctors</li>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Hospitals</li>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Health Advisor</li>
+              <li onClick={()=>navigate('/')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Home</li>
+              <li onClick={()=>navigate('/doctors')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Find Doctors</li>
+              <li onClick={()=>navigate('/hospitals')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Hospitals</li>
+              <li onClick={()=>navigate('/medical-advisor')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Health Advisor</li>
             </ul>
           </div>
 
@@ -47,10 +49,10 @@ const Footer = () => {
           <div>
             <h4 className='text-sm font-bold uppercase tracking-widest mb-8 text-gray-900 dark:text-white'>Company</h4>
             <ul className='flex flex-col gap-4 text-sm font-medium text-gray-600 dark:text-gray-400'>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>About us</li>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Contact us</li>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Terms of service</li>
-              <li className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Privacy policy</li>
+              <li onClick={()=>navigate('/about')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>About us</li>
+              <li onClick={()=>navigate('/about')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Contact us</li>
+              <li onClick={()=>navigate('/terms-conditions')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Terms of service</li>
+              <li onClick={()=>navigate('/privacy-policy')} className='cursor-pointer hover:text-[#5f6FFF] hover:pl-2 transition-all duration-300'>Privacy policy</li>
             </ul>
           </div>
 

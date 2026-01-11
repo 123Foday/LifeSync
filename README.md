@@ -26,6 +26,7 @@ To create a seamless healthcare experience for every user by bridging the gap be
 
 ### For Hospitals
 - **Hospital Dashboard** - Overview of appointments and statistics
+- **Doctor Management** - Add, edit, and manage their doctors profile
 - **Appointment Management** - View and manage patient appointments
 - **Profile Management** - Update professional information and availability
 - **Slot Management** - Control appointment availability and timing
@@ -72,6 +73,7 @@ To create a seamless healthcare experience for every user by bridging the gap be
 
 ## 📁 Project Structure
 
+```bash
 LifeSync/
 ├── frontend/                 # Patient-facing React application
 │   ├── src/
@@ -80,7 +82,7 @@ LifeSync/
 │   │   ├── context/        # React context for state management
 │   │   └── assets/         # Images and static assets
 │   └── package.json
-├── admin/                   # Admin and Doctor panel React application
+├── admin/                   # Admin, Hospital and Doctor panel React application
 │   ├── src/
 │   │   ├── components/     # UI components
 │   │   ├── pages/         # Admin/Doctor pages
@@ -107,11 +109,18 @@ We believe in maintaining professional, up-to-date documentation. Please refer t
 - **[Implementation Summary](./IMPLEMENTATION_SUMMARY.md)**: A high-level report of recent changes, features, and system status.
 - **[System Architecture](./ARCHITECTURE.md)**: Technical overview of the MERN stack, database schema, and data flow.
 - **[Setup Guide](./SETUP.md)**: Detailed step-by-step instructions to get the environment running.
+- **[Google SSO Setup](./GOOGLE_SSO_SETUP.md)**: Production & Pre-production configuration for Google OAuth.
+- **[Apple SSO Setup](./APPLE_SSO_SETUP.md)**: Production & Pre-production configuration for Apple Sign-In.
+- **[Microsoft SSO Setup](./MICROSOFT_SSO_SETUP.md)**: Instructions for Microsoft Entra ID.
+- **[Legal Documentation](./LEGAL_DOCUMENTATION.md)**: Summary of Terms & Privacy Policy integration.
+- **[Mobile Setup](./MOBILE_SETUP.md)**: Run the mobile app via Expo.
 - **[Changelog](./CHANGELOG.md)**: Chronological history of all changes and updates.
+
 
 ## 🚀 Getting Started
 
 For a comprehensive guide on setting up each module and viewing the development history, please refer to the **[setup.md](./setup.md)** file.
+
 
 ### Prerequisites
 - Node.js (v16 or higher)
@@ -200,10 +209,16 @@ The applications will be available at:
 ### User Routes (`/api/user`)
 - `POST /register` - User registration
 - `POST /login` - User login
+- `POST /google-login` - Google Login
+- `POST /apple-login` - Apple Login
+- `POST /microsoft-login` - Microsoft Login
 - `GET /get-profile` - Get user profile
 - `POST /update-profile` - Update user profile
 - `POST /book-appointment` - Book an appointment
 - `GET /appointments` - Get user appointments
+- `POST /delete-account` - Delete user account
+- `POST /request-deletion-otp` - Request deletion verification
+- `POST /request-email-change` - Multi-step email change
 
 ### Doctor Routes (`/api/doctor`)
 - `POST /register` - Doctor registration
@@ -212,7 +227,7 @@ The applications will be available at:
 - `POST /update-profile` - Update doctor profile
 - `GET /appointments` - Get doctor appointments
 
-### Hospital Routes (`/api/doctor`)
+### Hospital Routes (`/api/hospital`)
 - `POST /register` - Hospital registration
 - `POST /login` - Hospital login
 - `GET /get-profile` - Get Hospital profile

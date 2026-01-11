@@ -21,8 +21,10 @@ const Login = () => {
   const router = useRouter();
   const { backendUrl, setToken, token } = useContext(AppContext);
 
-  const [state, setState] = useState<"Login" | "Sign Up">("Login");
+  const [state, setState] = useState<"Login" | "Sign Up" | "Verify" | "Forgot Password">("Login");
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
@@ -37,6 +39,80 @@ const Login = () => {
     }
   }, [token]);
 
+  const onVerifyHandler = async () => {
+    if (otp.length !== 6) {
+      Alert.alert("Error", "Please enter 6-digit code");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data } = await axios.post(backendUrl + "/api/user/verify-otp", {
+        email,
+        otp,
+      });
+
+      if (data.success) {
+        setToken(data.token);
+        Alert.alert("Success", "Verified successfully!");
+        router.replace("/(tabs)");
+      } else {
+        Alert.alert("Error", data.message);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.response?.data?.message || "Verification failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onResendOtp = async () => {
+    if (resendTimer > 0) return;
+
+    setIsLoading(true);
+    try {
+      const { data } = await axios.post(backendUrl + "/api/user/resend-otp", {
+        email,
+      });
+
+      if (data.success) {
+        Alert.alert("Success", "Code resent!");
+        setResendTimer(60);
+      } else {
+        Alert.alert("Error", data.message);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", "Failed to resend code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onForgotPasswordHandler = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data } = await axios.post(backendUrl + "/api/user/forgot-password", {
+        email,
+      });
+
+      if (data.success) {
+        Alert.alert("Success", data.message || "Reset link sent!");
+        setState("Login");
+      } else {
+        Alert.alert("Error", data.message);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.response?.data?.message || "Failed to send link");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const onSubmitHandler = async () => {
     // Validation
     if (state === "Sign Up" && !agreedToTerms) {
@@ -46,6 +122,16 @@ const Login = () => {
 
     if (state === "Sign Up" && password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+    if (state === "Verify") {
+      onVerifyHandler();
+      return;
+    }
+
+    if (state === "Forgot Password") {
+      onForgotPasswordHandler();
       return;
     }
 
@@ -65,8 +151,8 @@ const Login = () => {
         });
 
         if (data.success) {
-          Alert.alert("Success", data.message || "Account created! Please login.");
-          setState("Login");
+          Alert.alert("Success", data.message || "Please verify your email.");
+          setState("Verify");
           setConfirmPassword("");
           setAgreedToTerms(false);
         } else {
@@ -83,7 +169,12 @@ const Login = () => {
           Alert.alert("Success", "Login successful!");
           router.replace("/(tabs)");
         } else {
-          Alert.alert("Error", data.message);
+          if (data.needsVerification) {
+            Alert.alert("Verification Required", "Please verify your email.");
+            setState("Verify");
+          } else {
+            Alert.alert("Error", data.message);
+          }
         }
       }
     } catch (error: any) {
@@ -94,10 +185,22 @@ const Login = () => {
     }
   };
 
-  const handleStateChange = (newState: "Login" | "Sign Up") => {
+
+  useEffect(() => {
+    let interval: string | number | NodeJS.Timeout | undefined;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  const handleStateChange = (newState: "Login" | "Sign Up" | "Verify" | "Forgot Password") => {
       setState(newState);
       setConfirmPassword("");
       setAgreedToTerms(false);
+      setOtp("");
   };
 
   return (
@@ -108,12 +211,13 @@ const Login = () => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
         {/* Sliding Toggle */}
-        <View style={styles.toggleContainer}>
+        <View style={[styles.toggleContainer, (state === "Verify" || state === "Forgot Password") && { opacity: 0, height: 0, marginBottom: 0 }]}>
           <View style={[styles.slider, state === "Sign Up" ? styles.sliderRight : styles.sliderLeft]} />
           <TouchableOpacity
             style={styles.toggleButton}
             onPress={() => handleStateChange("Login")}
             activeOpacity={0.8}
+            disabled={state === "Verify"}
           >
             <Text style={[styles.toggleText, state === "Login" ? styles.activeText : styles.inactiveText]}>
               Login
@@ -123,6 +227,7 @@ const Login = () => {
             style={styles.toggleButton}
             onPress={() => handleStateChange("Sign Up")}
             activeOpacity={0.8}
+            disabled={state === "Verify"}
           >
             <Text style={[styles.toggleText, state === "Sign Up" ? styles.activeText : styles.inactiveText]}>
               Sign Up
@@ -134,11 +239,15 @@ const Login = () => {
         <Image source={assets.logo} style={styles.logo} resizeMode="contain" />
 
         <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>{state === "Sign Up" ? "Create Account" : "Welcome Back"}</Text>
+            <Text style={styles.headerTitle}>{state === "Verify" ? "Verify Email" : state === "Forgot Password" ? "Reset Password" : (state === "Sign Up" ? "Create Account" : "Welcome Back")}</Text>
             <Text style={styles.headerSubtitle}>
-                {state === "Login"
-                ? "Login to book appointments and manage your health"
-                : "Sign up to get started with LifeSync"}
+                {state === "Verify"
+                ? `Enter the 6-digit code sent to ${email}`
+                : state === "Forgot Password"
+                ? "Enter your email to receive a password reset link"
+                : (state === "Login"
+                  ? "Login to book appointments and manage your health"
+                  : "Sign up to get started with LifeSync")}
             </Text>
         </View>
 
@@ -157,35 +266,61 @@ const Login = () => {
             </View>
           )}
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="your@email.com"
-              placeholderTextColor="#A1A1AA"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
+          {state !== "Verify" && (
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email</Text>
               <TextInput
-                style={styles.passwordInput}
-                placeholder={state === "Sign Up" ? "Create a strong password" : "Enter your password"}
+                style={styles.input}
+                placeholder="your@email.com"
                 placeholderTextColor="#A1A1AA"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                {showPassword ? <EyeOff size={20} color="#71717A" /> : <Eye size={20} color="#71717A" />}
-              </TouchableOpacity>
             </View>
-          </View>
+          )}
+
+          {state === "Verify" && (
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>6-Digit Code</Text>
+              <TextInput
+                style={[styles.input, styles.otpInput]}
+                placeholder="000000"
+                placeholderTextColor="#A1A1AA"
+                value={otp}
+                onChangeText={(text) => setOtp(text.replace(/[^0-9]/g, ""))}
+                keyboardType="number-pad"
+                maxLength={6}
+              />
+            </View>
+          )}
+
+          {state !== "Verify" && state !== "Forgot Password" && (
+            <View style={styles.inputGroup}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Text style={styles.label}>Password</Text>
+                {state === "Login" && (
+                  <TouchableOpacity onPress={() => setState("Forgot Password")}>
+                    <Text style={{ fontSize: 12, color: '#5f6FFF', fontWeight: '500' }}>Forgot Password?</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder={state === "Sign Up" ? "Create a strong password" : "Enter your password"}
+                  placeholderTextColor="#A1A1AA"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                  {showPassword ? <EyeOff size={20} color="#71717A" /> : <Eye size={20} color="#71717A" />}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {state === "Sign Up" && (
             <View style={styles.inputGroup}>
@@ -228,52 +363,98 @@ const Login = () => {
             disabled={isLoading}
           >
             <Text style={styles.submitButtonText}>
-              {isLoading ? "Authenticating..." : state === "Sign Up" ? "Create Account" : "Sign In"}
+              {isLoading ? "Processing..." : state === "Verify" ? "Verify Account" : state === "Forgot Password" ? "Send Reset Link" : state === "Sign Up" ? "Create Account" : "Sign In"}
             </Text>
           </TouchableOpacity>
+
+          {state === "Forgot Password" && (
+            <TouchableOpacity onPress={() => setState("Login")} style={{ marginTop: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#71717A', fontSize: 14 }}>Back to Login</Text>
+            </TouchableOpacity>
+          )}
+
+          {state === "Verify" && (
+            <View style={styles.resendContainer}>
+              <Text style={styles.resendText}>Didn't receive the code?</Text>
+              {resendTimer > 0 ? (
+                <Text style={styles.resendCountdown}>Resend in {resendTimer}s</Text>
+              ) : (
+                <TouchableOpacity onPress={onResendOtp}>
+                  <Text style={styles.resendLink}>Resend Code</Text>
+                </TouchableOpacity>
+              )}
+              
+              <TouchableOpacity onPress={() => handleStateChange("Login")} style={styles.backButton}>
+                <Text style={styles.backButtonText}>Back to Login</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>OR CONTINUE WITH</Text>
-          <View style={styles.dividerLine} />
-        </View>
+        {state !== "Verify" && state !== "Forgot Password" && (
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR CONTINUE WITH</Text>
+            <View style={styles.dividerLine} />
+          </View>
+        )}
 
         {/* SSO Buttons */}
-        <View style={styles.ssoContainer}>
-          {/* Google Sign-In */}
-          <TouchableOpacity 
-            style={styles.ssoButton} 
-            onPress={() => Alert.alert("Info", "Google Sign-In not fully configured in this demo")}
-            activeOpacity={0.7}
-          >
-            <View style={styles.ssoIconContainer}>
-              <Image 
-                source={{ uri: "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" }} 
-                style={styles.ssoIcon} 
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.ssoButtonText}>
-              {state === "Sign Up" ? "Sign up with Google" : "Sign in with Google"}
-            </Text>
-          </TouchableOpacity>
+        {state !== "Verify" && state !== "Forgot Password" && (
+          <View style={styles.ssoContainer}>
+            {/* Google Sign-In */}
+            <TouchableOpacity 
+              style={styles.ssoButton} 
+              onPress={() => Alert.alert("Info", "Google Sign-In not fully configured in this demo")}
+              activeOpacity={0.7}
+            >
+              <View style={styles.ssoIconContainer}>
+                <Image 
+                  source={{ uri: "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" }} 
+                  style={styles.ssoIcon} 
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.ssoButtonText}>
+                {state === "Sign Up" ? "Sign up with Google" : "Sign in with Google"}
+              </Text>
+            </TouchableOpacity>
 
-          {/* Apple Sign-In */}
-          <TouchableOpacity 
-            style={styles.ssoButton} 
-            onPress={() => Alert.alert("Info", "Apple Sign-In not fully configured in this demo")}
-            activeOpacity={0.7}
-          >
-            <View style={styles.ssoIconContainer}>
-              <Text style={styles.appleIconText}></Text>
-            </View>
-            <Text style={styles.ssoButtonText}>
-              {state === "Sign Up" ? "Sign up with Apple" : "Sign in with Apple"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            {/* Apple Sign-In */}
+            <TouchableOpacity 
+              style={styles.ssoButton} 
+              onPress={() => Alert.alert("Info", "Apple Sign-In not fully configured in this demo")}
+              activeOpacity={0.7}
+            >
+              <View style={styles.ssoIconContainer}>
+                <Text style={styles.appleIconText}></Text>
+              </View>
+              <Text style={styles.ssoButtonText}>
+                {state === "Sign Up" ? "Sign up with Apple" : "Sign in with Apple"}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Microsoft Sign-In */}
+            <TouchableOpacity 
+              style={styles.ssoButton} 
+              onPress={() => Alert.alert("Info", "Microsoft Sign-In not fully configured in this demo")}
+              activeOpacity={0.7}
+            >
+              <View style={styles.ssoIconContainer}>
+                <View style={{ width: 16, height: 16, flexWrap: 'wrap', flexDirection: 'row' }}>
+                    <View style={{ width: 7, height: 7, backgroundColor: '#f35325', marginRight: 1, marginBottom: 1 }} />
+                    <View style={{ width: 7, height: 7, backgroundColor: '#81bc06', marginBottom: 1 }} />
+                    <View style={{ width: 7, height: 7, backgroundColor: '#05a6f0', marginRight: 1 }} />
+                    <View style={{ width: 7, height: 7, backgroundColor: '#ffba08' }} />
+                </View>
+              </View>
+              <Text style={styles.ssoButtonText}>
+                {state === "Sign Up" ? "Sign up with Microsoft" : "Sign in with Microsoft"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
 
       </ScrollView>
@@ -500,6 +681,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#52525B",
     fontWeight: "600",
+  },
+  otpInput: {
+    textAlign: 'center',
+    fontSize: 24,
+    letterSpacing: 10,
+    fontWeight: 'bold',
+  },
+  resendContainer: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  resendText: {
+    fontSize: 14,
+    color: '#71717A',
+    marginBottom: 8,
+  },
+  resendCountdown: {
+    fontSize: 14,
+    color: '#A1A1AA',
+    fontWeight: '600',
+  },
+  resendLink: {
+    fontSize: 14,
+    color: '#5f6FFF',
+    fontWeight: '600',
+  },
+  backButton: {
+    marginTop: 20,
+  },
+  backButtonText: {
+    fontSize: 14,
+    color: '#71717A',
   },
 });
 

@@ -22,7 +22,13 @@ The web-based patient application for LifeSync, providing a seamless interface f
    ```
 
 2. **Configure Environment**
-   Ensure `VITE_BACKEND_URL` is set in your `.env` file.
+   Create a `.env` file with:
+   ```env
+   VITE_BACKEND_URL=http://localhost:4000
+   VITE_GOOGLE_CLIENT_ID=your_google_id
+   VITE_APPLE_CLIENT_ID=your_apple_id
+   ```
+   *For production setup, refer to the root [GOOGLE_SSO_SETUP.md](../GOOGLE_SSO_SETUP.md) and [APPLE_SSO_SETUP.md](../APPLE_SSO_SETUP.md).*
 
 3. **Start Development Server**
    ```bash

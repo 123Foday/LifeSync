@@ -38,7 +38,7 @@ The project is structured as a logical monorepo, housing all distinct applicatio
 
 ### 1. Backend Service (`/backend`)
 The backbone of LifeSync. It exposes a **RESTful API** consumed by all clients.
-- **Authentication**: Stateless JWT authentication using `bcrypt` for hashing. Middleware ensures role-based access (User vs Doctor vs Admin).
+- **Authentication**: Stateless JWT authentication using `bcrypt` for hashing. Supports multi-provider Single Sign-On (SSO) including Google, Apple, and Microsoft. Middleware ensures role-based access.
 - **Controllers**:
     - `userController`: Handles patient registration, booking, and profile updates.
     - `doctorController`: Manages doctor availability, profile, and appointment views.
@@ -70,9 +70,9 @@ A near-native experience for iOS and Android.
 
 ## 💾 Data Model (Simplified)
 
-- **User**: `_id`, `name`, `email`, `password`, `role`, `appointments[]`
-- **Doctor**: `_id`, `name`, `speciality`, `slots[]`, `hospitalId` (optional)
-- **Appointment**: `_id`, `userId`, `doctorId`, `date`, `slot`, `status`, `payment`
+- **User**: `_id`, `name`, `email`, `password`, `role`, `googleId`, `appleId`, `microsoftId`, `is_verified`, `appointments[]`
+- **Doctor**: `_id`, `name`, `email`, `password`, `speciality`, `slots[]`, `hospitalId` (optional)
+- **Appointment**: `_id`, `userId`, `doctorId`, `hospitalId`, `date`, `slot`, `status`, `cancelled`
 
 ---
 

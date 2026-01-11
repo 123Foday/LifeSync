@@ -19,7 +19,10 @@ The management dashboard for LifeSync, used by administrators and healthcare pro
    npm install
    ```
 
-2. **Start Development Server**
+2. **Configure Environment**
+   Ensure `VITE_BACKEND_URL` is set in your `.env` file.
+
+3. **Start Development Server**
    ```bash
    npm run dev
    ```

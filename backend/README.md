@@ -30,6 +30,10 @@ The core engine for LifeSync, providing RESTful endpoints, authentication, and d
    - `CLOUDINARY_API_KEY`
    - `CLOUDINARY_API_SECRET`
    - `PORT` (default: 4000)
+   - `GOOGLE_CLIENT_ID` (for portal authentication)
+   - `APPLE_CLIENT_ID` (for portal authentication)
+
+   *For production SSO configuration, refer to the root [GOOGLE_SSO_SETUP.md](../GOOGLE_SSO_SETUP.md) and [APPLE_SSO_SETUP.md](../APPLE_SSO_SETUP.md).*
 
 3. **Run Server**
    ```bash

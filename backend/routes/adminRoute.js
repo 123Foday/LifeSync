@@ -4,11 +4,12 @@ import { changeHospitalAvailability } from '../controllers/hospitalController.js
 import upload from '../middlewares/multer.js'
 import authAdmin from '../middlewares/authAdmin.js'
 import { changeAvailability } from '../controllers/doctorController.js'
+import { loginLimiter } from '../middlewares/rateLimiter.js'
 
 
 const adminRouter = express.Router()
 adminRouter.post('/add-doctor', authAdmin, upload.single('image'), addDoctor)
-adminRouter.post('/login', loginAdmin)
+adminRouter.post('/login', loginLimiter, loginAdmin)
 adminRouter.post('/all-doctors', authAdmin, allDoctors)
 adminRouter.post('/all-hospitals', authAdmin, allHospitals)
 adminRouter.post('/all-users', authAdmin, allUsers)

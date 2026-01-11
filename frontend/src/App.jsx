@@ -10,6 +10,9 @@ import MyAppointments from "./pages/MyAppointments";
 import Appointments from "./pages/Appointments";
 import HospitalDetail from "./pages/HospitalDetail";
 import MedicalAdvisor from "./pages/MedicalAdvisor";
+import ResetPassword from "./pages/ResetPassword";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import Layout from "./components/Layout";
 import MedicalBotButton from "./components/MedicalBotButton";
 
@@ -30,6 +33,9 @@ const App = () => {
         <Route path="/hospitals/:speciality" element={<Hospitals />} />
         <Route path="/hospital/:hospitalId" element={<HospitalDetail />} />
         <Route path="/medical-advisor" element={<MedicalAdvisor />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-conditions" element={<TermsAndConditions />} />
       </Routes>
 
       {/* ✅ NEW: Floating Medical Bot Button - Accessible from all pages */}

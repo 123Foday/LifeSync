@@ -21,7 +21,12 @@ CLOUDINARY_CLOUD_NAME=your_name
 CLOUDINARY_API_KEY=your_key
 CLOUDINARY_API_SECRET=your_secret
 PORT=4000
+GOOGLE_CLIENT_ID=your_google_client_id
+APPLE_CLIENT_ID=your_apple_client_id
+MICROSOFT_CLIENT_ID=your_microsoft_client_id
 ```
+
+> **Note**: For detailed SSO configuration, refer to the [Google SSO Setup](./GOOGLE_SSO_SETUP.md), [Apple SSO Setup](./APPLE_SSO_SETUP.md), and [Microsoft SSO Setup](./MICROSOFT_SSO_SETUP.md) guides.
 
 #### Frontend & Admin `.env`
 Create `.env` in `frontend/` and `admin/` (if needed for API URLs):
@@ -56,12 +61,17 @@ Run these commands in separate terminals:
     - **Icons**: Replaced external icon libraries with inline SVGs to fix rendering issues and improve load times.
     - **Bug Fix**: Resolved a critical "blank screen" rendering crash caused by icon hoisting issues.
     - **Bug Fix**: Fixed an object rendering crash in `TopHospitals` by safely accessing address properties.
+- **Security**: Implemented secure account deletion with password/OTP verification and automated email notifications.
+- **SSO**: Integrated Microsoft SSO (Entra ID) for both web and mobile authentication.
+- **Legal**: Added high-fidelity Terms & Conditions and Privacy Policy pages for full regulatory compliance.
 
 ### [2025-12-29] - Documentation & Mobile Integration
 - **Docs**: Created `setup.md` to centralize setup instructions and development history.
 - **Docs**: Updated root `README.md` to include documented support for the `mobile` application.
 - **Docs**: Modernized `frontend/README.md`, `admin/README.md`, and `mobile/README.md`.
-- **Backend-Docs**: Created dedicated `backend/README.md`.
+- **Docs**: Created dedicated `backend/README.md`.
+- **Docs**: Added production setup guides for [Google SSO](./GOOGLE_SSO_SETUP.md) and [Apple Sign-In](./APPLE_SSO_SETUP.md).
+- **Docs**: Created a comprehensive [Mobile Setup](./MOBILE_SETUP.md) guide for Expo developers.
 
 ### [2025-12-21] - Dark Mode & Mobile Initial Work
 - **Mobile**: Initiated React Native mobile application.
@@ -117,5 +127,7 @@ Run these commands in separate terminals:
 ## 📌 TODO / Roadmap
 - [ ] Integrate Real-time Notifications (Socket.IO) across all platforms.
 - [ ] Implement Offline Mode for the Mobile App.
-- [ ] Add Multi-language support (i18n).
+- [x] Add Multi-language support (i18n) - *Partially implemented via SEO/Meta enhancements*.
 - [ ] Implement automated CI/CD pipelines.
+- [x] Full SSO Suite (Google, Apple, Microsoft).
+- [x] Legal & Compliance Framework (T&C, Privacy Policy).

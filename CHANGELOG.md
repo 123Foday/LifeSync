@@ -1,6 +1,36 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+ 
+## [2026-01-11] - Security Enhancements & SSO Expansion
+- **Security & Privacy**:
+    - **Account Deletion**: Added a secure account deletion flow in "My Profile" with password/OTP confirmation.
+    - **Email Notifications**: Implemented automated security emails for account deletion, email changes, and OTP verifications.
+    - **Email Change Flow**: Enhanced account security with a multi-step verification process for changing registered emails.
+- **SSO Suite**:
+    - **Microsoft SSO**: Added backend support and integration for Microsoft Entra ID (Azure AD) login.
+    - **Documentation**: Created `MICROSOFT_SSO_SETUP.md` with detailed portal configuration for developer and production environments.
+- **Legal**: 
+    - **Compliance**: Added "Terms & Conditions" and "Privacy Policy" pages to ensure regulatory compliance and user transparency.
+- **Backend Refinement**:
+    - **Data Integrity**: Optimized user controllers to purge associated data (appointments, OTPs) upon account closure.
+    - **OTP System**: Expanded OTP purpose enum to include granular security actions (deletion, change verification).
+
+## [2026-01-10] - Authentication UI & Production SSO Suite
+- **Auth UI (Web & Admin)**:
+    - **Premium Login**: Implemented a sliding toggle for Login/Signup, LifeSync branding, and centered layout.
+    - **Security UX**: Added "eye" toggle for password visibility and "Confirm Password" field for signups.
+    - **SSO Rebrand**: Rebuilt Google and Apple SSO buttons as custom components to ensure identical premium design.
+    - **Terms Alignment**: Added mandatory T&C checkbox for customer signups.
+- **Mobile App**:
+    - **Login Implementation**: Created a new mobile login screen matching the web's premium sliding toggle and SSO buttons.
+    - **Auth Navigation**: Updated root layout with a loading spinner and dedicated redirection logic to handle protected routes.
+- **Backend**:
+    - **Flexible Auth**: Updated Google login controller to support both ID Tokens and Access Tokens for custom frontend buttons.
+    - **SSO Integration**: Added Apple Sign-In backend support and improved account linking logic.
+- **Docs**:
+    - **Setup Suite**: Created `GOOGLE_SSO_SETUP.md` (Production instructions), `APPLE_SSO_SETUP.md`, and `MOBILE_SETUP.md` (Expo guide).
+    - **Project Overview**: Updated `README.md` and `IMPLEMENTATION_SUMMARY.md` with centralized documentation links.
 
 ## [2025-12-30] - Professional Documentation Suite
 - **Docs**: Added `IMPLEMENTATION_SUMMARY.md` detailing project status, recent UI overhauls, and stability fixes.

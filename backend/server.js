@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import "dotenv/config";
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
@@ -16,7 +17,9 @@ connectDB();
 connectCloudinary();
 
 // middlewares
+app.use(helmet()); // Sets various security-related HTTP headers
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // DURING development (open - allow all origins):
 // app.use(cors());

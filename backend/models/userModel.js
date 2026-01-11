@@ -72,7 +72,7 @@ const userSchema = new mongoose.Schema(
     },
 
     // Account status
-    isEmailVerified: {
+    is_verified: {
       type: Boolean,
       default: function () {
         // SSO emails are pre-verified
