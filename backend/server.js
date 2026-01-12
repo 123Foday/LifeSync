@@ -28,12 +28,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
-      "https://life-sync-tau.vercel.app/", // Your Vercel URL
-      "https://amused-illumination-production.up.railway.app", // Railway URL
-      "http://localhost:5173", // Local development
-      "http://localhost:5174", // Local development
-      "http://localhost:5175", // Local development
-      // Your custom domain if any
+      "https://life-sync-tau.vercel.app",  // ✅ frontend
+      "https://amused-illumination-production.up.railway.app", // backend
+      "http://localhost:5173", // local frontend
+      "http://localhost:5174", // local admin
+      "http://localhost:5175", // local mobile
     ],
     credentials: true,
   })
