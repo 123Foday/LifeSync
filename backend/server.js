@@ -29,6 +29,7 @@ app.use(
   cors({
     origin: [
       "https://life-sync-tau.vercel.app/", // Your Vercel URL
+      "https://amused-illumination-production.up.railway.app", // Railway URL
       "http://localhost:5173", // Local development
       "http://localhost:5174", // Local development
       "http://localhost:5175", // Local development
