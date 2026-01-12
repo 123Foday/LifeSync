@@ -15,10 +15,13 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import Layout from "./components/Layout";
 import MedicalBotButton from "./components/MedicalBotButton";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
-    <Layout>
+    <>
+      <ScrollToTop />
+      <Layout>
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -41,6 +44,7 @@ const App = () => {
       {/* ✅ NEW: Floating Medical Bot Button - Accessible from all pages */}
       <MedicalBotButton />
     </Layout>
+    </>
   );
 };
 

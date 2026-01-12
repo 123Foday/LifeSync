@@ -109,10 +109,10 @@ const TopBar = () => {
       <nav className="sticky top-0 z-50 w-full glass-morphism border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 flex items-center justify-between transition-colors">
         <div className="flex items-center gap-8">
           <img 
-            onClick={() => navigate('/')} 
+            onClick={() => { navigate('/'); window.scrollTo(0, 0); }} 
             src={assets.logo} 
             alt="Logo" 
-            className="w-28 cursor-pointer"
+            className="w-28 cursor-pointer active:scale-95 transition-transform"
           />
           
           <ul className="hidden md:flex items-center gap-6">
@@ -120,6 +120,7 @@ const TopBar = () => {
               <li key={item.path}>
                 <NavLink
                   to={item.path}
+                  onClick={() => window.scrollTo(0, 0)}
                   className={({ isActive }) =>
                     `text-sm font-medium transition-colors ${
                       isActive 

@@ -39,6 +39,7 @@ const BottomBar = () => {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={() => window.scrollTo(0, 0)}
             className={({ isActive }) =>
               `flex flex-col items-center justify-center gap-1 w-full h-full transition-all duration-300 relative ${
                 isActive 

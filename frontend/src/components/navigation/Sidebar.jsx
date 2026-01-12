@@ -64,10 +64,10 @@ const Sidebar = () => {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-[#121212] border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 transition-all duration-300">
       <div className="p-6">
         <img 
-          onClick={() => navigate('/')} 
+          onClick={() => { navigate('/'); window.scrollTo(0, 0); }} 
           src={assets.logo} 
           alt="LifeSync Logo" 
-          className="w-32 cursor-pointer transition-all hover:scale-105"
+          className="w-32 cursor-pointer transition-all hover:scale-105 active:scale-95"
         />
       </div>
 
@@ -79,6 +79,7 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={() => window.scrollTo(0, 0)}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                 isActive 
@@ -101,6 +102,7 @@ const Sidebar = () => {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={() => window.scrollTo(0, 0)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive 
