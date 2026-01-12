@@ -28,7 +28,7 @@ const registerUser = async (req, res) => {
     }
 
     // validating a strong password (min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol)
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W\_]).{8,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({ 
         success: false, 
@@ -249,7 +249,7 @@ const resetPassword = async (req, res) => {
     }
 
     // Validate new password strength
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W\_]).{8,}$/;
     if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({ 
         success: false, 

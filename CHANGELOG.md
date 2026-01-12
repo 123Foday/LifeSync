@@ -1,7 +1,16 @@
 # Changelog
-
+ 
 All notable changes to this project will be documented in this file.
  
+## [2026-01-12] - Production Readiness & Infrastructure
+- **Backend Optimization**:
+    - **Production Readiness**: Upgraded `server.js` with `helmet` security headers, `compression` for performance, and `morgan` for detailed request logging.
+    - **Error Handling**: Implemented a Global Error Handler and 404 middleware to standardize API responses and prevent crashes.
+    - **Reliability**: Added **Graceful Shutdown** logic (SIGTERM) to handle clean environment transitions during deployment.
+    - **Load Balancing**: Configured **Trust Proxy** settings for accurate IP detection behind platforms like Railway/Vercel.
+    - **Email Verification**: Verified and tested the **Gmail SMTP** delivery system with production credentials.
+- **Monitoring**: Added a `/health` endpoint for automated system monitoring and uptime tracking.
+
 ## [2026-01-11] - Security Enhancements & SSO Expansion
 - **Security & Privacy**:
     - **Account Deletion**: Added a secure account deletion flow in "My Profile" with password/OTP confirmation.

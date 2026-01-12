@@ -4,9 +4,9 @@ dotenv.config();
 
 const testEmail = async () => {
     console.log('--- Email Service Test ---');
-    console.log('Sending test email to:', process.env.EMAIL_USER);
+    console.log('Sending test email to: adaudabangura@gmail.com');
     
-    const result = await sendOTPEmail(process.env.EMAIL_USER, '123456');
+    const result = await sendOTPEmail('adaudabangura@gmail.com', '123456');
     
     if (result.success) {
         console.log('✅ Success: Test email sent successfully!');
