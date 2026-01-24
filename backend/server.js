@@ -34,7 +34,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // CORS configuration
 const allowedOrigins = [
   "https://life-sync-tau.vercel.app",  // frontend
-  "https://amused-illumination-production.up.railway.app", // backend itself
+  "https://life-sync-admin.vercel.app", // admin
+  "https://lifesync-staging-b239.up.railway.app", // backend itself
   "http://localhost:5173", // local frontend
   "http://localhost:5174", // local admin
   "http://localhost:5175", // local mobile
