@@ -12,6 +12,7 @@ import userRouter from "./routes/userRoute.js";
 import hospitalRouter from "./routes/hospitalRoute.js";
 import medicalRouter from "./routes/medicalRoute.js";
 import notificationRouter from "./routes/notificationRoute.js";
+import emergencyRouter from "./routes/emergencyRoute.js";
 import { startAppointmentScheduler } from "./utils/appointmentScheduler.js";
 
 // app config
@@ -80,6 +81,7 @@ app.use("/api/user", userRouter);
 app.use("/api/hospital", hospitalRouter);
 app.use("/api/medical", medicalRouter);
 app.use("/api/notification", notificationRouter);
+app.use("/api/emergency", emergencyRouter);
 
 
 app.get("/", (req, res) => {

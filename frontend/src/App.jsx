@@ -14,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import VerifyEmail from "./pages/VerifyEmail";
+import Emergency from "./pages/Emergency";
 import Layout from "./components/Layout";
 import MedicalBotButton from "./components/MedicalBotButton";
 import ScrollToTop from "./components/ScrollToTop";
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-conditions" element={<TermsAndConditions />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/emergency" element={<Emergency />} />
       </Routes>
     </Layout>
     

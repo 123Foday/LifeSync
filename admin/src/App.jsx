@@ -11,6 +11,7 @@ import AddDoctor from './pages/Admin/AddDoctor.jsx';
 import AddHospital from './pages/Admin/AddHospital.jsx';
 import DoctorList from './pages/Admin/DoctorList.jsx';
 import HospitalList from './pages/Admin/HospitalList.jsx';
+import EmergencyCallCenter from './pages/Admin/EmergencyCallCenter.jsx';
 import { HospitalContext } from './context/HospitalContext.jsx';
 import { DoctorContext } from './context/DoctorContext.jsx';
 import HospitalDashboard from './pages/Hospital/HospitalDashboard.jsx';
@@ -18,6 +19,7 @@ import HospitalAppointments from './pages/Hospital/HospitalAppointment.jsx';
 import HospitalProfile from './pages/Hospital/HospitalProfile.jsx';
 import HospitalAddDoctor from './pages/Hospital/HospitalAddDoctor.jsx';
 import HospitalDoctorList from './pages/Hospital/HospitalDoctorList.jsx';
+import HospitalEmergencyCallCenter from './pages/Hospital/EmergencyCallCenter.jsx';
 import DoctorDashboard from './pages/Doctor/DoctorDashboard.jsx';
 import DoctorAppointments from './pages/Doctor/DoctorAppointments.jsx';
 import DoctorProfile from './pages/Doctor/DoctorProfile.jsx';
@@ -54,6 +56,7 @@ const App = () => {
             <Route path='/add-hospital' element={<AddHospital />} />
             <Route path='/doctor-list' element={<DoctorList />} />
             <Route path='/hospital-list' element={<HospitalList />} />
+            <Route path='/emergency-call-center' element={<EmergencyCallCenter />} />
 
             {/* Doctor Routes */}
             <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
@@ -66,6 +69,7 @@ const App = () => {
             <Route path='/hospital-add-doctor' element={<HospitalAddDoctor />} />
             <Route path='/hospital-doctor-list' element={<HospitalDoctorList />} />
             <Route path='/hospital-profile' element={<HospitalProfile />} />
+            <Route path='/hospital-emergency-call-center' element={<HospitalEmergencyCallCenter />} />
           </Routes>
         </main>
       </div>

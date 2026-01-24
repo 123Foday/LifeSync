@@ -32,6 +32,7 @@ const Navbar = () => {
     { label: 'Home', path: '/' },
     { label: 'Hospitals', path: '/hospitals' },
     { label: 'All Doctors', path: '/doctors' },
+    { label: 'Emergency', path: '/emergency' },
     { label: 'About Us', path: '/about' }
   ], [])
 
@@ -582,6 +583,9 @@ const Navbar = () => {
                 </NavLink>
                 <NavLink onClick={() => setShowMenu(false)} to="/doctors">
                   <p className="px-4 py-2 rounded inline-block">All Doctors</p>
+                </NavLink>
+                <NavLink onClick={() => setShowMenu(false)} to="/emergency">
+                  <p className="px-4 py-2 rounded inline-block text-red-600 dark:text-red-400 font-semibold">Emergency</p>
                 </NavLink>
                 <NavLink onClick={() => setShowMenu(false)} to="/about">
                   <p className="px-4 py-2 rounded inline-block">About Us</p>

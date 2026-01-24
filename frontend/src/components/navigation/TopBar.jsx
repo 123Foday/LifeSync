@@ -111,6 +111,7 @@ const TopBar = () => {
     { label: 'Home', path: '/' },
     { label: 'Hospitals', path: '/hospitals' },
     { label: 'Doctors', path: '/doctors' },
+    { label: 'Emergency', path: '/emergency' },
     { label: 'About', path: '/about' },
   ];
 
