@@ -30,7 +30,7 @@ const HospitalList = () => {
                   hospital.available ? 'bg-green-500' : 'bg-red-500'
                 }`}
               >
-                <img src={assets.tick_icon} alt="" className='w-4 h-4 invert'/>
+                <img src={assets.tick_icon} alt="" className='w-4 h-4'/>
               </div>
             </div>
 

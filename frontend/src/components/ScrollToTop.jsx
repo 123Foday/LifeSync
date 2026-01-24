@@ -1,56 +1,26 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
+/**
+ * ScrollToTop Component
+ * 
+ * This component scrolls the window to the top whenever the route changes.
+ * It ensures a clean UX by starting each page at the top rather than
+ * maintaining the scroll position from the previous page.
+ */
 const ScrollToTop = () => {
-    const { pathname } = useLocation();
+  const { pathname } = useLocation();
 
-    useEffect(() => {
-        // Smooth scroll to top when path changes
-        window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-        });
-    }, [pathname]);
+  useEffect(() => {
+    // Scroll to the top of the page on route change
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' // Use 'instant' for immediate scroll, 'smooth' for animated scroll
+    });
+  }, [pathname]);
 
-    useEffect(() => {
-        // If the user clicks an internal link that points to the current pathname,
-        // force a full reload so the page re-fetches data and gives a clean UX.
-        // Also, any element with `data-refresh="true"` or `data-reload="true"`
-        // will trigger a reload when clicked.
-        const onClick = (e) => {
-            let el = e.target;
-            while (el && el !== document.body) {
-                if (el.dataset && (el.dataset.refresh === 'true' || el.dataset.reload === 'true')) {
-                    // allow navigation to happen (if any) then reload shortly after
-                    setTimeout(() => window.location.reload(), 50);
-                    return;
-                }
-                if (el.tagName === 'A' && el.href) {
-                    try {
-                        const url = new URL(el.href);
-                        if (url.origin === window.location.origin) {
-                            if (url.pathname === window.location.pathname) {
-                                // clicking the active route — reload instead of letting
-                                // React keep the current state.
-                                e.preventDefault();
-                                window.location.reload();
-                            }
-                        }
-                    } catch (err) {
-                        // ignore malformed URLs
-                    }
-                    return;
-                }
-                el = el.parentElement;
-            }
-        };
-
-        document.addEventListener('click', onClick, true);
-        return () => document.removeEventListener('click', onClick, true);
-    }, []);
-
-    return null;
+  return null; // This component doesn't render anything
 };
 
 export default ScrollToTop;

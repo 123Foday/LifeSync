@@ -60,7 +60,7 @@ const Login = () => {
           email,
         });
         if (data.success) {
-          toast.success(data.message || "Registered. Please verify your email.")
+          toast.success(data.message || "Registered. Please check your email for verification link.")
           setState('Verify')
           setAgreedToTerms(false);
           setConfirmPassword("");
@@ -409,7 +409,7 @@ const Login = () => {
           </p>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
             {state === "Verify" 
-              ? `Enter the 6-digit code sent to ${email}` 
+              ? `A verification link has been sent to ${email}. Please check your inbox (and spam folder) and click the link to activate your account.` 
               : state === "Forgot Password"
               ? "Enter your email to receive a password reset link"
               : (state === "Login" 
@@ -450,21 +450,17 @@ const Login = () => {
           </div>
         )}
 
-        {/* OTP Input (Verification only) */}
+        {/* OTP Input Removed for link verification */}
         {state === "Verify" && (
-          <div className="w-full">
-            <p className="mb-1 font-medium">6-Digit Code</p>
-            <input
-              className="border dark:border-gray-800 dark:bg-zinc-900 dark:text-white rounded-lg w-full p-3.5 text-center text-3xl tracking-[0.5em] font-mono focus:ring-2 focus:ring-[#5f6FFF] outline-none transition-all"
-              type="text"
-              maxLength="6"
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-              value={otp}
-              required
-              disabled={isLoading}
-              placeholder="000000"
-              autoFocus
-            />
+          <div className="w-full py-6 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-[#5f6FFF] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+              Can't find the email? It might take a minute to arrive.
+            </p>
           </div>
         )}
 
@@ -575,14 +571,15 @@ const Login = () => {
 
         {/* Submit button */}
         <button
-          type="submit"
+          type={state === "Verify" ? "button" : "submit"}
+          onClick={state === "Verify" ? onResendOtp : undefined}
           className="bg-[#5f6FFF] text-white w-full py-3 rounded-lg text-base font-semibold hover:bg-[#4f5fef] hover:scale-[1.02] active:scale-95 transition-all disabled:bg-gray-400 dark:disabled:bg-gray-700 disabled:cursor-not-allowed mt-2 shadow-lg shadow-blue-100 dark:shadow-none"
-          disabled={isLoading}
+          disabled={isLoading || (state === "Verify" && resendTimer > 0)}
         >
           {isLoading
             ? "Processing..."
             : state === "Verify"
-            ? "Verify Account"
+            ? "Resend Verification Email"
             : state === "Forgot Password"
             ? "Send Reset Link"
             : state === "Sign Up"
@@ -608,18 +605,8 @@ const Login = () => {
         {state === "Verify" && (
           <div className="w-full flex flex-col gap-3 mt-2 text-center">
             <p className="text-gray-500">
-              Didn't receive the code?{" "}
-              {resendTimer > 0 ? (
-                <span className="text-zinc-400 font-medium">Resend in {resendTimer}s</span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={onResendOtp}
-                  className="text-[#5f6FFF] font-medium hover:underline"
-                  disabled={isLoading}
-                >
-                  Resend Code
-                </button>
+              {resendTimer > 0 && (
+                <span className="text-zinc-400 font-medium">Wait {resendTimer}s to resend again</span>
               )}
             </p>
             <button

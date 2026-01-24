@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import AppContextProvider from './context/AppContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { NotificationProvider } from './context/NotificationContext.jsx'
 
 import { PublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
@@ -35,7 +36,9 @@ msalInstance.initialize().then(() => {
           <MsalProvider instance={msalInstance}>
             <AppContextProvider>
               <ThemeProvider>
-                <App />
+                <NotificationProvider>
+                  <App />
+                </NotificationProvider>
               </ThemeProvider>
             </AppContextProvider>
           </MsalProvider>

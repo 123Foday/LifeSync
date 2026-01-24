@@ -38,6 +38,11 @@ const MyProfile = () => {
       formData.append('address', JSON.stringify(userData.address))
       formData.append('gender', userData.gender)
       formData.append('dob', userData.dob)
+      
+      // Append settings
+      if (userData.settings) {
+        formData.append('settings', JSON.stringify(userData.settings))
+      }
 
       image && formData.append('image', image)
 
@@ -196,6 +201,22 @@ const MyProfile = () => {
     }
   }
 
+  const getProfileImage = () => {
+    if (image) return URL.createObjectURL(image)
+    
+    // Check if it's the specific hardcoded default base64 or generic default
+    const isDefaultBase64 = userData.image && userData.image.startsWith("data:image/png;base64,iVBORw0KGgoAAA")
+    
+    // Use custom image if it exists and isn't the default
+    if (userData.image && !isDefaultBase64) return userData.image
+    
+    // Gender-based fallback
+    if (userData.gender === 'Male') return assets.avatar_male
+    if (userData.gender === 'Female') return assets.avatar_female
+    
+    return assets.avatar_default
+  }
+
   return userData && (
     <>
     <div className='max-w-lg flex flex-col gap-4 text-sm transition-all duration-300'>
@@ -204,14 +225,14 @@ const MyProfile = () => {
           isEdit
           ? <label htmlFor="image" className='group'>
             <div className='inline-block relative cursor-pointer'>
-              <img className='w-40 h-40 object-cover rounded-xl opacity-75 ring-4 ring-indigo-50 dark:ring-indigo-900/30' src={image ? URL.createObjectURL(image): userData.image} alt="" />
+              <img className='w-40 h-40 object-cover rounded-xl opacity-75 ring-4 ring-indigo-50 dark:ring-indigo-900/30' src={getProfileImage()} alt="" />
               <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-xl'>
                  <img className='w-10' src={assets.upload_icon} alt="" />
               </div>
             </div>
             <input onChange={(e)=>setImage(e.target.files[0])} type="file"  id="image" hidden />
-          </label>
-          : <img className='w-40 h-40 object-cover rounded-xl shadow-lg ring-4 ring-white dark:ring-zinc-900' src={userData.image} alt="" />
+          </label> // Line 213 replacement
+          : <img className='w-40 h-40 object-cover rounded-xl shadow-lg ring-4 ring-white dark:ring-zinc-900' src={getProfileImage()} alt="" />
         }
         
         <div className='flex-1'>
@@ -272,6 +293,7 @@ const MyProfile = () => {
           {
             isEdit
             ? <select className='max-w-32 bg-gray-50 dark:bg-zinc-900 dark:text-white p-2 rounded border dark:border-gray-700' onChange={(e) => setUserData(prev => ({...prev, gender: e.target.value}))} value={userData.gender}>
+              <option value="Not Selected">Select</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
@@ -292,11 +314,80 @@ const MyProfile = () => {
         </div>
       </div>
 
+      <div className='bg-white dark:bg-[#121212] p-6 rounded-2xl border dark:border-gray-800 shadow-sm'>
+        <p className='text-neutral-500 dark:text-gray-400 font-bold uppercase tracking-widest text-xs mb-4'>APP SETTINGS & PREFERENCES</p>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-neutral-700 dark:text-neutral-300'>
+          
+          {/* Notifications */}
+          <div className='flex flex-col gap-3'>
+            <p className='font-semibold text-sm text-gray-900 dark:text-white border-b dark:border-gray-800 pb-2'>Notifications</p>
+            <div className='flex items-center justify-between'>
+              <span className='text-sm text-gray-600 dark:text-gray-400'>Email Notifications</span>
+              <input 
+                type="checkbox" 
+                disabled={!isEdit}
+                checked={userData.settings?.notifications?.email ?? true}
+                onChange={(e) => setUserData(prev => ({ ...prev, settings: { ...prev.settings, notifications: { ...(prev.settings?.notifications || {}), email: e.target.checked } } }))}
+                className={`w-4 h-4 ${!isEdit ? 'opacity-60' : 'cursor-pointer'}`}
+              />
+            </div>
+            <div className='flex items-center justify-between'>
+              <span className='text-sm text-gray-600 dark:text-gray-400'>SMS Notifications</span>
+              <input 
+                type="checkbox" 
+                disabled={!isEdit}
+                checked={userData.settings?.notifications?.sms ?? true}
+                onChange={(e) => setUserData(prev => ({ ...prev, settings: { ...prev.settings, notifications: { ...(prev.settings?.notifications || {}), sms: e.target.checked } } }))}
+                className={`w-4 h-4 ${!isEdit ? 'opacity-60' : 'cursor-pointer'}`}
+              />
+            </div>
+          </div>
+
+          {/* Appearance */}
+          <div className='flex flex-col gap-3'>
+            <p className='font-semibold text-sm text-gray-900 dark:text-white border-b dark:border-gray-800 pb-2'>Appearance</p>
+            <div className='flex items-center justify-between'>
+              <span className='text-sm text-gray-600 dark:text-gray-400'>Theme</span>
+              {isEdit ? (
+                <select 
+                  value={userData.settings?.theme ?? 'light'}
+                  onChange={(e) => setUserData(prev => ({ ...prev, settings: { ...prev.settings, theme: e.target.value } }))}
+                  className='bg-gray-50 dark:bg-zinc-900 dark:text-white text-xs p-1.5 rounded border dark:border-gray-700 outline-none'
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="system">System</option>
+                </select>
+              ) : (
+                <span className='text-xs font-medium bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded capitalize'>{userData.settings?.theme || 'Light'}</span>
+              )}
+            </div>
+            <div className='flex items-center justify-between'>
+              <span className='text-sm text-gray-600 dark:text-gray-400'>Font Size</span>
+              {isEdit ? (
+                <select 
+                  value={userData.settings?.font?.size ?? 'medium'}
+                  onChange={(e) => setUserData(prev => ({ ...prev, settings: { ...prev.settings, font: { ...(prev.settings?.font || {}), size: e.target.value } } }))}
+                  className='bg-gray-50 dark:bg-zinc-900 dark:text-white text-xs p-1.5 rounded border dark:border-gray-700 outline-none'
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              ) : (
+                <span className='text-xs font-medium bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded capitalize'>{userData.settings?.font?.size || 'Medium'}</span>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <div className='mt-8 mb-10 flex gap-4'>
         {
           isEdit
           ? <button className='flex-1 bg-[#5f6FFF] text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-blue-100 dark:shadow-none hover:scale-105 transition-all' onClick={updateUserProfileData}>
-              Save Profile
+              Save Profile & Settings
             </button>
           : <button className='flex-1 border-2 border-[#5f6FFF] text-[#5f6FFF] dark:text-[#5f6FFF] px-8 py-3 rounded-xl font-semibold hover:bg-[#5f6FFF] hover:text-white transition-all' onClick={()=>setIsEdit(true)}>
               Edit Profile

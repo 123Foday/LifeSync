@@ -135,6 +135,25 @@ const HospitalContextProvider = ({ children }) => {
     }
   }, [backendUrl, hToken]);
 
+  const assignDoctor = useCallback(async (appointmentId, doctorId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/hospital/assign-doctor",
+        { appointmentId, doctorId },
+        { headers: { Authorization: `Bearer ${hToken}` } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  }, [backendUrl, hToken, getAppointments]);
+
   const value = {
     hToken,
     setHToken,
@@ -153,6 +172,7 @@ const HospitalContextProvider = ({ children }) => {
     doctors,
     setDoctors,
     getDoctors,
+    assignDoctor,
   };
 
   // Listen for appointment updates from other parts of the app (and other tabs)

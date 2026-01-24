@@ -113,7 +113,7 @@ const AllAppointments = () => {
               ) : (
                 <img
                   onClick={() => cancelAppointment(item._id)}
-                  className="w-8 cursor-pointer hover:scale-110 transition-transform dark:brightness-200 grayscale hover:grayscale-0"
+                  className="w-8 cursor-pointer hover:scale-110 transition-transform grayscale hover:grayscale-0"
                   src={assets.cancel_icon}
                   alt="Cancel"
                 />
@@ -126,7 +126,7 @@ const AllAppointments = () => {
         {/* Empty State */}
         {appointments.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
-             <img className="w-20 opacity-20 mb-4 dark:brightness-200" src={assets.appointment_icon} alt="" />
+             <img className="w-20 opacity-20 mb-4" src={assets.appointment_icon} alt="" />
             <p className="text-lg">No appointments found</p>
           </div>
         )}

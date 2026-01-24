@@ -12,6 +12,7 @@ import {
   addDoctorToHospital,
   removeDoctorFromHospital,
   hospitalAddDoctor,
+  assignDoctorToAppointment,
 } from "../controllers/hospitalController.js";
 import authHospital from "../middlewares/authHospital.js";
 import upload from "../middlewares/multer.js";
@@ -37,5 +38,6 @@ hospitalRouter.post("/remove-doctor", authHospital, removeDoctorFromHospital);
 hospitalRouter.get("/doctors", authHospital, getHospitalDoctors);
 // allow hospital to create a new doctor via multipart/form-data
 hospitalRouter.post("/create-doctor", authHospital, upload.single('image'), hospitalAddDoctor);
+hospitalRouter.post("/assign-doctor", authHospital, assignDoctorToAppointment);
 
 export default hospitalRouter;

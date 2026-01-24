@@ -11,6 +11,8 @@ import doctorRouter from "./routes/doctorRoute.js";
 import userRouter from "./routes/userRoute.js";
 import hospitalRouter from "./routes/hospitalRoute.js";
 import medicalRouter from "./routes/medicalRoute.js";
+import notificationRouter from "./routes/notificationRoute.js";
+import { startAppointmentScheduler } from "./utils/appointmentScheduler.js";
 
 // app config
 const app = express();
@@ -35,16 +37,31 @@ const allowedOrigins = [
   "http://localhost:5173", // local frontend
   "http://localhost:5174", // local admin
   "http://localhost:5175", // local mobile
+  "http://127.0.0.1:5173", // local frontend (IP)
+  "http://127.0.0.1:5174", // local admin (IP)
+  "http://127.0.0.1:5175", // local mobile (IP)
 ];
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
+      
+      // In development, allow all localhost and 127.0.0.1 origins
+      if (isDevelopment) {
+        const isLocalOrigin = origin.includes('localhost') || origin.includes('127.0.0.1');
+        if (isLocalOrigin) {
+          return callback(null, true);
+        }
+      }
+      
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.warn(`CORS blocked origin: ${origin}`);
         callback(new Error('Not allowed by CORS'));
       }
     },
@@ -62,6 +79,8 @@ app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
 app.use("/api/hospital", hospitalRouter);
 app.use("/api/medical", medicalRouter);
+app.use("/api/notification", notificationRouter);
+
 
 app.get("/", (req, res) => {
   res.send("LifeSync API - Production Ready");
@@ -85,6 +104,9 @@ app.use((err, req, res, next) => {
 
 const server = app.listen(port, () => {
   console.log(`🚀 Server running on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
+  
+  // Start the appointment scheduler for auto-cancelling overdue pending appointments
+  startAppointmentScheduler();
 });
 
 // --- Graceful Shutdown ---

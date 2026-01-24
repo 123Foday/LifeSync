@@ -5,7 +5,9 @@ import { AdminContext } from '../context/AdminContext'
 import { DoctorContext } from '../context/DoctorContext'
 import { HospitalContext } from '../context/HospitalContext'
 import { useTheme } from '../context/ThemeContext'
-import { Sun, Moon, Search } from 'lucide-react'
+import { Sun, Moon, Search, Bell, X, Check } from 'lucide-react'
+import { NotificationContext } from '../context/NotificationContext'
+
 import Fuse from 'fuse.js'
 
 const Navbar = () => {
@@ -15,9 +17,11 @@ const Navbar = () => {
   const { hToken, setHToken } = useContext(HospitalContext)
   const { theme, toggleTheme } = useTheme()
   
+  const [showResults, setShowResults] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
-  const [showResults, setShowResults] = useState(false)
+  const { notifications, unreadCount, markAsRead, clearAll } = useContext(NotificationContext)
 
   const navigate = useNavigate()
 
@@ -75,10 +79,10 @@ const Navbar = () => {
   }
 
   return (
-    <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white dark:bg-[#121212] dark:border-zinc-800 sticky top-0 z-50 transition-colors duration-300'>
+    <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-background dark:bg-zinc-900 dark:border-zinc-800 sticky top-0 z-50 transition-colors duration-300'>
       <div className='flex items-center gap-2 text-xs'>
         <img className='w-36 sm:w-40 cursor-pointer transition-all' src={assets.admin_logo} alt="" />
-        <p className='border px-2.5 py-0.5 rounded-full border-gray-500 dark:text-gray-300 dark:border-gray-500'>{aToken ? 'Admin' : dToken ? 'Doctor' : 'Hospital'}</p>
+        <p className='border px-2.5 py-0.5 rounded-full border-gray-500 text-gray-500 dark:text-white dark:border-white'>{aToken ? 'Admin' : dToken ? 'Doctor' : 'Hospital'}</p>
       </div>
       
       {/* Search Bar - Desktop Only */}
@@ -128,6 +132,67 @@ const Navbar = () => {
         >
           {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
         </button>
+
+        {/* Notifications */}
+        <div className='relative'>
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="p-2 rounded-full bg-gray-100 dark:bg-zinc-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-all relative"
+            aria-label="Notifications"
+          >
+            <Bell size={20} />
+            {unreadCount > 0 && (
+              <span className='absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-900'>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {showNotifications && (
+            <div className='absolute top-full mt-2 right-0 w-80 bg-white dark:bg-zinc-900 shadow-2xl rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2 duration-200'>
+              <div className='px-4 py-3 border-b dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/50'>
+                <h3 className='font-bold text-sm dark:text-gray-100'>Activity Updates</h3>
+                {unreadCount > 0 && (
+                  <button onClick={clearAll} className='text-xs text-primary hover:underline font-medium'>Mark all read</button>
+                )}
+              </div>
+              <div className='max-h-96 overflow-y-auto'>
+                {notifications.length === 0 ? (
+                  <div className='p-8 text-center'>
+                    <Bell className='mx-auto text-gray-300 mb-2' size={32} />
+                    <p className='text-sm text-gray-500'>No new activities</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <div 
+                      key={n._id} 
+                      onClick={() => !n.read && markAsRead(n._id)}
+                      className={`px-4 py-3 border-b last:border-none dark:border-zinc-800 transition-colors cursor-pointer ${!n.read ? 'bg-primary/5 dark:bg-primary/10' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+                    >
+                      <div className='flex gap-3'>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          n.type.includes('cancelled') ? 'bg-red-100 text-red-600' : 
+                          n.type.includes('booked') ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                        }`}>
+                          {n.type.includes('cancelled') ? <X size={14} /> : <Check size={14} />}
+                        </div>
+                        <div className='flex-1'>
+                          <p className={`text-sm ${!n.read ? 'font-bold' : 'font-medium'} dark:text-gray-200`}>{n.title}</p>
+                          <p className='text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2'>{n.message}</p>
+                          <p className='text-[10px] text-gray-400 mt-1 uppercase font-semibold'>
+                            {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(n.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        {!n.read && <div className='w-2 h-2 bg-primary rounded-full self-center'></div>}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         <button onClick={logout} className='bg-primary text-white text-sm px-6 sm:px-10 py-2 rounded-full hover:opacity-90 transition-opacity'>Logout</button>
       </div>
     </div>

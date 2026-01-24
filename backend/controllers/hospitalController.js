@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
 import doctorModel from "../models/doctorModel.js";
 import { v2 as cloudinary } from 'cloudinary'
+import { createNotification } from "./notificationController.js";
+
 
 const changeHospitalAvailability = async (req, res) => {
   try {
@@ -100,6 +102,23 @@ const appointmentComplete = async (req, res) => {
 
     if (appointmentData && appointmentData.hospitalId === hospitalId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true, status: 'booked' });
+      
+      // Create notification for Admin
+      await createNotification(
+        'appointment_completed', 
+        'Appointment Booked', 
+        `Hospital has accepted the appointment for ${appointmentData.userData.name} on ${appointmentData.slotDate}`,
+        { hospitalId: hospitalId }
+      );
+
+      // Create notification for User
+      await createNotification(
+        'appointment_completed',
+        'Appointment Accepted',
+        `Hospital ${appointmentData.hospitalData.name} has accepted your appointment for ${appointmentData.slotDate}.`,
+        { userId: appointmentData.userId }
+      );
+
       return res.json({ success: true, message: "Appointment Booked" });
     } else {
       return res.json({ success: false, message: "Mark Failed" });
@@ -143,6 +162,22 @@ const appointmentCancel = async (req, res) => {
 
       await hospitalModel.findByIdAndUpdate(hospitalId, { slots_booked });
 
+      // Create notification for Admin
+      await createNotification(
+        'appointment_cancelled', 
+        'Appointment Cancelled', 
+        `Hospital has rejected the appointment for ${appointmentData.userData.name} on ${appointmentData.slotDate}`,
+        { hospitalId: hospitalId }
+      );
+
+      // Create notification for User
+      await createNotification(
+        'appointment_cancelled',
+        'Appointment Rejected',
+        `Hospital ${appointmentData.hospitalData.name} has rejected your appointment for ${appointmentData.slotDate}.`,
+        { userId: appointmentData.userId }
+      );
+
       return res.json({ success: true, message: "Appointment Cancelled" });
     } else {
       return res.json({ success: false, message: "Cancellation Failed" });
@@ -156,7 +191,6 @@ const appointmentCancel = async (req, res) => {
 // API to get dashboard data for hospital panel
 const hospitalDashboard = async (req, res) => {
   try {
-    // Support hospitalId from body or injected by authHospital middleware
     const hospitalId = req.body?.hospitalId || req.hospitalId;
 
     if (!hospitalId) {
@@ -168,23 +202,30 @@ const hospitalDashboard = async (req, res) => {
       providerType: "hospital",
     });
 
-    // Count booked appointments (no monetary earnings tracked anymore)
-    const bookedCount = appointments.filter((item) => item.status === 'booked').length;
+    const statusDistribution = [
+      { name: 'Completed', value: appointments.filter(a => a.isCompleted).length },
+      { name: 'Cancelled', value: appointments.filter(a => a.cancelled).length },
+      { name: 'Active', value: appointments.filter(a => !a.isCompleted && !a.cancelled).length }
+    ]
 
-    let patients = [];
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      return d.toISOString().split('T')[0]
+    }).reverse()
 
-    appointments.forEach((item) => {
-      if (!patients.includes(item.userId)) {
-        patients.push(item.userId);
-      }
-    });
+    const trends = last7Days.map(date => ({
+      day: date,
+      count: appointments.filter(a => new Date(a.date).toISOString().split('T')[0] === date).length
+    }))
 
-    // Also include number of booked appointments and total appointments
     const dashData = {
-      bookedCount,
+      bookedCount: appointments.filter(a => a.status === 'booked').length,
       appointments: appointments.length,
-      patients: patients.length,
-      latestAppointments: appointments.reverse().slice(0, 5),
+      patients: [...new Set(appointments.map(a => a.userId.toString()))].length,
+      latestAppointments: [...appointments].reverse().slice(0, 5),
+      statusDistribution,
+      trends
     };
 
     res.json({ success: true, dashData });
@@ -370,6 +411,74 @@ const hospitalAddDoctor = async (req, res) => {
   }
 };
 
+// API to assign a doctor to a hospital appointment
+const assignDoctorToAppointment = async (req, res) => {
+  try {
+    const hospitalId = req.body?.hospitalId || req.hospitalId;
+    const { appointmentId, doctorId } = req.body;
+
+    if (!hospitalId || !appointmentId || !doctorId) {
+      return res.json({ success: false, message: 'Missing Required Fields' });
+    }
+
+    const appointment = await appointmentModel.findById(appointmentId);
+    if (!appointment) {
+      return res.json({ success: false, message: 'Appointment not found' });
+    }
+
+    if (appointment.hospitalId !== hospitalId) {
+      return res.json({ success: false, message: 'Wait, this appointment does not belong to your hospital' });
+    }
+
+    const doctor = await doctorModel.findById(doctorId).select('-password');
+    if (!doctor) {
+      return res.json({ success: false, message: 'Doctor not found' });
+    }
+
+    if (doctor.hospitalId !== hospitalId) {
+      return res.json({ success: false, message: 'Doctor is not affiliated with this hospital' });
+    }
+
+    // Update appointment with doctor data
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      docId: doctorId,
+      docData: {
+        name: doctor.name,
+        email: doctor.email,
+        image: doctor.image,
+        speciality: doctor.speciality,
+        degree: doctor.degree,
+        experience: doctor.experience,
+        about: doctor.about,
+        address: doctor.address
+      },
+      status: 'pending' // Still pending until doctor/hospital completes it
+    });
+
+    // Create notification for Doctor
+    await createNotification(
+      'appointment_assigned',
+      'New Task Assigned',
+      `You have been assigned a new appointment for patient ${appointment.userData.name} on ${appointment.slotDate}`,
+      { doctorId }
+    );
+
+    // Create notification for User
+    await createNotification(
+      'appointment_updated',
+      'Doctor Assigned',
+      `Your appointment at ${appointment.hospitalData.name} has been assigned to Dr. ${doctor.name}.`,
+      { userId: appointment.userId }
+    );
+
+    res.json({ success: true, message: `Appointment assigned to Dr. ${doctor.name}` });
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   hospitalList,
   loginHospital,
@@ -384,4 +493,5 @@ export {
   addDoctorToHospital,
   removeDoctorFromHospital,
   hospitalAddDoctor,
+  assignDoctorToAppointment,
 };

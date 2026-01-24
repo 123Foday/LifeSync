@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import doctorModel from '../models/doctorModel.js'
 import appointmentModel from '../models/appointmentModel.js'
+import { createNotification } from './notificationController.js';
+
 
 const changeAvailability = async (req, res) => {
   try {
@@ -89,6 +91,23 @@ const appointmentComplete = async (req, res) => {
 
       // When doctor accepts/completes the appointment, mark it as booked
       await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true, status: 'booked' })
+      
+      // Create notification for Admin
+      await createNotification(
+        'appointment_completed', 
+        'Appointment Booked', 
+        `Doctor has accepted the appointment for ${appointmentData.userData.name} on ${appointmentData.slotDate}`,
+        { doctorId: docId }
+      );
+
+      // Create notification for User
+      await createNotification(
+        'appointment_completed',
+        'Appointment Accepted',
+        `Doctor ${appointmentData.docData.name} has accepted your appointment for ${appointmentData.slotDate}.`,
+        { userId: appointmentData.userId }
+      );
+
       return res.json({ success: true, message: "Appointment Booked" })
 
     } else {
@@ -115,6 +134,23 @@ const appointmentCancel = async (req, res) => {
     if (appointmentData && appointmentData.docId === docId) {
 
       await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true, cancelledBy: 'doctor', status: 'rejected' })
+      
+      // Create notification for Admin
+      await createNotification(
+        'appointment_cancelled', 
+        'Appointment Cancelled', 
+        `Doctor has rejected the appointment for ${appointmentData.userData.name} on ${appointmentData.slotDate}`,
+        { doctorId: docId }
+      );
+
+      // Create notification for User
+      await createNotification(
+        'appointment_cancelled',
+        'Appointment Rejected',
+        `Doctor ${appointmentData.docData.name} has rejected your appointment for ${appointmentData.slotDate}.`,
+        { userId: appointmentData.userId }
+      );
+
       return res.json({ success: true, message: "Appointment Cancelled" })
 
     } else {
@@ -129,29 +165,36 @@ const appointmentCancel = async (req, res) => {
 
 // API to get dashboard data for doctor panel
 const doctorDashboard = async (req, res) => {
-
   try {
-
     const docId = req.docId
-
     const appointments = await appointmentModel.find({ docId })
 
-    // Count booked appointments (payments/earnings are not tracked in this version)
-    const bookedCount = appointments.filter((item) => item.status === 'booked').length
+    // Grouping appointments by status
+    const statusDistribution = [
+      { name: 'Completed', value: appointments.filter(a => a.isCompleted).length },
+      { name: 'Cancelled', value: appointments.filter(a => a.cancelled).length },
+      { name: 'Active', value: appointments.filter(a => !a.isCompleted && !a.cancelled).length }
+    ]
 
-    let patients = []
+    // Trends for last 7 days
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      return d.toISOString().split('T')[0]
+    }).reverse()
 
-    appointments.map((item) => {
-      if (!patients.includes(item.userId)) {
-        patients.push(item.userId)
-      }
-    })
+    const trends = last7Days.map(date => ({
+      day: date,
+      count: appointments.filter(a => new Date(a.date).toISOString().split('T')[0] === date).length
+    }))
 
     const dashData = {
-      bookedCount,
+      bookedCount: appointments.filter(a => a.status === 'booked').length,
       appointments: appointments.length,
-      patients: patients.length,
-      latestAppointments: appointments.reverse().slice(0, 5)
+      patients: [...new Set(appointments.map(a => a.userId.toString()))].length,
+      latestAppointments: [...appointments].reverse().slice(0, 5),
+      statusDistribution,
+      trends
     }
 
     res.json({ success: true, dashData })
@@ -160,7 +203,6 @@ const doctorDashboard = async (req, res) => {
     console.log(error)
     res.json({ success: false, message: error.message })
   }
-
 }
 
 // API to get doctor profile for Doctor Panel

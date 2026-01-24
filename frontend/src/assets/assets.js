@@ -42,6 +42,10 @@ import Neurologist from './Neurologist.svg'
 import Pediatricians from './Pediatricians.svg'
 
 
+import avatar_male from './avatar_male.svg'
+import avatar_female from './avatar_female.svg'
+import avatar_default from './avatar_default.svg'
+
 export const assets = {
     appointment_img,
     header_img,
@@ -57,7 +61,13 @@ export const assets = {
     menu_icon,
     cross_icon,
     dropdown_icon,
-    upload_icon
+    upload_icon,
+    doc1,
+    doc2,
+    doc3,
+    avatar_male,
+    avatar_female,
+    avatar_default
 }
 
 export const specialityData = [

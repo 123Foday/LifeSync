@@ -14,9 +14,9 @@ const Home = () => {
   const [selectedSpeciality, setSelectedSpeciality] = useState('')
 
   return (
-    <div className="pt-4 sm:pt-6 md:pt-9">
+    <div>
       <Header />
-      <div className="mt-6 sm:mt-8 md:mt-10"></div>
+      <div className="mt-4 sm:mt-6 md:mt-6"></div>
       {/* MedicalAdvisor */}
       <HealthAdvisorCard />
       {/*add margin */}

@@ -120,18 +120,18 @@ const AddHospital = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="p-6 bg-gray-50 dark:bg-[#121212] min-h-screen transition-all duration-300">
+      <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
         Add New Hospital
       </h1>
 
       <form
         onSubmit={onSubmitHandler}
-        className="bg-white rounded-xl shadow-sm p-6 max-w-4xl"
+        className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-6 max-w-4xl border border-gray-100 dark:border-zinc-800"
       >
         <div className="flex items-center gap-4 mb-8">
           <label htmlFor="doc-img" className="relative group cursor-pointer">
-            <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden border-2 border-blue-100 group-hover:border-blue-300 transition-all">
+            <div className="w-24 h-24 rounded-full bg-blue-50 dark:bg-zinc-950 flex items-center justify-center overflow-hidden border-2 border-blue-100 dark:border-zinc-800 group-hover:border-primary transition-all">
               <img
                 className="w-full h-full object-cover"
                 src={docImg ? URL.createObjectURL(docImg) : assets.upload_area}
@@ -150,23 +150,23 @@ const AddHospital = () => {
             accept="image/*"
           />
           <div>
-            <h2 className="text-lg font-medium text-gray-800">
+            <h2 className="text-lg font-medium text-gray-800 dark:text-gray-100">
               Hospital Image
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Upload hospital logo or building image
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-start gap-10 text-gray-600">
+        <div className="flex flex-col lg:flex-row items-start gap-10 text-gray-600 dark:text-gray-300">
           <div className="w-full lg:flex-1 flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-1">
               <p>Hospital name</p>
               <input
                 onChange={(e) => setName(e.target.value)}
                 value={name}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
                 type="text"
                 placeholder="Name"
                 required
@@ -178,7 +178,7 @@ const AddHospital = () => {
               <input
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
                 type="email"
                 placeholder="Email"
                 required
@@ -190,7 +190,7 @@ const AddHospital = () => {
               <input
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
                 type="password"
                 placeholder="Password"
                 required
@@ -202,7 +202,7 @@ const AddHospital = () => {
               <select
                 onChange={(e) => setExperience(e.target.value)}
                 value={experience}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
                 name=""
                 id=""
               >
@@ -239,7 +239,7 @@ const AddHospital = () => {
               <select
                 onChange={(e) => setSpeciality(e.target.value)}
                 value={speciality}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
                 name=""
                 id=""
               >
@@ -266,7 +266,7 @@ const AddHospital = () => {
               <select
                 onChange={(e) => setDegree(e.target.value)}
                 value={degree}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
               >
                 <option value="College of Medicine and Allied Health Sciences (COMAHS)">
                   College of Medicine and Allied Health Sciences (COMAHS)
@@ -300,7 +300,7 @@ const AddHospital = () => {
                 <input
                   onChange={(e) => setDegree(e.target.value)}
                   value={degree}
-                  className="border rounded px-3 py-2 mt-2"
+                  className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all mt-2"
                   type="text"
                   placeholder="Enter Accreditation / Affiliation"
                   required
@@ -313,14 +313,14 @@ const AddHospital = () => {
               <input
                 onChange={(e) => setAddress1(e.target.value)}
                 value={address1}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all"
                 type="text"
                 placeholder="address 1"
               />
               <input
                 onChange={(e) => setAddress2(e.target.value)}
                 value={address2}
-                className="border rounded px-3 py-2"
+                className="border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded px-3 py-2 outline-none focus:border-primary transition-all mt-2"
                 type="text"
                 placeholder="address 2"
               />
@@ -333,7 +333,7 @@ const AddHospital = () => {
           <textarea
             onChange={(e) => setAbout(e.target.value)}
             value={about}
-            className="w-full px-4 pt-2 border rounded"
+            className="w-full px-4 pt-2 border dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded outline-none focus:border-primary transition-all"
             placeholder="write about hospital..."
             rows={5}
             required
@@ -341,12 +341,13 @@ const AddHospital = () => {
         </div>
         <button
           type="submit"
-          className="bg-primary px-10 py-3 mt-4 text-white rounded-full"
+          className="bg-primary hover:bg-[#4a58e6] px-10 py-3 mt-8 text-white rounded-full transition-colors shadow-lg hover:shadow-primary/20"
         >
           Add Hospital
         </button>
       </form>
     </div>
+
   );
 };
 

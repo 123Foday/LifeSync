@@ -1,5 +1,5 @@
 import express from 'express'
-import { registerUser, verifyOTP, resendOTP, forgotPassword, resetPassword, requestEmailChange, verifyOldEmailAndSendNewOTP, finalizeEmailChange, googleLoginController, appleLoginController, microsoftLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment, deleteAccount, requestDeletionOTP } from '../controllers/userController.js'
+import { registerUser, verifyEmail, verifyOTP, resendOTP, forgotPassword, resetPassword, requestEmailChange, verifyOldEmailAndSendNewOTP, finalizeEmailChange, googleLoginController, appleLoginController, microsoftLoginController, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment, deleteAccount, requestDeletionOTP } from '../controllers/userController.js'
 import authUser from '../middlewares/authUser.js'
 import upload from '../middlewares/multer.js'
 import { authLimiter, otpLimiter, loginLimiter } from '../middlewares/rateLimiter.js'
@@ -12,6 +12,7 @@ userRouter.use(authLimiter)
 
 // Public Registration & Verification
 userRouter.post('/register', registerUser)
+userRouter.get('/verify-email', verifyEmail)
 userRouter.post('/verify-otp', otpLimiter, verifyOTP)
 userRouter.post('/resend-otp', otpLimiter, resendOTP)
 

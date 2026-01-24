@@ -13,6 +13,41 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+export const sendVerificationEmail = async (email, token) => {
+  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}&email=${email}`;
+  const mailOptions = {
+    from: `"LifeSync Security" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Complete Your Registration - LifeSync',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <h2 style="color: #333; text-align: center;">Verify Your Email</h2>
+        <p>Hello,</p>
+        <p>Thank you for registering with LifeSync. Click the button below to verify your email address and activate your account:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verificationLink}" style="background: #007bff; color: #fff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Email Address</a>
+        </div>
+        <p>If the button doesn't work, you can also click the link below or copy and paste it into your browser:</p>
+        <p style="word-break: break-all;"><a href="${verificationLink}">${verificationLink}</a></p>
+        <p>This link will expire in 24 hours.</p>
+        <p>If you did not create an account, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+        <p style="font-size: 12px; color: #777; text-align: center;">
+          LifeSync Inc. | 2026. All rights reserved.
+        </p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error('Verification email failed:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 export const sendOTPEmail = async (email, otp) => {
   const mailOptions = {
     from: `"LifeSync Security" <${process.env.EMAIL_USER}>`,

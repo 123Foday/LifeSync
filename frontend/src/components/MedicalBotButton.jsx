@@ -9,16 +9,13 @@ const MedicalBotButton = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
 
-  // Don't show the button on the medical advisor page itself or login page
-  if (
-    location.pathname === "/medical-advisor" ||
-    location.pathname === "/login"
-  ) {
-    return null;
-  }
+  // Determine if button should be hidden
+  const shouldHide = location.pathname === "/medical-advisor" || location.pathname === "/login";
 
   // Show welcome message on first visit
   useEffect(() => {
+    if (shouldHide) return; // Don't run effect if hidden
+    
     const hasSeenWelcome = localStorage.getItem("medicalBotWelcomeSeen");
     if (!hasSeenWelcome) {
       const timer = setTimeout(() => {
@@ -32,7 +29,7 @@ const MedicalBotButton = () => {
 
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [shouldHide]);
 
   const handleClick = () => {
     setShowWelcome(false);
@@ -48,6 +45,11 @@ const MedicalBotButton = () => {
     setShowWelcome(false);
     localStorage.setItem("medicalBotWelcomeSeen", "true");
   };
+
+  // Don't render anything on hidden pages (after all hooks have been called)
+  if (shouldHide) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50">

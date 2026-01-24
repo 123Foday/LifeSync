@@ -3,8 +3,10 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {assets} from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { useTheme } from '../context/ThemeContext'
+import { NotificationContext } from '../context/NotificationContext'
+import NotificationDropdown from './NotificationDropdown'
 import { toast } from 'react-toastify' 
-import { Search } from 'lucide-react' 
+import { Search, Bell, X, Check, BellRing } from 'lucide-react' 
 import Fuse from 'fuse.js'
 
 const Navbar = () => {
@@ -12,12 +14,15 @@ const Navbar = () => {
   const location = useLocation();
   const { token, setToken, userData, setUserData, hospitals = [], doctors = [] } = useContext(AppContext)
   const { theme, toggleTheme } = useTheme();
+  const { notifications, unreadCount, markAsRead, clearAll } = useContext(NotificationContext)
+  
   const [showMenu, setShowMenu] = useState(false);
   const [hasShadow, setHasShadow] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedTerm, setDebouncedTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [hoverIndex, setHoverIndex] = useState(null);
 
   // ... (rest of the code)
@@ -270,56 +275,97 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Search Bar */}
-        <div className="hidden md:flex items-center relative flex-1 max-w-xs lg:max-w-sm ml-4 mr-4">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-             <Search size={16} />
-          </div>
-          <input
-            type="text"
-            placeholder="Search hospitals, doctors..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setShowSearchResults(e.target.value.trim().length > 0);
-            }}
-            onFocus={() => setShowSearchResults(searchTerm.trim().length > 0)}
-            onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-            className="w-full pl-9 pr-3 py-1.5 md:py-2 border border-gray-300 dark:border-gray-800 bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5f6FFF] text-xs md:text-sm transition-all"
-          />
+        {/* Desktop Search & Notifications Group */}
+        <div className="hidden md:flex items-center gap-2 flex-1 max-w-xs lg:max-w-sm ml-4 mr-2 relative">
+          <div className="relative flex-1">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+               <Search size={16} />
+            </div>
+            <input
+              type="text"
+              placeholder="Search hospitals, doctors..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowSearchResults(e.target.value.trim().length > 0);
+              }}
+              onFocus={() => setShowSearchResults(searchTerm.trim().length > 0)}
+              onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+              className="w-full pl-9 pr-3 py-1.5 md:py-2 border border-gray-300 dark:border-gray-800 bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5f6FFF] text-xs md:text-sm transition-all"
+            />
 
-          {/* Search Results Dropdown */}
-          {showSearchResults && searchResults.length > 0 && (
-            <div className="absolute top-12 left-0 right-0 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-800 rounded-lg shadow-lg z-30 max-h-96 overflow-y-auto">
-              {searchResults.map((item, idx) => (
-                <div
-                  key={idx}
-                  onClick={() =>
-                    handleSearchSelect(
-                      item,
-                      item.type?.toLowerCase() || (item.availableSlots ? "doctor" : "hospital")
-                    )
-                  }
-                  className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex justify-between items-center group"
-                >
-                   <div>
-                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {item.speciality || item.address?.line1 || item.address}
-                    </p>
+            {/* Search Results Dropdown */}
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="absolute top-12 left-0 right-0 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-800 rounded-lg shadow-lg z-30 max-h-96 overflow-y-auto">
+                {searchResults.map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() =>
+                      handleSearchSelect(
+                        item,
+                        item.type?.toLowerCase() || (item.availableSlots ? "doctor" : "hospital")
+                      )
+                    }
+                    className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0 flex justify-between items-center group"
+                  >
+                     <div>
+                      <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {item.speciality || item.address?.line1 || item.address}
+                      </p>
+                    </div>
+                    <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full 
+                      ${item.type === 'Doctor' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 
+                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'}`}>
+                      {item.type}
+                    </span>
                   </div>
-                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full 
-                    ${item.type === 'Doctor' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 
-                      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'}`}>
-                    {item.type}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Notifications - Integrated near Search */}
+          {token && (
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={`p-2.5 rounded-xl transition-all relative flex items-center justify-center ${
+                  showNotifications 
+                  ? "bg-[#5f6FFF] text-white shadow-lg shadow-blue-500/20" 
+                  : "bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-800"
+                }`}
+                aria-label="Toggle notifications"
+              >
+                {unreadCount > 0 ? (
+                  <BellRing size={20} className={unreadCount > 0 ? "animate-wiggle" : ""} />
+                ) : (
+                  <Bell size={20} />
+                )}
+                
+                {unreadCount > 0 && (
+                  <>
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-white dark:border-zinc-900 text-[9px] text-white items-center justify-center font-black">
+                        {unreadCount > 9 ? "9" : unreadCount}
+                      </span>
+                    </span>
+                  </>
+                )}
+              </button>
+
+              <NotificationDropdown 
+                isOpen={showNotifications} 
+                onClose={() => setShowNotifications(false)} 
+              />
             </div>
           )}
         </div>
+
+
 
         {/* Theme Toggle Button */}
         <button
@@ -409,12 +455,45 @@ const Navbar = () => {
             </button>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Mobile Notifications - Strategically placed near search */}
+            {token && (
+              <div className="md:hidden relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className={`p-2 rounded-xl transition-all relative ${
+                    showNotifications 
+                    ? "bg-[#5f6FFF] text-white" 
+                    : "text-gray-700 dark:text-gray-300"
+                  }`}
+                  aria-label="Notifications"
+                >
+                  {unreadCount > 0 ? (
+                    <BellRing size={18} className={unreadCount > 0 ? "animate-wiggle" : ""} />
+                  ) : (
+                    <Bell size={18} />
+                  )}
+                  
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white dark:border-zinc-900 font-bold">
+                      {unreadCount > 9 ? "9" : unreadCount}
+                    </span>
+                  )}
+                </button>
+                
+                <NotificationDropdown 
+                  isOpen={showNotifications} 
+                  onClose={() => setShowNotifications(false)} 
+                />
+              </div>
+            )}
+
             <button
               aria-label="Open search"
               onClick={() => {
                 setShowSearchMobile(true);
                 setShowMenu(false);
+                setShowNotifications(false);
               }}
               className="md:hidden p-2 text-gray-700 dark:text-gray-300"
             >

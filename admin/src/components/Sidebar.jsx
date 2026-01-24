@@ -18,36 +18,36 @@ const Sidebar = () => {
     }`
 
   return (
-    <div className="h-full bg-white dark:bg-[#121212] border-r dark:border-zinc-800 transition-colors duration-300">
+    <div className="h-full bg-background dark:bg-zinc-900 border-r dark:border-zinc-800 transition-colors duration-300">
       {aToken && (
         <ul className="py-5">
           <NavLink className={activeStyle} to={"/admin-dashboard"}>
-            <img src={assets.home_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.home_icon} alt="" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/all-appointments"}>
-            <img src={assets.appointment_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.appointment_icon} alt="" />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/add-doctor"}>
-            <img src={assets.add_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.add_icon} alt="" />
             <p className="hidden md:block">Add Doctor</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/doctor-list"}>
-            <img src={assets.people_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.people_icon} alt="" />
             <p className="hidden md:block">Doctors List</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/add-hospital"}>
-            <img src={assets.add_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.add_icon} alt="" />
             <p className="hidden md:block">Add Hospital</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/hospital-list"}>
-            <img src={assets.people_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.people_icon} alt="" />
             <p className="hidden md:block">Hospitals List</p>
           </NavLink>
         </ul>
@@ -56,17 +56,17 @@ const Sidebar = () => {
       {dToken && (
         <ul className="mt-5">
           <NavLink className={activeStyle} to={"/doctor-dashboard"}>
-            <img src={assets.home_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.home_icon} alt="" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/doctor-appointments"}>
-            <img src={assets.appointment_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.appointment_icon} alt="" />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/doctor-profile"}>
-            <img src={assets.people_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.people_icon} alt="" />
             <p className="hidden md:block">Profile</p>
           </NavLink>
         </ul>
@@ -75,27 +75,27 @@ const Sidebar = () => {
       {hToken && (
         <ul className="mt-5">
           <NavLink className={activeStyle} to={"/hospital-dashboard"}>
-            <img src={assets.home_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.home_icon} alt="" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/hospital-appointments"}>
-            <img src={assets.appointment_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.appointment_icon} alt="" />
             <p className="hidden md:block">Appointments</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/hospital-add-doctor"}>
-            <img src={assets.add_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.add_icon} alt="" />
             <p className="hidden md:block">Add Doctor</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/hospital-doctor-list"}>
-            <img src={assets.people_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.people_icon} alt="" />
             <p className="hidden md:block">Doctors List</p>
           </NavLink>
 
           <NavLink className={activeStyle} to={"/hospital-profile"}>
-            <img src={assets.people_icon} alt="" />
+            <img className='brand-icon w-5' src={assets.people_icon} alt="" />
             <p className="hidden md:block">Profile</p>
           </NavLink>
         </ul>

@@ -14,7 +14,7 @@ const Icons = {
 
 const TopDoctors = ({ speciality = '' }) => {
   const navigate = useNavigate();
-  const {doctors} = useContext(AppContext);
+  const { doctors, hospitals } = useContext(AppContext);
 
   const filteredDoctors = speciality 
     ? doctors.filter(doc => doc.speciality === speciality) 
@@ -62,7 +62,7 @@ const TopDoctors = ({ speciality = '' }) => {
             <div className="p-6 flex flex-col flex-1 gap-2">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-xl font-bold group-hover:text-[#5f6FFF] transition-colors">{item.name}</h3>
+                  <h3 className="text-xl font-bold group-hover:text-[#5f6FFF] transition-colors line-clamp-1">{item.name}</h3>
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.speciality}</p>
                 </div>
                 <div className="bg-blue-50 dark:bg-zinc-800 p-2 rounded-xl text-[#5f6FFF]">
@@ -71,15 +71,22 @@ const TopDoctors = ({ speciality = '' }) => {
               </div>
               
               <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className={`text-[10px] font-bold px-2 py-1 rounded transition-colors ${
-                  item.hospitalId 
-                    ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20" 
-                    : "text-orange-600 bg-orange-50 dark:bg-orange-900/20"
-                }`}>
-                  {item.hospitalId ? "INSTITUTIONAL" : "PRIVATE"}
-                </span>
+                <div className="flex flex-col gap-1">
+                  <span className={`text-[9px] font-black px-2 py-0.5 rounded transition-colors w-fit ${
+                    item.hospitalId 
+                      ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20" 
+                      : "text-orange-600 bg-orange-50 dark:bg-orange-900/20"
+                  }`}>
+                    {item.hospitalId ? "INSTITUTIONAL" : "PRIVATE"}
+                  </span>
+                  {item.hospitalId && (
+                    <p className="text-[10px] text-gray-400 font-medium truncate max-w-[100px]">
+                      {hospitals.find(h => h._id === item.hospitalId)?.name}
+                    </p>
+                  )}
+                </div>
                 <span className="text-xs text-gray-400 flex items-center gap-1 group-hover:text-[#5f6FFF] transition-colors">
-                  Book Now <Icons.ArrowRight size={12} />
+                  Book <Icons.ArrowRight size={12} />
                 </span>
               </div>
             </div>

@@ -71,7 +71,7 @@ const Hospitals = () => {
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6 ">
           {filterDoc.map((item, index) => (
             <div
-              onClick={() => navigate(`/appointment/${item._id}`)}
+              onClick={() => navigate(`/hospital/${item._id}`)}
               className="border border-blue-200 dark:border-gray-800 rounded-xl overflow-hidden cursor-pointer hover:-translate-y-1 transition-all duration-300 bg-white dark:bg-black shadow-sm"
               key={index}
             >

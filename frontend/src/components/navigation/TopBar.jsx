@@ -3,10 +3,18 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 import { AppContext } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
+import { NotificationContext } from '../../context/NotificationContext';
+import NotificationDropdown from '../NotificationDropdown';
 import Fuse from 'fuse.js';
-import { Search, X } from 'lucide-react';
+import { Search, X, Bell, BellRing } from 'lucide-react';
 
 const Icons = {
+  Bell: ({ size = 24, ...props }) => (
+    <Bell size={size} {...props} />
+  ),
+  BellRing: ({ size = 24, ...props }) => (
+    <BellRing size={size} {...props} />
+  ),
   Home: ({ size = 24, ...props }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
   ),
@@ -42,9 +50,11 @@ const Icons = {
 const TopBar = () => {
   const navigate = useNavigate();
   const { token, setToken, userData, setUserData, hospitals = [], doctors = [] } = useContext(AppContext);
+  const { notifications, unreadCount, markAsRead, clearAll } = useContext(NotificationContext);
   const { theme, toggleTheme } = useTheme();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   
   // Search Logic
   const [searchTerm, setSearchTerm] = useState('');
@@ -183,6 +193,41 @@ const TopBar = () => {
           >
             {theme === 'dark' ? <Icons.Sun size={20} className="text-yellow-400" /> : <Icons.Moon size={20} className="text-gray-600" />}
           </button>
+
+          {/* Desktop Notifications - Integrated near Search */}
+          {token && (
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={`p-2 rounded-full transition-all relative flex items-center justify-center ${
+                  showNotifications 
+                  ? "bg-[#5f6FFF] text-white" 
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                }`}
+                aria-label="Toggle notifications"
+              >
+                {unreadCount > 0 ? (
+                  <Icons.BellRing size={20} className={unreadCount > 0 ? "animate-wiggle" : ""} />
+                ) : (
+                  <Icons.Bell size={20} />
+                )}
+                
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 flex h-4 w-4">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-white dark:border-zinc-900 text-[8px] text-white items-center justify-center font-black">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  </span>
+                )}
+              </button>
+
+              <NotificationDropdown 
+                isOpen={showNotifications} 
+                onClose={() => setShowNotifications(false)} 
+              />
+            </div>
+          )}
 
           {token ? (
             <div className="relative">

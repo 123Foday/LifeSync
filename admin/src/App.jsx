@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import Login from './pages/Login.jsx';
 import { AdminContext } from './context/AdminContext.jsx';
@@ -21,15 +21,17 @@ import HospitalDoctorList from './pages/Hospital/HospitalDoctorList.jsx';
 import DoctorDashboard from './pages/Doctor/DoctorDashboard.jsx';
 import DoctorAppointments from './pages/Doctor/DoctorAppointments.jsx';
 import DoctorProfile from './pages/Doctor/DoctorProfile.jsx';
+import { useTheme } from './context/ThemeContext.jsx';
 
 const App = () => {
   const { aToken } = useContext(AdminContext)
   const { dToken } = useContext(DoctorContext)
   const { hToken } = useContext(HospitalContext)
+  const { theme } = useTheme()
 
   return aToken || dToken || hToken ? (
-    <div className='flex flex-col min-h-screen bg-[#F8F9FD] dark:bg-[#121212] transition-colors duration-300'>
-      <ToastContainer />
+    <div className={`flex flex-col min-h-screen bg-background transition-colors duration-300 ${theme}`}>
+      <ToastContainer theme={theme} />
       <div className='fixed top-0 left-0 right-0 z-50'>
         <Navbar />
       </div>
@@ -40,7 +42,12 @@ const App = () => {
         <main className='flex-1 ml-[72px] md:ml-[288px] overflow-y-auto'>
           <Routes>
             {/* Admin Routes */}
-            <Route path='/' element={<></>} />
+            <Route path='/' element={
+              aToken ? <Navigate to='/admin-dashboard' /> : 
+              dToken ? <Navigate to='/doctor-dashboard' /> : 
+              hToken ? <Navigate to='/hospital-dashboard' /> : 
+              <Login />
+            } />
             <Route path='/admin-dashboard' element={<Dashboard />} />
             <Route path='/all-appointments' element={<AllAppointments />} />
             <Route path='/add-doctor' element={<AddDoctor />} />
@@ -66,7 +73,7 @@ const App = () => {
   ) : (
     <>
       <Login />
-      <ToastContainer />
+      <ToastContainer theme={theme} />
     </>
   )
 }

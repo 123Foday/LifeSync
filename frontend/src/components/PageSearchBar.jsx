@@ -1,17 +1,21 @@
 import React, { useContext, useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
+import { NotificationContext } from '../context/NotificationContext'
+import NotificationDropdown from './NotificationDropdown'
 import Fuse from 'fuse.js'
-import { Search } from 'lucide-react'
+import { Search, Bell, BellRing } from 'lucide-react'
 
 const PageSearchBar = () => {
   const navigate = useNavigate();
-  const { hospitals = [], doctors = [] } = useContext(AppContext)
+  const { token, userData, hospitals = [], doctors = [] } = useContext(AppContext)
+  const { notifications, unreadCount, markAsRead, clearAll } = useContext(NotificationContext)
   
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedTerm, setDebouncedTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Filter hospitals and doctors using Fuse.js
   const allData = useMemo(() => {
@@ -69,25 +73,62 @@ const PageSearchBar = () => {
   return (
     <div className="hidden xl:block sticky top-0 z-40 py-4 bg-white/80 dark:bg-black/80 backdrop-blur-md transition-colors duration-500 border-b border-gray-100 dark:border-gray-800">
       <div className="relative max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12">
-        <div className="relative max-w-2xl mx-auto">
-          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
-             <Search size={22} />
+        <div className="relative max-w-2xl mx-auto flex items-center gap-4">
+          <div className="relative flex-1">
+            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
+               <Search size={22} />
+            </div>
+            <input
+              type="text"
+              placeholder="Search for doctors, hospitals, specialities..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => setShowResults(searchTerm.trim().length > 0)}
+              onBlur={() => setTimeout(() => setShowResults(false), 200)}
+              className="w-full pl-14 pr-32 py-4 bg-gray-50 dark:bg-zinc-900/50 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm hover:shadow-md focus:shadow-lg focus:border-[#5f6FFF] dark:focus:border-[#5f6FFF] outline-none transition-all text-gray-700 dark:text-gray-200 text-base"
+            />
+            <button 
+              onClick={handleSearchClick}
+              className="absolute right-2 top-2 bottom-2 bg-[#5f6FFF] text-white px-6 rounded-full font-medium hover:bg-[#4b58e6] transition-colors shadow-md"
+            >
+              Search
+            </button>
           </div>
-          <input
-            type="text"
-            placeholder="Search for doctors, hospitals, specialities..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onFocus={() => setShowResults(searchTerm.trim().length > 0)}
-            onBlur={() => setTimeout(() => setShowResults(false), 200)}
-            className="w-full pl-14 pr-32 py-4 bg-gray-50 dark:bg-zinc-900/50 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm hover:shadow-md focus:shadow-lg focus:border-[#5f6FFF] dark:focus:border-[#5f6FFF] outline-none transition-all text-gray-700 dark:text-gray-200 text-base"
-          />
-          <button 
-            onClick={handleSearchClick}
-            className="absolute right-2 top-2 bottom-2 bg-[#5f6FFF] text-white px-6 rounded-full font-medium hover:bg-[#4b58e6] transition-colors shadow-md"
-          >
-            Search
-          </button>
+
+          {/* Desktop Notifications - Strategically placed near search */}
+          {token && (
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={`p-3.5 rounded-full transition-all relative flex items-center justify-center ${
+                  showNotifications 
+                  ? "bg-[#5f6FFF] text-white shadow-lg shadow-blue-500/20" 
+                  : "bg-gray-50 dark:bg-zinc-900/50 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200 dark:border-gray-700"
+                }`}
+                aria-label="Toggle notifications"
+              >
+                {unreadCount > 0 ? (
+                  <BellRing size={22} className={unreadCount > 0 ? "animate-wiggle" : ""} />
+                ) : (
+                  <Bell size={22} />
+                )}
+                
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 border-2 border-white dark:border-zinc-900 text-[10px] text-white items-center justify-center font-black">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  </span>
+                )}
+              </button>
+
+              <NotificationDropdown 
+                isOpen={showNotifications} 
+                onClose={() => setShowNotifications(false)} 
+              />
+            </div>
+          )}
         </div>
 
         {/* Results Dropdown */}

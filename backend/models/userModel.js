@@ -79,6 +79,33 @@ const userSchema = new mongoose.Schema(
         return this.authProvider !== "local";
       },
     },
+    verificationToken: {
+      type: String,
+      sparse: true,
+    },
+    verificationTokenExpires: {
+      type: Date,
+      sparse: true,
+    },
+
+    // User Settings & Preferences
+    settings: {
+      notifications: {
+        email: { type: Boolean, default: true },
+        sms: { type: Boolean, default: true },
+        push: { type: Boolean, default: true },
+        promotional: { type: Boolean, default: false },
+      },
+      theme: {
+        type: String,
+        enum: ["light", "dark", "system"],
+        default: "light",
+      },
+      font: {
+        size: { type: String, enum: ["small", "medium", "large"], default: "medium" },
+        family: { type: String, default: "Inter" },
+      },
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt
@@ -87,6 +114,9 @@ const userSchema = new mongoose.Schema(
 
 // No need for explicit indexes - unique: true and sparse: true already create indexes
 // The 'unique' option automatically creates an index
+
+// Partial TTL Index: Automatically remove unverified accounts after 24 hours (86400 seconds)
+userSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400, partialFilterExpression: { is_verified: false } });
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);
 

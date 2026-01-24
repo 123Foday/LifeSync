@@ -7,6 +7,8 @@ import DoctorContextProvider from "./context/DoctorContext.jsx";
 import HospitalContextProvider from "./context/HospitalContext.jsx";
 import AppContextProvider from "./context/AppContext.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { NotificationProvider } from "./context/NotificationContext.jsx";
+
 
 
 createRoot(document.getElementById("root")).render(
@@ -16,8 +18,11 @@ createRoot(document.getElementById("root")).render(
         <DoctorContextProvider>
           <AppContextProvider>
             <ThemeProvider>
-              <App />
+              <NotificationProvider>
+                <App />
+              </NotificationProvider>
             </ThemeProvider>
+
           </AppContextProvider>
         </DoctorContextProvider>
       </HospitalContextProvider>

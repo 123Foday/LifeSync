@@ -7,8 +7,7 @@ import { AppContext } from '../context/AppContext'
 const Doctors = () => {
 
   const { speciality } = useParams();
-
-  const {doctors} = useContext(AppContext);
+  const { doctors, hospitals } = useContext(AppContext);
   const [filterDoc, setFilterDoc] = useState([]);
   const [showFilter, setShowFilter] = useState(false)
   const navigate = useNavigate();
@@ -64,9 +63,22 @@ const Doctors = () => {
               <p className='text-gray-900 dark:text-gray-100 text-lg font-medium'>{item.name}</p>
               <p className='text-gray-600 dark:text-gray-400 text-sm'>{item.speciality}</p>
               {item.hospitalId ? (
-                <p className='text-blue-600 dark:text-blue-400 text-xs font-semibold mt-1'>🏥 Institutional Doctor</p>
+                <div className="flex flex-col gap-1 mt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                      Institutional
+                    </span>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate">
+                      {hospitals.find(h => h._id === item.hospitalId)?.name || 'Hospital'}
+                    </p>
+                  </div>
+                </div>
               ) : (
-                <p className='text-orange-600 dark:text-orange-400 text-xs font-semibold mt-1'>👨‍⚕️ Private Doctor</p>
+                <div className="mt-2">
+                  <span className="text-[9px] bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                    Private Specialist
+                  </span>
+                </div>
               )}
             </div>
           </div>

@@ -8,9 +8,11 @@ import doctorModel from '../models/doctorModel.js'
 import hospitalModel from '../models/hospitalModel.js'
 import appointmentModel from '../models/appointmentModel.js'
 import otpModel from '../models/otpModel.js'
-import { sendOTPEmail, sendPasswordResetEmail, sendAccountDeletionEmail } from '../utils/emailService.js'
+import { sendOTPEmail, sendPasswordResetEmail, sendAccountDeletionEmail, sendVerificationEmail } from '../utils/emailService.js'
 import crypto from 'crypto'
 import { OAuth2Client } from "google-auth-library";
+import { createNotification } from './notificationController.js';
+
 
 
 // API to register user
@@ -46,41 +48,31 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = await bcrypt.hash(verificationToken, 10);
+
     const userData = {
       name,
       email,
       password: hashedPassword,
-      is_verified: false // Set to false, user needs OTP
+      is_verified: false,
+      verificationToken: tokenHash,
+      verificationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
     }
 
     const newUser = new userModel(userData)
     await newUser.save()
 
-    // Generate 6-digit OTP
-    const otp = crypto.randomInt(100000, 999999).toString();
-    const otp_hash = await bcrypt.hash(otp, salt); // Using same salt for simplicity, though bcrypt.hash(otp, 10) is also fine
-
-    // Store OTP in database
-    await otpModel.findOneAndUpdate(
-      { email, purpose: 'verification' },
-      { 
-        otp_hash, 
-        expires_at: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-        attempts: 0 
-      },
-      { upsert: true, new: true }
-    );
-
-    // Send OTP to user's email
-    const emailResult = await sendOTPEmail(email, otp);
+    // Send verification email
+    const emailResult = await sendVerificationEmail(email, verificationToken);
     if (!emailResult.success) {
-      // In production, you might want to log this or handle differently
-      console.warn('Registration: OTP email failed to send to', email);
+      console.warn('Registration: Verification email failed to send to', email);
     }
 
     res.status(201).json({ 
       success: true, 
-      message: "Registration successful. Please check your email for verification code."
+      message: "Registration successful. Please check your email for the verification link."
     })
 
   } catch (error) {
@@ -88,6 +80,51 @@ const registerUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" })
   }
 }
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { email, token } = req.query; // Usually links have them in query params
+
+    if (!email || !token) {
+      return res.status(400).json({ success: false, message: "Invalid verification link" });
+    }
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (user.is_verified) {
+      return res.status(400).json({ success: false, message: "Account is already verified" });
+    }
+
+    if (!user.verificationToken || user.verificationTokenExpires < new Date()) {
+      return res.status(400).json({ success: false, message: "Verification link has expired. Please request a new one." });
+    }
+
+    // Verify token
+    const isMatch = await bcrypt.compare(token, user.verificationToken);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid verification link" });
+    }
+
+    // Success: Verify user
+    user.is_verified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: "Email verified successfully! You can now login." 
+    });
+
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 // API to verify OTP for registration
 const verifyOTP = async (req, res) => {
@@ -165,7 +202,25 @@ const resendOTP = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Generate new 6-digit OTP
+    if (purpose === 'verification') {
+      // Generate new verification token
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = await bcrypt.hash(verificationToken, 10);
+
+      user.verificationToken = tokenHash;
+      user.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      await user.save();
+
+      // Send email
+      await sendVerificationEmail(email, verificationToken);
+      
+      return res.json({ 
+        success: true, 
+        message: "Verification link resent successfully" 
+      });
+    }
+
+    // Generate new 6-digit OTP (for other purposes like email change)
     const otp = crypto.randomInt(100000, 999999).toString();
     const salt = await bcrypt.genSalt(10);
     const otp_hash = await bcrypt.hash(otp, salt);
@@ -437,12 +492,12 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // Google SSO login/register controller
 const googleLoginController = async (req, res) => {
   try {
-    const { credential } = req.body
+    const { credential, accessToken } = req.body
 
-    if (!credential) {
+    if (!credential && !accessToken) {
       return res.status(400).json({
         success: false,
-        message: 'Google credential is required',
+        message: 'Google credential or access token is required',
       })
     }
 
@@ -525,7 +580,7 @@ const googleLoginController = async (req, res) => {
         // Link Google account to existing account
         existingUser.googleId = googleId
         existingUser.image = picture || existingUser.image
-        existingUser.isEmailVerified = true
+        existingUser.is_verified = true
         await existingUser.save()
 
         const token = jwt.sign(
@@ -557,7 +612,7 @@ const googleLoginController = async (req, res) => {
       googleId,
       image: picture || undefined, // Use default if no picture
       authProvider: 'google',
-      isEmailVerified: true,
+      is_verified: true,
     })
 
     await newUser.save()
@@ -642,7 +697,7 @@ const appleLoginController = async (req, res) => {
         if (!emailUser.appleId) {
           // Link Apple account to existing account
           emailUser.appleId = appleId
-          emailUser.isEmailVerified = true
+          emailUser.is_verified = true
           
           // Update name if provided by Apple and not already set
           if (user && user.name && !emailUser.name) {
@@ -691,7 +746,7 @@ const appleLoginController = async (req, res) => {
       email: email || `${appleId}@appleid.private`, // Apple may hide email
       appleId,
       authProvider: 'apple',
-      isEmailVerified: !!email, // Only verified if email is provided
+      is_verified: true, // SSO users are pre-verified
     })
 
     await newUser.save()
@@ -909,7 +964,7 @@ const updateProfile = async (req, res) => {
   try {
     // Get userId from middleware (authUser sets req.body.userId)
     const userId = req.body.userId;
-    const { name, phone, address, dob, gender } = req.body;
+    const { name, phone, address, dob, gender, settings } = req.body;
     const imageFile = req.file;
 
     console.log('Update profile request:', { userId, name, phone, hasImage: !!imageFile });
@@ -926,13 +981,19 @@ const updateProfile = async (req, res) => {
     }
 
     // Update basic user info
-    await userModel.findByIdAndUpdate(userId, {
+    const updateData = {
       name, 
       phone, 
       address: JSON.parse(address), 
       dob, 
-      gender 
-    });
+      gender
+    };
+
+    if (settings) {
+      updateData.settings = JSON.parse(settings);
+    }
+
+    await userModel.findByIdAndUpdate(userId, updateData);
 
     // Handle image upload if provided
     if (imageFile) {
@@ -1142,6 +1203,22 @@ const bookAppointment = async (req, res) => {
 
     console.log('Appointment booked successfully:', newAppointment._id);
 
+    // Create notification for Provider/Admin
+    await createNotification(
+      'appointment_booked', 
+      'New Appointment', 
+      `User ${userData.name} has booked an appointment for ${slotTime} on ${slotDate}`,
+      providerType === 'doctor' ? { doctorId: providerId } : { hospitalId: providerId }
+    );
+
+    // Create notification for User
+    await createNotification(
+      'appointment_booked', 
+      'Booking Confirmed', 
+      `Your appointment with ${providerData.name} on ${slotDate} at ${slotTime} has been booked.`,
+      { userId: userId }
+    );
+
     // Keep response backward-compatible with existing tests
     res.json({ success: true, message: 'Appointment booked' });
 
@@ -1218,6 +1295,22 @@ const cancelAppointment = async (req, res) => {
         await doctorModel.findByIdAndUpdate(docId, {slots_booked});
       }
     }
+
+    // Create notification for Provider/Admin
+    await createNotification(
+      'appointment_cancelled', 
+      'Appointment Cancelled', 
+      `User ${appointmentData.userData.name} has cancelled their appointment for ${appointmentData.slotTime} on ${appointmentData.slotDate}`,
+      providerType === 'hospital' ? { hospitalId: hospitalId } : { doctorId: docId }
+    );
+
+    // Create notification for User
+    await createNotification(
+      'appointment_cancelled', 
+      'Appointment Cancelled', 
+      `You have cancelled your appointment with ${providerType === 'doctor' ? appointmentData.docData.name : appointmentData.hospitalData.name} on ${appointmentData.slotDate}.`,
+      { userId: userId }
+    );
 
     res.json({success: true, message: "Appointment cancelled"});
 
@@ -1333,6 +1426,7 @@ const deleteAccount = async (req, res) => {
 
 export { 
   registerUser, 
+  verifyEmail,
   verifyOTP, 
   resendOTP, 
   forgotPassword, 

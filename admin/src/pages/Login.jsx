@@ -6,9 +6,11 @@ import { assets } from '../assets/assets'
 import { AdminContext } from '../context/AdminContext'
 import { DoctorContext } from '../context/DoctorContext'
 import { HospitalContext } from '../context/HospitalContext'
+import { useTheme } from '../context/ThemeContext'
 
 const Login = () => {
 
+  const { theme } = useTheme()
   const [state, setState] = useState('Admin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -58,9 +60,9 @@ const Login = () => {
   }
 
   return (
-    <form onSubmit={onSubmitHandler} className='min-h-screen flex items-center bg-gray-50 dark:bg-[#121212] transition-colors duration-300'>
+    <form onSubmit={onSubmitHandler} className={`min-h-screen flex items-center bg-background transition-colors duration-300 ${theme}`}>
       <div className='flex flex-col gap-4 w-full max-w-md mx-auto items-center p-8 sm:p-10 border dark:border-zinc-800 rounded-2xl text-[#5E5E5E] dark:text-gray-300 text-sm shadow-xl bg-white dark:bg-zinc-900'>
-        <img src={assets.logo} alt="LifeSync" className="h-10 mb-2" />
+        <img src={assets.admin_logo} alt="LifeSync" className="h-10 mb-2" />
         <p className='text-3xl font-bold mb-4'><span className='text-primary'>{state}</span> Login</p>
 
         <div className='w-full'>

@@ -36,7 +36,7 @@ const TopHospitals = ({ selectedCategory = '' }) => {
           <div
             key={index}
             onClick={() => {
-              navigate(`/appointment/${item._id}`);
+              navigate(`/hospital/${item._id}`);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="premium-card group cursor-pointer overflow-hidden flex flex-col h-full"
@@ -65,7 +65,7 @@ const TopHospitals = ({ selectedCategory = '' }) => {
               
               <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
                 <button className="w-full py-3 rounded-xl bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-white text-sm font-bold transition-all group-hover:bg-[#5f6FFF] group-hover:text-white">
-                  View Medical Staff
+                  Explore Institution
                 </button>
               </div>
             </div>

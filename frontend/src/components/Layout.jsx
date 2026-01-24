@@ -33,7 +33,7 @@ const Layout = ({ children }) => {
 
         <div 
           key={location.pathname}
-          className="max-w-[1600px] mx-auto p-4 md:p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-2 duration-500"
+          className="max-w-[1600px] mx-auto px-4 py-4 md:px-8 md:py-6 lg:px-12 lg:py-6 animate-in fade-in slide-in-from-bottom-2 duration-500"
         >
           {children}
         </div>

@@ -250,9 +250,33 @@ const MyAppointments = () => {
                   {/* Cancelled / Rejected Status */}
                   {item.cancelled && !item.isCompleted && (
                     item.status === 'rejected' ? (
-                      <button className="sm:min-w-48 py-2 border border-red-500 text-red-500 rounded font-medium">
-                        Appointment Rejected
-                      </button>
+                      <div className="flex flex-col gap-2">
+                        <button className="sm:min-w-48 py-2 border border-red-500 text-red-500 rounded font-medium">
+                          Appointment Rejected
+                        </button>
+                        <button
+                          onClick={() => navigate(item.providerType === 'hospital' 
+                            ? `/hospital/${item.hospitalId}` 
+                            : `/appointment/${item.docId}`)}
+                          className="sm:min-w-48 py-2 border border-[#5f6FFF] text-[#5f6FFF] rounded font-medium hover:bg-[#5f6FFF] hover:text-white transition-all"
+                        >
+                          Reschedule
+                        </button>
+                      </div>
+                    ) : item.cancelledBy === 'system' ? (
+                      <div className="flex flex-col gap-2">
+                        <button className="sm:min-w-48 py-2 border border-orange-500 text-orange-500 rounded font-medium bg-orange-50/50 dark:bg-orange-900/10">
+                          Expired (Auto-Cancelled)
+                        </button>
+                        <button
+                          onClick={() => navigate(item.providerType === 'hospital' 
+                            ? `/hospital/${item.hospitalId}` 
+                            : `/appointment/${item.docId}`)}
+                          className="sm:min-w-48 py-2 border border-[#5f6FFF] text-[#5f6FFF] rounded font-medium hover:bg-[#5f6FFF] hover:text-white transition-all"
+                        >
+                          📅 Reschedule Now
+                        </button>
+                      </div>
                     ) : (
                       <button className="sm:min-w-48 py-2 border border-red-500 text-red-500 rounded font-medium">
                         Appointment Cancelled
@@ -263,7 +287,7 @@ const MyAppointments = () => {
                   {/* Booked Status */}
                   {(item.status === 'booked' || item.isCompleted) && (
                     <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500 font-medium bg-green-50/50 dark:bg-green-900/10">
-                      Payment Confirmed
+                      Booking Confirmed
                     </button>
                   )}
                 </div>

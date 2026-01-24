@@ -21,14 +21,14 @@ const Header = () => {
       <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-400/20 rounded-full blur-[80px] pointer-events-none"></div>
 
       {/* -------left Side------- */ }
-      <div className='md:w-1/2 flex flex-col items-start justify-center gap-4 py-10 md:py-[6vw] z-10'>
+      <div className='md:w-1/2 flex flex-col items-start justify-center gap-4 py-8 md:py-[4vw] z-10'>
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-100 text-xs font-medium tracking-wide">
           <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
           Trusted by 10k+ users
         </div>
         
         <h1 className='text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-white font-bold leading-[1.1] tracking-tight'>
-          Premium <span className="text-blue-300">Healthcare</span> <br className='hidden lg:block' /> Within Your Reach
+          Premium <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Healthcare</span> <br className='hidden lg:block' /> Within Your Reach
         </h1>
         
         <p className='text-blue-100/80 text-sm sm:text-base md:text-lg max-w-md leading-relaxed'>
@@ -56,9 +56,9 @@ const Header = () => {
 
           <div className='flex items-center gap-4 mt-2 sm:mt-0'>
              <div className="flex -space-x-3 overflow-hidden">
-                <img className="inline-block h-10 w-10 rounded-full ring-4 ring-[#5f6FFF] dark:ring-[#1e1e2d]" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" alt="" />
-                <img className="inline-block h-10 w-10 rounded-full ring-4 ring-[#5f6FFF] dark:ring-[#1e1e2d]" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=100" alt="" />
-                <img className="inline-block h-10 w-10 rounded-full ring-4 ring-[#5f6FFF] dark:ring-[#1e1e2d]" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=100" alt="" />
+                <img className="inline-block h-10 w-10 rounded-full object-cover shadow-md z-30" src={assets.doc1} alt="" />
+                <img className="inline-block h-10 w-10 rounded-full object-cover shadow-md z-20" src={assets.doc2} alt="" />
+                <img className="inline-block h-10 w-10 rounded-full object-cover shadow-md z-10" src={assets.doc3} alt="" />
              </div>
              <p className="text-blue-100/60 text-xs font-medium">Join 500+ doctors today</p>
           </div>
@@ -67,7 +67,7 @@ const Header = () => {
 
       {/* -------Right Side------- */ }
       <div className='md:w-1/2 relative hidden md:block'>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#5f6FFF]/20 to-transparent pointer-events-none z-10"></div>
+
         <img 
           className='w-full h-auto object-contain object-bottom max-h-[110%] absolute bottom-0 -right-5 scale-105 drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]' 
           src={assets.header_img} 

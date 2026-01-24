@@ -59,11 +59,9 @@ const Banner = () => {
 
           <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
              <div className="flex -space-x-2">
-                {[1,2,3].map(i => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-black bg-gray-800 flex items-center justify-center text-[10px] text-white font-bold">
-                    {i === 3 ? "24/7" : "DR"}
-                  </div>
-                ))}
+                <img className="inline-block h-8 w-8 rounded-full object-cover shadow-sm z-30 bg-gray-100" src={assets.avatar_male} alt="" />
+                <img className="inline-block h-8 w-8 rounded-full object-cover shadow-sm z-20 bg-gray-100" src={assets.avatar_female} alt="" />
+                <img className="inline-block h-8 w-8 rounded-full object-cover shadow-sm z-10 bg-gray-100" src={assets.profile_pic} alt="" />
              </div>
              <p className="text-xs font-semibold text-gray-300">Available Support</p>
           </div>

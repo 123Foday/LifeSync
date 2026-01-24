@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import appointmentModel from '../models/appointmentModel.js'
 import userModel from '../models/userModel.js'
 import hospitalModel from '../models/hospitalModel.js'
+import { createNotification } from './notificationController.js';
 
 
 // API for adding doctor
@@ -237,6 +238,14 @@ const appointmentCancel = async (req, res) => {
       console.log('Warning while releasing hospital slot:', e.message)
     }
 
+    // Create notification
+    await createNotification(
+      'appointment_cancelled', 
+      'Appointment Cancelled', 
+      `Admin has cancelled the appointment for ${appointmentData.userData.name} on ${appointmentData.slotDate}`,
+      appointmentData.providerType === 'hospital' ? { hospitalId: appointmentData.hospitalId } : { doctorId: appointmentData.docId }
+    );
+
     res.json({ success: true, message: 'Appointment cancelled' })
   } catch (error) {
     console.log(error)
@@ -247,27 +256,45 @@ const appointmentCancel = async (req, res) => {
 
 // API to get dashboard data for admin panel
 const adminDashboard = async (req, res) => {
-  
   try {
-    
     const doctors = await doctorModel.find({})
     const users = await userModel.find({})
     const appointments = await appointmentModel.find({})
     const hospitals = await hospitalModel.find({})
+
+    // Calculate appointment trends for last 7 days
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      return d.toISOString().split('T')[0]
+    }).reverse()
+
+    const appointmentTrends = last7Days.map(date => {
+      const count = appointments.filter(app => {
+        const appDate = new Date(app.date).toISOString().split('T')[0]
+        return appDate === date
+      }).length
+      return { day: date, count }
+    })
 
     const dashData = {
       doctors: doctors.length,
       hospitals: hospitals.length,
       appointments: appointments.length,
       patients: users.length,
-      latestAppointments: appointments.reverse().slice(0, 5)
+      latestAppointments: [...appointments].reverse().slice(0, 5),
+      trends: appointmentTrends,
+      distribution: [
+        { name: 'Doctors', value: doctors.length },
+        { name: 'Hospitals', value: hospitals.length }
+      ]
     }
 
-    res.json({success: true, dashData})
+    res.json({ success: true, dashData })
 
   } catch (error) {
     console.log(error)
-    res.json({success: false, message: error.message})
+    res.json({ success: false, message: error.message })
   }
 }
 

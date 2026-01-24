@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 export const AppContext = createContext();
 
 const AppContextProvider = ({ children }) => {
-  const currencySymbol = "$";
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
   
   // Log backend URL for debugging (remove in production)
@@ -189,7 +189,7 @@ const AppContextProvider = ({ children }) => {
     getDoctorsData,
     hospitals,
     getHospitalsData,
-    currencySymbol,
+
     token,
     setToken,
     backendUrl,

@@ -13,6 +13,7 @@ import MedicalAdvisor from "./pages/MedicalAdvisor";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import VerifyEmail from "./pages/VerifyEmail";
 import Layout from "./components/Layout";
 import MedicalBotButton from "./components/MedicalBotButton";
 import ScrollToTop from "./components/ScrollToTop";
@@ -39,11 +40,12 @@ const App = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-conditions" element={<TermsAndConditions />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
       </Routes>
-
-      {/* ✅ NEW: Floating Medical Bot Button - Accessible from all pages */}
-      <MedicalBotButton />
     </Layout>
+    
+    {/* ✅ NEW: Floating Medical Bot Button - Accessible from all pages */}
+    <MedicalBotButton />
     </>
   );
 };
